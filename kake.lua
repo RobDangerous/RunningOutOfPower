@@ -4,6 +4,6 @@ project = Project.new("BlocksFromHeaven")
 project:addFile("Sources/**")
 project:setDebugDir("Deployment")
 
-project:addSubProject(Solution.createProject("../.."))
+project:addSubProject(Solution.createProject("Kore"))
 
 solution:addProject(project)
