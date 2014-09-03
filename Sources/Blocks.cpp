@@ -535,7 +535,7 @@ namespace {
 		}
 	}
 	
-	void mouseUp(MouseEvent event) {
+	void mouseUp(int button, int x, int y) {
 		switch (state) {
 			case TitleState:
 				startGame();
@@ -601,7 +601,7 @@ int kore(int argc, char** argv) {
 
 	Keyboard::the()->KeyDown = keyDown;
 	Keyboard::the()->KeyUp = keyUp;
-	Mouse::the()->ReleaseLeft = mouseUp;
+	Mouse::the()->Release = mouseUp;
 
 	Mixer::play(music);
 	
