@@ -5,7 +5,6 @@
 #include <Kore/Graphics/Graphics.h>
 #include <Kore/Graphics/Shader.h>
 #include <Kore/Input/Keyboard.h>
-#include <Kore/Input/KeyEvent.h>
 #include <Kore/Input/Mouse.h>
 #include <Kore/Audio/Audio.h>
 #include <Kore/Audio/Mixer.h>
@@ -491,13 +490,13 @@ namespace {
 		state = InGameState;
 	}
 
-	void keyDown(KeyEvent* event) {
+	void keyDown(KeyCode code, wchar_t character) {
 		switch (state) {
 		case TitleState:
 			startGame();
 			break;
 		case InGameState:
-			switch (event->keycode()) {
+			switch (code) {
 			case Kore::Key_Left:
 				left = true;
 				break;
@@ -515,10 +514,10 @@ namespace {
 		}
 	}
 
-	void keyUp(KeyEvent* event) {
+	void keyUp(KeyCode code, wchar_t character) {
 		switch (state) {
 		case InGameState:
-			switch (event->keycode()) {
+			switch (code) {
 			case Kore::Key_Left:
 				left = false;
 				break;
