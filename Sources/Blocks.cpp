@@ -454,8 +454,6 @@ namespace {
 			if (next != nullptr) next->draw();
 		}
 
-		Graphics::drawIndexedVertices();
-
 		Graphics::end();
 		Graphics::swapBuffers();
 	}
@@ -603,6 +601,8 @@ int kore(int argc, char** argv) {
 	Mouse::the()->Release = mouseUp;
 
 	Mixer::play(music);
+
+	startGame();
 	
 	lastDownTime = System::time();
 	app->start();
