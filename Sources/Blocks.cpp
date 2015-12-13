@@ -567,7 +567,7 @@ int kore(int argc, char** argv) {
 	program->setFragmentShader(fragmentShader);
 	program->link(structure);
 
-	texUnit = program->getTextureUnit("tex");
+	texUnit = program->getTextureUnit("texcoord");
 
 	titleImage = new Texture("Graphics/title.png");
 	boardImage = new Texture("Graphics/board.png");
