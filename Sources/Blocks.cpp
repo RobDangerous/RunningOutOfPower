@@ -63,8 +63,8 @@ namespace {
 			v[i++] = right; v[i++] = bottom; v[i++] = 0; v[i++] = tex->width / (float)tex->texWidth; v[i++] = 0;
 			vb->unlock();
 
-			vb->set();
-			tex->set(texUnit);
+			Graphics::setVertexBuffer(*vb);
+			Graphics::setTexture(texUnit, tex);
 			Graphics::drawIndexedVertices();
 		}
 	};
@@ -439,7 +439,7 @@ namespace {
 		Graphics::clear(Graphics::ClearColorFlag, 0);
 	
 		program->set();
-		indices->set();
+		Graphics::setIndexBuffer(*indices);
 
 		back.draw();
 
