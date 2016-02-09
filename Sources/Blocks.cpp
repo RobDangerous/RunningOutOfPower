@@ -542,7 +542,7 @@ namespace {
 }
 
 int kore(int argc, char** argv) {
-	Application* app = new Application(argc, argv, 1024, 768, false, "Blocks From Heaven");
+	Application* app = new Application(argc, argv, 1024, 768, 0, false, "Blocks From Heaven");
 	//Sound::init();
 	Mixer::init();
 	Audio::init();
