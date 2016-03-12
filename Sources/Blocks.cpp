@@ -1,6 +1,5 @@
 #include "pch.h"
 
-#include <Kore/Application.h>
 #include <Kore/IO/FileReader.h>
 #include <Kore/Graphics/Graphics.h>
 #include <Kore/Graphics/Shader.h>
@@ -25,15 +24,15 @@ namespace {
 	Texture* titleImage;
 	Texture* boardImage;
 	Texture* scoreImage;
-	
+
 	SoundStream* music;
-	
+
 	enum BlockColor {
 		Blue, Green, Orange, Purple, Red, Violet, Yellow
 	};
 
 	Texture** blockImages;
-	
+
 	TextureUnit texUnit;
 	VertexStructure structure;
 
@@ -87,7 +86,7 @@ namespace {
 		Texture* image;
 		vec2i pos;
 		vec2i lastpos;
-	
+
 		Block(int xx, int yy, Texture* image) : image(image) {
 			pos = vec2i(xx, yy);
 			lastpos = vec2i(xx, yy);
@@ -97,25 +96,25 @@ namespace {
 
 		void draw() {
 			//272x480
-			x = (16 + pos.x() * 16) * 2 / (float)Application::the()->width() - 272.0f / Application::the()->width();
-			y = (16 * 4 + pos.y() * 16) * 2 / (float)Application::the()->height() - 480.0f / Application::the()->height();
-			w = 16 * 2 / (float)Application::the()->width();
-			h = 16 * 2 / (float)Application::the()->height();
+			x = (16 + pos.x() * 16) * 2 / (float)System::windowWidth() - 272.0f / System::windowWidth();
+			y = (16 * 4 + pos.y() * 16) * 2 / (float)System::windowHeight() - 480.0f / System::windowHeight();
+			w = 16 * 2 / (float)System::windowWidth();
+			h = 16 * 2 / (float)System::windowHeight();
 			Sprite::draw();
 		}
 
 		int getX() {
 			return pos.x();
 		}
-	
+
 		int getY() {
 			return pos.y();
 		}
-	
+
 		vec2i getPos() {
 			return pos;
 		}
-	
+
 		bool right(int i = 1) {
 			if (pos.x() + i < xsize && pos.y() < ysize && blocked[pos.y() * xsize + pos.x() + i] != nullptr) {
 				return false;
@@ -124,7 +123,7 @@ namespace {
 			pos.x() += i;
 			return true;
 		}
-	
+
 		bool left(int i = 1) {
 			if (pos.x() - i < xsize && pos.y() < ysize && blocked[pos.y() * xsize + pos.x() - i] != nullptr) {
 				return false;
@@ -133,7 +132,7 @@ namespace {
 			pos.x() -= i;
 			return true;
 		}
-	
+
 		bool down(int i = 1) {
 			if (pos.x() < xsize && pos.y() - i < ysize && blocked[(pos.y() - i) * xsize + pos.x()] != nullptr) {
 				return false;
@@ -142,7 +141,7 @@ namespace {
 			pos.y() -= i;
 			return true;
 		}
-	
+
 		bool up(int i = 1) {
 			if (pos.x() < xsize && pos.y() + i < ysize && blocked[(pos.y() + i) * xsize + pos.x()] != nullptr) {
 				return false;
@@ -151,7 +150,7 @@ namespace {
 			pos.y() += i;
 			return true;
 		}
-	
+
 		bool rotate(vec2i center) {
 			vec2i newpos(center.x() - (pos.y() - center.y()), center.y() + (pos.x() - center.x()));
 			if (blocked[newpos.y() * xsize + newpos.x()] != nullptr) return false;
@@ -159,7 +158,7 @@ namespace {
 			pos = newpos;
 			return true;
 		}
-	
+
 		void back() {
 			pos = lastpos;
 		}
@@ -173,7 +172,7 @@ namespace {
 	public:
 		static BigBlock* next;
 		static BigBlock* current;
-	
+
 		vec2i center;
 		Block** blocks;
 
@@ -182,11 +181,11 @@ namespace {
 			blocks = new Block*[4];
 			for (int i = 0; i < 4; ++i) blocks[i] = nullptr;
 		}
-	
+
 		void draw() {
 			for (int i = 0; i < 4; ++i) blocks[i]->draw();
 		}
-	
+
 		void right() {
 			int i = 0;
 			while (i < 4) {
@@ -202,7 +201,7 @@ namespace {
 				--i;
 			}
 		}
-	
+
 		void left() {
 			int i = 0;
 			while (i < 4) {
@@ -235,11 +234,11 @@ namespace {
 			}
 			return false;
 		}
-	
+
 		Block* getBlock(int b) {
 			return blocks[b];
 		}
-	
+
 		virtual void rotate() {
 			Mixer::play(rotateSound);
 			int i = 0;
@@ -255,7 +254,7 @@ namespace {
 				--i;
 			}
 		}
-	
+
 		bool hop() {
 			for (int i = 0; i < 4; ++i) {
 				blocks[i]->up(8);
@@ -284,9 +283,9 @@ namespace {
 			blocks[0] = new Block(12, 18, image); blocks[1] = new Block(12, 17, image);
 			blocks[2] = new Block(13, 18, image); blocks[3] = new Block(13, 17, image);
 		}
-	
+
 		void rotate() override {
-		
+
 		}
 	};
 
@@ -354,7 +353,7 @@ namespace {
 		return isBlocked(1, y) && isBlocked(2, y) && isBlocked(3, y) && isBlocked(4, y) && isBlocked(5, y) &&
 			isBlocked(6, y) && isBlocked(7, y) && isBlocked(8, y) && isBlocked(9, y) && isBlocked(10, y);
 	}
-	
+
 	void check() {
 		bool lineDeleted = false;
 		for (int i = 0; i < 4; ++i) {
@@ -437,7 +436,7 @@ namespace {
 
 		Graphics::begin();
 		Graphics::clear(Graphics::ClearColorFlag, 0);
-	
+
 		program->set();
 		Graphics::setIndexBuffer(*indices);
 
@@ -479,7 +478,7 @@ namespace {
 		for (int y = 0; y < Block::ysize; ++y) blocked[y * Block::xsize + 0] = new Block(0, y, nullptr);
 		for (int y = 0; y < Block::ysize; ++y) blocked[y * Block::xsize + Block::xsize - 1] = new Block(Block::xsize - 1, y, nullptr);
 		for (int x = 0; x < Block::xsize; ++x) blocked[x] = new Block(x, 0, nullptr);
-		
+
 		current = createRandomBlock();
 		current->hop();
 		next = createRandomBlock();
@@ -531,8 +530,8 @@ namespace {
 			}
 		}
 	}
-	
-	void mouseUp(int button, int x, int y) {
+
+	void mouseUp(int windowId, int button, int x, int y) {
 		switch (state) {
 			case TitleState:
 				startGame();
@@ -542,12 +541,30 @@ namespace {
 }
 
 int kore(int argc, char** argv) {
-	Application* app = new Application(argc, argv, 1024, 768, 0, false, "Blocks From Heaven");
+    int w = 1024;
+    int h = 768;
+
+    Kore::System::setName("Blocks");
+	Kore::System::setup();
+	Kore::WindowOptions options;
+	options.title = "Blocks";
+	options.width = w;
+	options.height = h;
+	options.x = 100;
+	options.y = 100;
+	options.targetDisplay = 0;
+	options.mode = WindowMode::Window;
+	options.rendererOptions.depthBufferBits = 16;
+	options.rendererOptions.stencilBufferBits = 8;
+	options.rendererOptions.textureFormat = 0;
+	options.rendererOptions.antialiasing = 0;
+	Kore::System::initWindow(options);
+
 	//Sound::init();
 	Mixer::init();
 	Audio::init();
 
-	app->setCallback(update);
+	Kore::System::setCallback(update);
 
 	music = new SoundStream("Sound/blocks.ogg", true);
 	rotateSound = new Sound("Sound/rotate.wav");
@@ -556,7 +573,7 @@ int kore(int argc, char** argv) {
 
 	structure.add("pos", Float3VertexData);
 	structure.add("tex", Float2VertexData);
-	
+
 	FileReader vs("shader.vert");
 	FileReader fs("shader.frag");
 	vertexShader = new Shader(vs.readAll(), vs.size(), VertexShader);
@@ -584,12 +601,12 @@ int kore(int argc, char** argv) {
 	blockImages[Yellow] = new Texture("Graphics/block_yellow.png");
 
 	back.tex = titleImage;
-	back.x = -titleImage->width / (float)app->width();
-	back.y = -titleImage->height / (float)app->height();
-	back.w = 2.0f * titleImage->width / (float)app->width();
-	back.h = 2.0f * titleImage->height / (float)app->height();
+	back.x = -titleImage->width / (float)System::windowWidth();
+	back.y = -titleImage->height / (float)System::windowHeight();
+	back.w = 2.0f * titleImage->width / (float)System::windowWidth();
+	back.h = 2.0f * titleImage->height / (float)System::windowHeight();
 	back.init();
-	
+
 	indices = new IndexBuffer(6);
 	int* i = indices->lock();
 	i[0] = 0; i[1] = 1; i[2] = 2;
@@ -603,9 +620,9 @@ int kore(int argc, char** argv) {
 	Mixer::play(music);
 
 	startGame();
-	
+
 	lastDownTime = System::time();
-	app->start();
+	Kore::System::start();
 
 	return 0;
 }
