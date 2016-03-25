@@ -506,8 +506,12 @@ namespace {
 			case Kore::Key_Up:
 				button = true;
 				break;
+            default:
+				break;
 			}
 			break;
+        default:
+            break;
 		}
 	}
 
@@ -527,15 +531,21 @@ namespace {
 			case Kore::Key_Up:
 				button = false;
 				break;
+            default:
+                break;
 			}
+        default:
+            break;
 		}
 	}
 
 	void mouseUp(int windowId, int button, int x, int y) {
 		switch (state) {
-			case TitleState:
-				startGame();
-				break;
+		case TitleState:
+			startGame();
+			break;
+        default:
+            break;
 		}
 	}
 }
@@ -563,6 +573,7 @@ int kore(int argc, char** argv) {
 	//Sound::init();
 	Mixer::init();
 	Audio::init();
+	Random::init(System::time() * 1000);
 
 	Kore::System::setCallback(update);
 
