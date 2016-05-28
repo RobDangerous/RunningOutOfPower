@@ -562,7 +562,7 @@ int kore(int argc, char** argv) {
 	options.height = h;
 	options.x = 100;
 	options.y = 100;
-	options.targetDisplay = 0;
+	options.targetDisplay = -1;
 	options.mode = WindowModeWindow;
 	options.rendererOptions.depthBufferBits = 16;
 	options.rendererOptions.stencilBufferBits = 8;
