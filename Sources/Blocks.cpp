@@ -551,26 +551,8 @@ namespace {
 }
 
 int kore(int argc, char** argv) {
-    int w = 1024;
-    int h = 768;
+	Kore::System::init("Blocks", 1024, 768);
 
-    Kore::System::setName("Blocks");
-	Kore::System::setup();
-	Kore::WindowOptions options;
-	options.title = "Blocks";
-	options.width = w;
-	options.height = h;
-	options.x = 100;
-	options.y = 100;
-	options.targetDisplay = -1;
-	options.mode = WindowModeWindow;
-	options.rendererOptions.depthBufferBits = 16;
-	options.rendererOptions.stencilBufferBits = 8;
-	options.rendererOptions.textureFormat = 0;
-	options.rendererOptions.antialiasing = 0;
-	Kore::System::initWindow(options);
-
-	//Sound::init();
 	Mixer::init();
 	Audio::init();
 	Random::init(System::time() * 1000);
