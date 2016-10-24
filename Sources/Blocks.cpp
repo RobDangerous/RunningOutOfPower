@@ -2,6 +2,7 @@
 
 #include <Kore/IO/FileReader.h>
 #include <Kore/Graphics/Graphics.h>
+#include <Kore/Graphics/Graphics2.h>
 #include <Kore/Graphics/Shader.h>
 #include <Kore/Input/Keyboard.h>
 #include <Kore/Input/Mouse.h>
@@ -16,11 +17,8 @@
 using namespace Kore;
 
 namespace {
-	Shader* vertexShader;
-	Shader* fragmentShader;
-	Program* program;
-	IndexBuffer* indices;
-
+    Graphics2* g2;
+    
 	Texture* titleImage;
 	Texture* boardImage;
 	Texture* scoreImage;
@@ -33,43 +31,6 @@ namespace {
 
 	Texture** blockImages;
 
-	TextureUnit texUnit;
-	VertexStructure structure;
-
-	class Sprite {
-	public:
-		float x, y, w, h;
-		Texture* tex;
-		VertexBuffer* vb;
-
-		Sprite() : tex(nullptr) { }
-
-		void init() {
-			vb = new VertexBuffer(4, structure);
-		}
-
-		//just for demonstration, this is really slow
-		void draw() {
-			float left = x;
-			float right = x + w;
-			float top = y;
-			float bottom = y + h;
-			float* v = vb->lock();
-			int i = 0;
-			v[i++] = left ; v[i++] = top   ; v[i++] = 0; v[i++] = 0;                                 v[i++] = tex->height / (float)tex->texHeight;
-			v[i++] = right; v[i++] = top   ; v[i++] = 0; v[i++] = tex->width / (float)tex->texWidth; v[i++] = tex->height / (float)tex->texHeight;
-			v[i++] = left ; v[i++] = bottom; v[i++] = 0; v[i++] = 0;                                 v[i++] = 0;
-			v[i++] = right; v[i++] = bottom; v[i++] = 0; v[i++] = tex->width / (float)tex->texWidth; v[i++] = 0;
-			vb->unlock();
-
-			Graphics::setVertexBuffer(*vb);
-			Graphics::setTexture(texUnit, tex);
-			Graphics::drawIndexedVertices();
-		}
-	};
-
-	Sprite back;
-
 	enum GameState {
 		TitleState, InGameState, GameOverState
 	};
@@ -78,7 +39,7 @@ namespace {
 	class Block;
 	Block** blocked;
 
-	class Block : public Sprite {
+	class Block {
 	public:
 		const static int xsize = 12;
 		const static int ysize = 23;
@@ -90,17 +51,11 @@ namespace {
 		Block(int xx, int yy, Texture* image) : image(image) {
 			pos = vec2i(xx, yy);
 			lastpos = vec2i(xx, yy);
-			Sprite::tex = image;
-			init();
 		}
 
-		void draw() {
+		void draw(Graphics2* g2) {
 			//272x480
-			x = (16 + pos.x() * 16) * 2 / (float)System::windowWidth() - 272.0f / System::windowWidth();
-			y = (16 * 4 + pos.y() * 16) * 2 / (float)System::windowHeight() - 480.0f / System::windowHeight();
-			w = 16 * 2 / (float)System::windowWidth();
-			h = 16 * 2 / (float)System::windowHeight();
-			Sprite::draw();
+            if (image != nullptr) g2->drawImage(image, 16 + pos.x() * 16, 400 - pos.y() * 16);
 		}
 
 		int getX() {
@@ -182,8 +137,8 @@ namespace {
 			for (int i = 0; i < 4; ++i) blocks[i] = nullptr;
 		}
 
-		void draw() {
-			for (int i = 0; i < 4; ++i) blocks[i]->draw();
+		void draw(Graphics2* g2) {
+			for (int i = 0; i < 4; ++i) blocks[i]->draw(g2);
 		}
 
 		void right() {
@@ -394,7 +349,6 @@ namespace {
 			next = createRandomBlock();
 			check();
 			if (!current->hop()) {
-				back.tex = scoreImage;
 				state = GameOverState;
 			}
 		}
@@ -435,25 +389,25 @@ namespace {
 		}
 
 		Graphics::begin();
-		Graphics::clear(Graphics::ClearColorFlag, 0);
-
-		program->set();
-		Graphics::setIndexBuffer(*indices);
-
-		back.draw();
+        g2->begin();
 
 		if (state == InGameState) {
+            g2->drawImage(boardImage, 0, 0);
+            
 			for (int y = 0; y < Block::ysize; ++y) for (int x = 0; x < Block::xsize; ++x) {
 				Block* block = blocked[y * Block::xsize + x];
-				if (block != nullptr && block->tex != nullptr) {
-					block->draw();
+				if (block != nullptr) {
+					block->draw(g2);
 				}
 			}
-			if (current != nullptr) current->draw();
-			if (next != nullptr) next->draw();
-		}
+			if (current != nullptr) current->draw(g2);
+			if (next != nullptr) next->draw(g2);
+        } else if (state == GameOverState) {
+            g2->drawImage(scoreImage, 0, 0);
+        }
 
-		Graphics::end();
+        g2->end();
+        Graphics::end();
 		Graphics::swapBuffers();
 	}
 
@@ -471,8 +425,6 @@ namespace {
 	}
 
 	void startGame() {
-		back.tex = boardImage;
-
 		blocked = new Block*[Block::ysize * Block::xsize];
 		for (int y = 0; y < Block::ysize; ++y) for (int x = 0; x < Block::xsize; ++x) blocked[y * Block::xsize + x] = nullptr;
 		for (int y = 0; y < Block::ysize; ++y) blocked[y * Block::xsize + 0] = new Block(0, y, nullptr);
@@ -551,8 +503,14 @@ namespace {
 }
 
 int kore(int argc, char** argv) {
-	Kore::System::init("Blocks", 1024, 768);
+    int w = 272;
+    int h = 480;
 
+	System::init("Blocks", w, h);
+    
+    g2 = new Graphics2(w, h);
+
+    //Sound::init();
 	Mixer::init();
 	Audio::init();
 	Random::init(System::time() * 1000);
@@ -560,24 +518,9 @@ int kore(int argc, char** argv) {
 	Kore::System::setCallback(update);
 
 	music = new SoundStream("Sound/blocks.ogg", true);
-	rotateSound = new Sound("Sound/rotate.wav");
+    rotateSound = new Sound("Sound/rotate.wav");
 	lineSound = new Sound("Sound/line.wav");
 	klackSound = new Sound("Sound/klack.wav");
-
-	structure.add("pos", Float3VertexData);
-	structure.add("tex", Float2VertexData);
-
-	FileReader vs("shader.vert");
-	FileReader fs("shader.frag");
-	vertexShader = new Shader(vs.readAll(), vs.size(), VertexShader);
-	fragmentShader = new Shader(fs.readAll(), fs.size(), FragmentShader);
-
-	program = new Program;
-	program->setVertexShader(vertexShader);
-	program->setFragmentShader(fragmentShader);
-	program->link(structure);
-
-	texUnit = program->getTextureUnit("texcoord");
 
 	titleImage = new Texture("Graphics/title.png");
 	boardImage = new Texture("Graphics/board.png");
@@ -593,18 +536,6 @@ int kore(int argc, char** argv) {
 	blockImages[Violet] = new Texture("Graphics/block_violet.png");
 	blockImages[Yellow] = new Texture("Graphics/block_yellow.png");
 
-	back.tex = titleImage;
-	back.x = -titleImage->width / (float)System::windowWidth();
-	back.y = -titleImage->height / (float)System::windowHeight();
-	back.w = 2.0f * titleImage->width / (float)System::windowWidth();
-	back.h = 2.0f * titleImage->height / (float)System::windowHeight();
-	back.init();
-
-	indices = new IndexBuffer(6);
-	int* i = indices->lock();
-	i[0] = 0; i[1] = 1; i[2] = 2;
-	i[3] = 1; i[4] = 3; i[5] = 2;
-	indices->unlock();
 
 	Keyboard::the()->KeyDown = keyDown;
 	Keyboard::the()->KeyUp = keyUp;
