@@ -6,13 +6,14 @@
 #include <Kore/Graphics/Shader.h>
 #include <Kore/Input/Keyboard.h>
 #include <Kore/Input/Mouse.h>
+#include <Kore/Input/Gamepad.h>
 #include <Kore/Audio/Audio.h>
 #include <Kore/Audio/Mixer.h>
 #include <Kore/Audio/Sound.h>
 #include <Kore/Audio/SoundStream.h>
 #include <Kore/Math/Random.h>
 #include <Kore/System.h>
-#include <stdio.h>
+#include <Kore/Log.h>
 
 using namespace Kore;
 
@@ -500,6 +501,44 @@ namespace {
             break;
 		}
 	}
+    
+    void gamepadAxis(int axis, float value) {
+        log(Info, "Axis %i Value %f", axis, value);
+        //if (axis == 0) {
+        if (axis == 20 || axis == 21) {
+            if (value < -0.1) {
+                left = true;
+                right = false;
+            }
+            else if (value > 0.1) {
+                right = true;
+                left = false;
+            }
+            else {
+                left = false;
+                right = false;
+            }
+        }
+        //if (axis == 1) {
+        if (axis == 22 || axis == 23) {
+            if (value < -0.1) {
+                down_ = true;
+            }
+            else {
+                down_ = false;
+            }
+        }
+    }
+    
+    void gamepadButton(int buttonNr, float value) {
+        log(Info, "Button %i Value %f", buttonNr, value);
+        if (value > 0.1) {
+            button = true;
+        }
+        else {
+            button = false;
+        }
+    }
 }
 
 int kore(int argc, char** argv) {
@@ -518,9 +557,11 @@ int kore(int argc, char** argv) {
 	Kore::System::setCallback(update);
 
 	music = new SoundStream("Sound/blocks.ogg", true);
+    music->setVolume(0.1f);
     rotateSound = new Sound("Sound/rotate.wav");
 	lineSound = new Sound("Sound/line.wav");
 	klackSound = new Sound("Sound/klack.wav");
+    //klackSound = new Sound("Sound/klack_mono.wav");
 
 	titleImage = new Texture("Graphics/title.png");
 	boardImage = new Texture("Graphics/board.png");
@@ -540,6 +581,8 @@ int kore(int argc, char** argv) {
 	Keyboard::the()->KeyDown = keyDown;
 	Keyboard::the()->KeyUp = keyUp;
 	Mouse::the()->Release = mouseUp;
+    Gamepad::get(0)->Axis = gamepadAxis;
+    Gamepad::get(0)->Button = gamepadButton;
 
 	Mixer::play(music);
 
@@ -547,6 +590,8 @@ int kore(int argc, char** argv) {
 
 	lastDownTime = System::time();
 	Kore::System::start();
+    
+    System::stop();
 
 	return 0;
 }
