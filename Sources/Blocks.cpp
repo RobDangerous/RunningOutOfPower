@@ -504,8 +504,7 @@ namespace {
     
     void gamepadAxis(int axis, float value) {
         log(Info, "Axis %i Value %f", axis, value);
-        //if (axis == 0) {
-        if (axis == 20 || axis == 21) {
+        if (axis == 0 || axis == 2) {   // 0 = left stick X, 2 = right stick X
             if (value < -0.1) {
                 left = true;
                 right = false;
@@ -519,8 +518,7 @@ namespace {
                 right = false;
             }
         }
-        //if (axis == 1) {
-        if (axis == 22 || axis == 23) {
+        if (axis == 1 || axis == 3) { // 1 = left stick Y, 3 = right stick Y
             if (value < -0.1) {
                 down_ = true;
             }
@@ -561,7 +559,6 @@ int kore(int argc, char** argv) {
     rotateSound = new Sound("Sound/rotate.wav");
 	lineSound = new Sound("Sound/line.wav");
 	klackSound = new Sound("Sound/klack.wav");
-    //klackSound = new Sound("Sound/klack_mono.wav");
 
 	titleImage = new Texture("Graphics/title.png");
 	boardImage = new Texture("Graphics/board.png");
