@@ -503,8 +503,7 @@ namespace {
 	}
     
     void gamepadAxis(int axis, float value) {
-        log(Info, "Axis %i Value %f", axis, value);
-        if (axis == 0 || axis == 2) {   // 0 = left stick X, 2 = right stick X
+        if (axis == 0 || axis == 2) {
             if (value < -0.1) {
                 left = true;
                 right = false;
@@ -518,7 +517,7 @@ namespace {
                 right = false;
             }
         }
-        if (axis == 1 || axis == 3) { // 1 = left stick Y, 3 = right stick Y
+        if (axis == 1 || axis == 3) {
             if (value < -0.1) {
                 down_ = true;
             }
@@ -529,7 +528,6 @@ namespace {
     }
     
     void gamepadButton(int buttonNr, float value) {
-        log(Info, "Button %i Value %f", buttonNr, value);
         if (value > 0.1) {
             button = true;
         }
