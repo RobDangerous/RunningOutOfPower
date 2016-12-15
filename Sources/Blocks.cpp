@@ -553,7 +553,6 @@ int kore(int argc, char** argv) {
 	Kore::System::setCallback(update);
 
 	music = new SoundStream("Sound/blocks.ogg", true);
-    music->setVolume(0.1f);
     rotateSound = new Sound("Sound/rotate.wav");
 	lineSound = new Sound("Sound/line.wav");
 	klackSound = new Sound("Sound/klack.wav");
