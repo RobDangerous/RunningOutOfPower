@@ -1,9 +1,9 @@
 #include "pch.h"
 
 #include <Kore/IO/FileReader.h>
-#include <Kore/Graphics/Graphics.h>
-#include <Kore/Graphics/Graphics2.h>
-#include <Kore/Graphics/Shader.h>
+#include <Kore/Graphics4/Graphics.h>
+#include <Kore/Graphics2/Graphics.h>
+#include <Kore/Graphics4/Shader.h>
 #include <Kore/Input/Keyboard.h>
 #include <Kore/Input/Mouse.h>
 #include <Kore/Input/Gamepad.h>
@@ -18,11 +18,11 @@
 using namespace Kore;
 
 namespace {
-    Graphics2* g2;
+    Graphics2::Graphics2* g2;
     
-	Texture* titleImage;
-	Texture* boardImage;
-	Texture* scoreImage;
+	Graphics4::Texture* titleImage;
+	Graphics4::Texture* boardImage;
+	Graphics4::Texture* scoreImage;
 
 	SoundStream* music;
 
@@ -30,7 +30,7 @@ namespace {
 		Blue, Green, Orange, Purple, Red, Violet, Yellow
 	};
 
-	Texture** blockImages;
+	Graphics4::Texture** blockImages;
 
 	enum GameState {
 		TitleState, InGameState, GameOverState
@@ -45,18 +45,18 @@ namespace {
 		const static int xsize = 12;
 		const static int ysize = 23;
 
-		Texture* image;
+		Graphics4::Texture* image;
 		vec2i pos;
 		vec2i lastpos;
 
-		Block(int xx, int yy, Texture* image) : image(image) {
+		Block(int xx, int yy, Graphics4::Texture* image) : image(image) {
 			pos = vec2i(xx, yy);
 			lastpos = vec2i(xx, yy);
 		}
 
-		void draw(Graphics2* g2) {
+		void draw(Graphics2::Graphics2* g2) {
 			//272x480
-            if (image != nullptr) g2->drawImage(image, 16 + pos.x() * 16, 400 - pos.y() * 16);
+            if (image != nullptr) g2->drawImage(image, 16 + pos.x() * 16.0f, 400.0f - pos.y() * 16.0f);
 		}
 
 		int getX() {
@@ -138,7 +138,7 @@ namespace {
 			for (int i = 0; i < 4; ++i) blocks[i] = nullptr;
 		}
 
-		void draw(Graphics2* g2) {
+		void draw(Graphics2::Graphics2* g2) {
 			for (int i = 0; i < 4; ++i) blocks[i]->draw(g2);
 		}
 
@@ -226,7 +226,7 @@ namespace {
 	class IBlock : public BigBlock {
 	public:
 		IBlock() : BigBlock(13, 17) {
-			Texture* image = blockImages[Red];
+			Graphics4::Texture* image = blockImages[Red];
 			blocks[0] = new Block(13, 18, image); blocks[1] = new Block(13, 17, image);
 			blocks[2] = new Block(13, 16, image); blocks[3] = new Block(13, 15, image);
 		}
@@ -235,7 +235,7 @@ namespace {
 	class OBlock : public BigBlock {
 	public:
 		OBlock() : BigBlock(13, 17) {
-			Texture* image = blockImages[Orange];
+			Graphics4::Texture* image = blockImages[Orange];
 			blocks[0] = new Block(12, 18, image); blocks[1] = new Block(12, 17, image);
 			blocks[2] = new Block(13, 18, image); blocks[3] = new Block(13, 17, image);
 		}
@@ -248,7 +248,7 @@ namespace {
 	class LBlock : public BigBlock {
 	public:
 		LBlock() : BigBlock(12, 17) {
-			Texture* image = blockImages[Blue];
+			Graphics4::Texture* image = blockImages[Blue];
 			blocks[0] = new Block(12, 18, image); blocks[1] = new Block(12, 17, image);
 			blocks[2] = new Block(12, 16, image); blocks[3] = new Block(13, 16, image);
 		}
@@ -257,7 +257,7 @@ namespace {
 	class JBlock : public BigBlock {
 	public:
 		JBlock() : BigBlock(12, 17) {
-			Texture* image = blockImages[Yellow];
+			Graphics4::Texture* image = blockImages[Yellow];
 			blocks[0] = new Block(13, 18, image); blocks[1] = new Block(13, 17, image);
 			blocks[2] = new Block(13, 16, image); blocks[3] = new Block(12, 16, image);
 		}
@@ -266,7 +266,7 @@ namespace {
 	class TBlock : public BigBlock {
 	public:
 		TBlock() : BigBlock(13, 17) {
-			Texture* image = blockImages[Green];
+			Graphics4::Texture* image = blockImages[Green];
 			blocks[0] = new Block(12, 18, image); blocks[1] = new Block(13, 18, image);
 			blocks[2] = new Block(14, 18, image); blocks[3] = new Block(13, 17, image);
 		}
@@ -275,7 +275,7 @@ namespace {
 	class ZBlock : public BigBlock {
 	public:
 		ZBlock() : BigBlock(13, 18) {
-			Texture* image = blockImages[Purple];
+			Graphics4::Texture* image = blockImages[Purple];
 			blocks[0] = new Block(12, 18, image); blocks[1] = new Block(13, 18, image);
 			blocks[2] = new Block(13, 17, image); blocks[3] = new Block(14, 17, image);
 		}
@@ -284,7 +284,7 @@ namespace {
 	class SBlock : public BigBlock {
 	public:
 		SBlock() : BigBlock(13, 17) {
-			Texture* image = blockImages[Violet];
+			Graphics4::Texture* image = blockImages[Violet];
 			blocks[0] = new Block(12, 17, image); blocks[1] = new Block(13, 17, image);
 			blocks[2] = new Block(13, 18, image); blocks[3] = new Block(14, 18, image);
 		}
@@ -389,7 +389,7 @@ namespace {
 			}
 		}
 
-		Graphics::begin();
+		Graphics4::begin();
         g2->begin();
 
 		if (state == InGameState) {
@@ -408,8 +408,8 @@ namespace {
         }
 
         g2->end();
-        Graphics::end();
-		Graphics::swapBuffers();
+        Graphics4::end();
+		Graphics4::swapBuffers();
 	}
 
 	BigBlock* createRandomBlock() {
@@ -543,12 +543,12 @@ int kore(int argc, char** argv) {
 
 	System::init("Blocks", w, h);
     
-    g2 = new Graphics2(w, h);
+    g2 = new Graphics2::Graphics2(w, h);
 
     //Sound::init();
 	Mixer::init();
 	Audio::init();
-	Random::init(System::time() * 1000);
+	Random::init(static_cast<int>(System::time() * 1000));
 
 	Kore::System::setCallback(update);
 
@@ -557,19 +557,19 @@ int kore(int argc, char** argv) {
 	lineSound = new Sound("Sound/line.wav");
 	klackSound = new Sound("Sound/klack.wav");
 
-	titleImage = new Texture("Graphics/title.png");
-	boardImage = new Texture("Graphics/board.png");
-	scoreImage = new Texture("Graphics/score.png");
+	titleImage = new Graphics4::Texture("Graphics/title.png");
+	boardImage = new Graphics4::Texture("Graphics/board.png");
+	scoreImage = new Graphics4::Texture("Graphics/score.png");
 
-	blockImages = new Texture*[7];
+	blockImages = new Graphics4::Texture*[7];
 	//Blue, Green, Orange, Purple, Red, Violet, Yellow
-	blockImages[Blue] = new Texture("Graphics/block_blue.png");
-	blockImages[Green] = new Texture("Graphics/block_green.png");
-	blockImages[Orange] = new Texture("Graphics/block_orange.png");
-	blockImages[Purple] = new Texture("Graphics/block_purple.png");
-	blockImages[Red] = new Texture("Graphics/block_red.png");
-	blockImages[Violet] = new Texture("Graphics/block_violet.png");
-	blockImages[Yellow] = new Texture("Graphics/block_yellow.png");
+	blockImages[Blue] = new Graphics4::Texture("Graphics/block_blue.png");
+	blockImages[Green] = new Graphics4::Texture("Graphics/block_green.png");
+	blockImages[Orange] = new Graphics4::Texture("Graphics/block_orange.png");
+	blockImages[Purple] = new Graphics4::Texture("Graphics/block_purple.png");
+	blockImages[Red] = new Graphics4::Texture("Graphics/block_red.png");
+	blockImages[Violet] = new Graphics4::Texture("Graphics/block_violet.png");
+	blockImages[Yellow] = new Graphics4::Texture("Graphics/block_yellow.png");
 
 
 	Keyboard::the()->KeyDown = keyDown;
