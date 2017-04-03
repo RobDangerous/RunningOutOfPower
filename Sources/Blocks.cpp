@@ -7,10 +7,10 @@
 #include <Kore/Input/Keyboard.h>
 #include <Kore/Input/Mouse.h>
 #include <Kore/Input/Gamepad.h>
-#include <Kore/Audio/Audio.h>
-#include <Kore/Audio/Mixer.h>
-#include <Kore/Audio/Sound.h>
-#include <Kore/Audio/SoundStream.h>
+#include <Kore/Audio2/Audio.h>
+#include <Kore/Audio1/Audio.h>
+#include <Kore/Audio1/Sound.h>
+#include <Kore/Audio1/SoundStream.h>
 #include <Kore/Math/Random.h>
 #include <Kore/System.h>
 #include <Kore/Log.h>
@@ -196,7 +196,7 @@ namespace {
 		}
 
 		virtual void rotate() {
-			Mixer::play(rotateSound);
+			Audio1::play(rotateSound);
 			int i = 0;
 			while (i < 4) {
 				if (!blocks[i]->rotate(center)) goto retreat;
@@ -333,8 +333,8 @@ namespace {
 				++y;
 			}
 		}
-		if (lineDeleted) Mixer::play(lineSound);
-		else Mixer::play(klackSound);
+		if (lineDeleted) Audio1::play(lineSound);
+		else Audio1::play(klackSound);
 	}
 
 	BigBlock* createRandomBlock();
@@ -356,7 +356,7 @@ namespace {
 	}
 
 	void update() {
-		Audio::update();
+		Audio2::update();
 		if (state == InGameState) {
 			lastleft = left;
 			lastright = right;
@@ -546,8 +546,8 @@ int kore(int argc, char** argv) {
     g2 = new Graphics2::Graphics2(w, h);
 
     //Sound::init();
-	Mixer::init();
-	Audio::init();
+	Audio1::init();
+	Audio2::init();
 	Random::init(static_cast<int>(System::time() * 1000));
 
 	Kore::System::setCallback(update);
@@ -578,7 +578,7 @@ int kore(int argc, char** argv) {
     Gamepad::get(0)->Axis = gamepadAxis;
     Gamepad::get(0)->Button = gamepadButton;
 
-	Mixer::play(music);
+	Audio1::play(music);
 
 	startGame();
 
