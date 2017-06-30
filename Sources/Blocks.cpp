@@ -440,23 +440,23 @@ namespace {
 		state = InGameState;
 	}
 
-	void keyDown(KeyCode code, wchar_t character) {
+	void keyDown(KeyCode code) {
 		switch (state) {
 		case TitleState:
 			startGame();
 			break;
 		case InGameState:
 			switch (code) {
-			case Kore::Key_Left:
+			case KeyLeft:
 				left = true;
 				break;
-			case Kore::Key_Right:
+			case KeyRight:
 				right = true;
 				break;
-			case Kore::Key_Down:
+			case KeyDown:
 				down_ = true;
 				break;
-			case Kore::Key_Up:
+			case KeyUp:
 				button = true;
 				break;
             default:
@@ -468,20 +468,20 @@ namespace {
 		}
 	}
 
-	void keyUp(KeyCode code, wchar_t character) {
+	void keyUp(KeyCode code) {
 		switch (state) {
 		case InGameState:
 			switch (code) {
-			case Kore::Key_Left:
+			case KeyLeft:
 				left = false;
 				break;
-			case Kore::Key_Right:
+			case KeyRight:
 				right = false;
 				break;
-			case Kore::Key_Down:
+			case KeyDown:
 				down_ = false;
 				break;
-			case Kore::Key_Up:
+			case KeyUp:
 				button = false;
 				break;
             default:
