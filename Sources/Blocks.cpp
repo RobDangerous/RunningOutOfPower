@@ -23,10 +23,10 @@ namespace {
 	Tileset* tileset;
 	
 	const int tileWidthHeight = 128;
-	const int rows = 1;
-	const int columns = 50;
-	const int w = 768;// columns * tileWidthHeight;
-	const int h = 768;// rows * tileWidthHeight;
+	const int rows = 6;
+	const int columns = 6;
+	const int w = columns * tileWidthHeight;
+	const int h = rows * tileWidthHeight;
 
     Graphics2::Graphics2* g2;
 	
