@@ -8,6 +8,10 @@ out vec4 FragColor;
 uniform float aspect;
 uniform float angle;
 
+float easeOutQuart(float t) {
+	return 1-(--t)*t*t*t;
+}
+
 void main() {
 	vec4 texcolor = texture(tex, texCoord) * color;
 	texcolor.rgb *= color.a;
@@ -16,9 +20,20 @@ void main() {
 	float start = angle - 0.4;
 	float end = angle + 0.4;
 	float tangle = atan(ty, tx);
-	if (tx * tx + ty * ty > 0.3 || !(tangle >= start && tangle <= end)) {
+	float tdistance = sqrt(tx * tx + ty * ty);
+
+	float scale = 1.0 - clamp(tdistance * 1.5, 0.0, 1.0);
+	
+	scale *= 1.0 - clamp(abs(tangle - angle) * 1.5, 0.0, 1.0);
+
+	scale = easeOutQuart(scale);
+
+	texcolor.r *= scale;
+	texcolor.g *= scale;
+	//texcolor.b *= scale;
+	/*if (tx * tx + ty * ty > 0.3 || !(tangle >= start && tangle <= end)) {
 		texcolor.r = 0;
 		texcolor.g = 0;
-	}
+	}*/
 	FragColor = texcolor;
 }
