@@ -6,17 +6,25 @@ in vec4 color;
 out vec4 FragColor;
 
 uniform float aspect;
-uniform float angle;
+//uniform float angle;
+uniform vec2 player;
+uniform vec2 mouse;
 
 float easeOutQuart(float t) {
-	return 1-(--t)*t*t*t;
+	return 1 - (--t) * t * t * t;
 }
 
 void main() {
 	vec4 texcolor = texture(tex, texCoord) * color;
 	texcolor.rgb *= color.a;
+	
 	float tx = (texCoord.x * 2 - 1) * aspect;
 	float ty = texCoord.y * 2 - 1;
+	tx = texCoord.x - player.x;
+	ty = texCoord.y - player.y;
+
+	float angle = atan(mouse.y - player.y, mouse.x - player.y);
+
 	float start = angle - 0.4;
 	float end = angle + 0.4;
 	float tangle = atan(ty, tx);
@@ -31,9 +39,6 @@ void main() {
 	texcolor.r *= scale;
 	texcolor.g *= scale;
 	//texcolor.b *= scale;
-	/*if (tx * tx + ty * ty > 0.3 || !(tangle >= start && tangle <= end)) {
-		texcolor.r = 0;
-		texcolor.g = 0;
-	}*/
+	
 	FragColor = texcolor;
 }
