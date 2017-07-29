@@ -23,7 +23,7 @@ void main() {
 	tx = texCoord.x - player.x;
 	ty = texCoord.y - player.y;
 
-	float angle = atan(mouse.y - player.y, mouse.x - player.y);
+	float angle = atan(mouse.y - player.y, mouse.x - player.x);
 
 	float start = angle - 0.4;
 	float end = angle + 0.4;
