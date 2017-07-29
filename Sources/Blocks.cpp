@@ -43,10 +43,15 @@ namespace {
 	float mx = 0.0f;
 	float my = 0.0f;
 
+	int lastDirection = 0;	// 0 - left, 1 - right
 	bool left = false;
 	bool right = false;
 	bool down_ = false;
 	bool up = false;
+	
+	int frameCount = 0;
+	
+	int runIndex = 0;
 
 	void createPipeline() {
 		Graphics4::VertexStructure structure;
@@ -103,7 +108,21 @@ namespace {
 		
 		tileset->drawTiles(g2);
 
-		g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px, py, playerWidth, playerHeight);
+		frameCount++;
+		if (frameCount > 10) {
+			frameCount = 0;
+			
+			runIndex = runIndex % 8;
+			runIndex++;
+		}
+		if (left)
+			g2->drawScaledSubImage(playerImage, runIndex*playerWidth, playerHeight, playerWidth, playerHeight, px, py, playerWidth, playerHeight);
+		else if (right)
+			g2->drawScaledSubImage(playerImage, runIndex*playerWidth, 0, playerWidth, playerHeight, px, py, playerWidth, playerHeight);
+		else if (lastDirection == 0)
+			g2->drawScaledSubImage(playerImage, 0, playerHeight, playerWidth, playerHeight, px, py, playerWidth, playerHeight);
+		else if (lastDirection == 1)
+			g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px, py, playerWidth, playerHeight);
 
         g2->end();
 		
@@ -130,10 +149,12 @@ namespace {
 		case KeyLeft:
 		case KeyA:
 			left = true;
+			lastDirection = 0;
 			break;
 		case KeyRight:
 		case KeyD:
 			right = true;
+			lastDirection = 1;
 			break;
 		case KeyDown:
 		case KeyS:
