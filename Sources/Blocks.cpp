@@ -22,11 +22,30 @@ using namespace Kore;
 namespace {
 	Tileset* tileset;
 	
+	const int w = 272;
+	const int h = 480;
+
     Graphics2::Graphics2* g2;
     
 	Graphics4::Texture* titleImage;
 	Graphics4::Texture* boardImage;
 	Graphics4::Texture* scoreImage;
+
+	Graphics4::Texture* playerImage;
+
+	Graphics4::RenderTarget* screen;
+	Graphics4::PipelineState* pipeline;
+	Graphics4::ConstantLocation aspectLocation;
+	Graphics4::ConstantLocation angleLocation;
+	Graphics4::ConstantLocation playerLocation;
+	Graphics4::ConstantLocation mouseLocation;
+
+	float angle = 0.0f;
+
+	float px = 100.0f;
+	float py = 200.0f;
+	float mx = 0.0f;
+	float my = 0.0f;
 
 	SoundStream* music;
 
@@ -299,6 +318,7 @@ namespace {
 	bool lastleft = false;
 	bool lastright = false;
 	bool down_ = false;
+	bool up = false;
 	bool button = false;
 	BigBlock* current = nullptr;
 	BigBlock* next = nullptr;
@@ -344,7 +364,7 @@ namespace {
 	BigBlock* createRandomBlock();
 
 	void down() {
-		if (!current->down()) {
+		/*if (!current->down()) {
 			down_ = false;
 			for (int i = 0; i < 4; ++i) {
 				Block* block = current->getBlock(i);
@@ -356,11 +376,42 @@ namespace {
 			if (!current->hop()) {
 				state = GameOverState;
 			}
-		}
+		}*/
+	}
+
+	void createPipeline() {
+		Graphics4::VertexStructure structure;
+		structure.add("vertexPosition", Graphics4::Float3VertexData);
+		structure.add("texPosition", Graphics4::Float2VertexData);
+		structure.add("vertexColor", Graphics4::Float4VertexData);
+
+		FileReader fs("flashlight.frag");
+		FileReader vs("flashlight.vert");
+		Graphics4::Shader* fragmentShader = new Graphics4::Shader(fs.readAll(), fs.size(), Graphics4::FragmentShader);
+		Graphics4::Shader* vertexShader = new Graphics4::Shader(vs.readAll(), vs.size(), Graphics4::VertexShader);
+
+		pipeline = new Graphics4::PipelineState;
+		pipeline->fragmentShader = fragmentShader;
+		pipeline->vertexShader = vertexShader;
+
+		pipeline->blendSource = Graphics4::BlendOne;
+		pipeline->blendDestination = Graphics4::InverseSourceAlpha;
+		pipeline->alphaBlendSource = Graphics4::SourceAlpha;
+		pipeline->alphaBlendDestination = Graphics4::InverseSourceAlpha;
+
+		pipeline->inputLayout[0] = &structure;
+		pipeline->inputLayout[1] = nullptr;
+		pipeline->compile();
+
+		aspectLocation = pipeline->getConstantLocation("aspect");
+		angleLocation = pipeline->getConstantLocation("angle");
+		playerLocation = pipeline->getConstantLocation("player");
+		mouseLocation = pipeline->getConstantLocation("mouse");
 	}
 
 	void update() {
 		Audio2::update();
+
 		if (state == InGameState) {
 			lastleft = left;
 			lastright = right;
@@ -393,7 +444,24 @@ namespace {
 			}
 		}
 
+		if (up) {
+			py -= 1;
+		}
+		if (down_) {
+			py += 1;
+		}
+		if (left) {
+			px -= 1;
+		}
+		if (right) {
+			px += 1;
+		}
+
+		float playerWidth = playerImage->width / 10.0f;
+		float playerHeight = playerImage->height / 2.0f;
+
 		Graphics4::begin();
+		Graphics4::setRenderTarget(screen);
         g2->begin();
 		
 		tileset->drawTiles(g2);
@@ -409,11 +477,28 @@ namespace {
 			}
 			if (current != nullptr) current->draw(g2);
 			if (next != nullptr) next->draw(g2);
+
+			g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px, py, playerWidth, playerHeight);
+
         } else if (state == GameOverState) {
             g2->drawImage(scoreImage, 0, 0);
         }*/
 
         g2->end();
+		
+		Graphics4::restoreRenderTarget();
+		g2->begin();
+		g2->setPipeline(pipeline);
+		Graphics4::setFloat(aspectLocation, w / h);
+		angle += 0.01f;
+		if (angle > pi) angle = -pi;
+		Graphics4::setFloat(angleLocation, angle);
+		Graphics4::setFloat2(playerLocation, vec2((px + playerWidth / 2.0f) / w, (py + playerHeight / 2.0f) / h));
+		Graphics4::setFloat2(mouseLocation, vec2(mx / w, my / h));
+		g2->drawImage(screen, 0, 0);
+		g2->end();
+		g2->setPipeline(nullptr);
+
         Graphics4::end();
 		Graphics4::swapBuffers();
 	}
@@ -447,54 +532,40 @@ namespace {
 	}
 
 	void keyDown(KeyCode code) {
-		switch (state) {
-		case TitleState:
-			startGame();
+		switch (code) {
+		case KeyLeft:
+			left = true;
 			break;
-		case InGameState:
-			switch (code) {
-			case KeyLeft:
-				left = true;
-				break;
-			case KeyRight:
-				right = true;
-				break;
-			case KeyDown:
-				down_ = true;
-				break;
-			case KeyUp:
-				button = true;
-				break;
-            default:
-				break;
-			}
+		case KeyRight:
+			right = true;
 			break;
-        default:
-            break;
+		case KeyDown:
+			down_ = true;
+			break;
+		case KeyUp:
+			up = true;
+			break;
+		default:
+			break;
 		}
 	}
 
 	void keyUp(KeyCode code) {
-		switch (state) {
-		case InGameState:
-			switch (code) {
-			case KeyLeft:
-				left = false;
-				break;
-			case KeyRight:
-				right = false;
-				break;
-			case KeyDown:
-				down_ = false;
-				break;
-			case KeyUp:
-				button = false;
-				break;
-            default:
-                break;
-			}
-        default:
-            break;
+		switch (code) {
+		case KeyLeft:
+			left = false;
+			break;
+		case KeyRight:
+			right = false;
+			break;
+		case KeyDown:
+			down_ = false;
+			break;
+		case KeyUp:
+			up = false;
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -506,6 +577,11 @@ namespace {
         default:
             break;
 		}
+	}
+
+	void mouseMove(int window, int x, int y, int moveX, int moveY) {
+		mx = x;
+		my = y;
 	}
     
     void gamepadAxis(int axis, float value) {
@@ -547,11 +623,13 @@ int kore(int argc, char** argv) {
     int w = 40*32+1;
     int h = 40*32+1;
 
-	System::init("Blocks", w, h);
+	System::init("Power", w, h);
 	
 	tileset = new Tileset("Tiles/desert.csv", "Tiles/tmw_desert_spacing.png", 40, 40, 32, 32);
     
-    g2 = new Graphics2::Graphics2(w, h);
+    g2 = new Graphics2::Graphics2(w, h, true);
+	screen = new Graphics4::RenderTarget(w, h, 0);
+	createPipeline();
 
     //Sound::init();
 	Audio1::init();
@@ -569,6 +647,8 @@ int kore(int argc, char** argv) {
 	boardImage = new Graphics4::Texture("Graphics/board.png");
 	scoreImage = new Graphics4::Texture("Graphics/score.png");
 
+	playerImage = new Graphics4::Texture("player.png");
+
 	blockImages = new Graphics4::Texture*[7];
 	//Blue, Green, Orange, Purple, Red, Violet, Yellow
 	blockImages[Blue] = new Graphics4::Texture("Graphics/block_blue.png");
@@ -583,6 +663,7 @@ int kore(int argc, char** argv) {
 	Keyboard::the()->KeyDown = keyDown;
 	Keyboard::the()->KeyUp = keyUp;
 	Mouse::the()->Release = mouseUp;
+	Mouse::the()->Move = mouseMove;
     Gamepad::get(0)->Axis = gamepadAxis;
     Gamepad::get(0)->Button = gamepadButton;
 
