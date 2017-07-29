@@ -38,6 +38,7 @@ namespace {
 	Graphics4::ConstantLocation angleLocation;
 	Graphics4::ConstantLocation playerLocation;
 	Graphics4::ConstantLocation mouseLocation;
+	Graphics4::ConstantLocation animLocation;
 
 	float angle = 0.0f;
 
@@ -84,10 +85,14 @@ namespace {
 		angleLocation = pipeline->getConstantLocation("angle");
 		playerLocation = pipeline->getConstantLocation("player");
 		mouseLocation = pipeline->getConstantLocation("mouse");
+		animLocation = pipeline->getConstantLocation("anim");
 	}
 
 	void update() {
 		Audio2::update();
+
+		static int anim = 0;
+		++anim;
 
 		if (up) {
 			py -= 1;
@@ -139,6 +144,7 @@ namespace {
 		Graphics4::setFloat(angleLocation, angle);
 		Graphics4::setFloat2(playerLocation, vec2((px + playerWidth / 2.0f) / w, (py + playerHeight / 2.0f) / h));
 		Graphics4::setFloat2(mouseLocation, vec2(mx / w, my / h));
+		Graphics4::setInt(animLocation, anim);
 		g2->drawImage(screen, 0, 0);
 		g2->end();
 		g2->setPipeline(nullptr);
@@ -150,17 +156,21 @@ namespace {
 	void keyDown(KeyCode code) {
 		switch (code) {
 		case KeyLeft:
+		case KeyA:
 			left = true;
 			lastDirection = 0;
 			break;
 		case KeyRight:
+		case KeyD:
 			right = true;
 			lastDirection = 1;
 			break;
 		case KeyDown:
+		case KeyS:
 			down_ = true;
 			break;
 		case KeyUp:
+		case KeyW:
 			up = true;
 			break;
 		default:
@@ -171,15 +181,19 @@ namespace {
 	void keyUp(KeyCode code) {
 		switch (code) {
 		case KeyLeft:
+		case KeyA:
 			left = false;
 			break;
 		case KeyRight:
+		case KeyD:
 			right = false;
 			break;
 		case KeyDown:
+		case KeyS:
 			down_ = false;
 			break;
 		case KeyUp:
+		case KeyW:
 			up = false;
 			break;
 		default:
