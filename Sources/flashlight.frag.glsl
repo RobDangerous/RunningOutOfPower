@@ -94,7 +94,7 @@ void main() {
 	
 	texcolor.r *= scale;
 	texcolor.g *= scale;
-	texcolor.b *= clamp(fractalNoise(texCoord) + (scale), 0.0, 1.0);
+	texcolor.b *= clamp(fractalNoise(texCoord - anim / 500.0) * fractalNoise(texCoord + anim / 500.0) * 1.5 + scale, 0.0, 1.0);
 	
 	FragColor = texcolor;
 }
