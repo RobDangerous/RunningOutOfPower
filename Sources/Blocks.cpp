@@ -99,7 +99,7 @@ namespace {
 
 		Graphics4::begin();
 		Graphics4::setRenderTarget(screen);
-        g2->begin();
+        g2->begin(true);
 		
 		tileset->drawTiles(g2);
 
@@ -173,7 +173,7 @@ int kore(int argc, char** argv) {
 	
 	tileset = new Tileset("Tiles/desert.csv", "Tiles/tmw_desert_spacing.png", 40, 40, 32, 32);
     
-    g2 = new Graphics2::Graphics2(w, h, true);
+    g2 = new Graphics2::Graphics2(w, h, false);
 	screen = new Graphics4::RenderTarget(w, h, 0);
 	createPipeline();
 
