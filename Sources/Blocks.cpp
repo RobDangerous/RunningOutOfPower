@@ -24,7 +24,7 @@ namespace {
 	
 	const int tileWidthHeight = 128;
 	const int rows = 1;
-	const int columns = 10;
+	const int columns = 50;
 	const int w = columns * tileWidthHeight;
 	const int h = rows * tileWidthHeight;
 
