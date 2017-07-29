@@ -110,6 +110,7 @@ namespace {
 		Graphics4::restoreRenderTarget();
 		g2->begin();
 		g2->setPipeline(pipeline);
+		Graphics4::setPipeline(pipeline);
 		Graphics4::setFloat(aspectLocation, w / h);
 		angle += 0.01f;
 		if (angle > pi) angle = -pi;
