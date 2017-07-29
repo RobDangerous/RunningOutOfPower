@@ -15,9 +15,13 @@
 #include <Kore/System.h>
 #include <Kore/Log.h>
 
+#include "Tileset.h"
+
 using namespace Kore;
 
 namespace {
+	Tileset* tileset;
+	
     Graphics2::Graphics2* g2;
     
 	Graphics4::Texture* titleImage;
@@ -391,8 +395,10 @@ namespace {
 
 		Graphics4::begin();
         g2->begin();
+		
+		tileset->drawTiles(g2);
 
-		if (state == InGameState) {
+		/*if (state == InGameState) {
             g2->drawImage(boardImage, 0, 0);
             
 			for (int y = 0; y < Block::ysize; ++y) for (int x = 0; x < Block::xsize; ++x) {
@@ -405,7 +411,7 @@ namespace {
 			if (next != nullptr) next->draw(g2);
         } else if (state == GameOverState) {
             g2->drawImage(scoreImage, 0, 0);
-        }
+        }*/
 
         g2->end();
         Graphics4::end();
@@ -538,10 +544,12 @@ namespace {
 }
 
 int kore(int argc, char** argv) {
-    int w = 272;
-    int h = 480;
+    int w = 40*32+1;
+    int h = 40*32+1;
 
 	System::init("Blocks", w, h);
+	
+	tileset = new Tileset("Tiles/desert.csv", "Tiles/tmw_desert_spacing.png", 40, 40, 32, 32);
     
     g2 = new Graphics2::Graphics2(w, h);
 
