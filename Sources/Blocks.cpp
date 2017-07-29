@@ -24,6 +24,9 @@ namespace {
 	Graphics4::Texture* boardImage;
 	Graphics4::Texture* scoreImage;
 
+	Graphics4::RenderTarget* screen;
+	Graphics4::PipelineState* pipeline;
+
 	SoundStream* music;
 
 	enum BlockColor {
@@ -355,6 +358,31 @@ namespace {
 		}
 	}
 
+	void createPipeline() {
+		Graphics4::VertexStructure structure;
+		structure.add("vertexPosition", Graphics4::Float3VertexData);
+		structure.add("texPosition", Graphics4::Float2VertexData);
+		structure.add("vertexColor", Graphics4::Float4VertexData);
+
+		FileReader fs("flashlight.frag");
+		FileReader vs("flashlight.vert");
+		Graphics4::Shader* fragmentShader = new Graphics4::Shader(fs.readAll(), fs.size(), Graphics4::FragmentShader);
+		Graphics4::Shader* vertexShader = new Graphics4::Shader(vs.readAll(), vs.size(), Graphics4::VertexShader);
+
+		pipeline = new Graphics4::PipelineState;
+		pipeline->fragmentShader = fragmentShader;
+		pipeline->vertexShader = vertexShader;
+
+		pipeline->blendSource = Graphics4::BlendOne;
+		pipeline->blendDestination = Graphics4::InverseSourceAlpha;
+		pipeline->alphaBlendSource = Graphics4::SourceAlpha;
+		pipeline->alphaBlendDestination = Graphics4::InverseSourceAlpha;
+
+		pipeline->inputLayout[0] = &structure;
+		pipeline->inputLayout[1] = nullptr;
+		pipeline->compile();
+	}
+
 	void update() {
 		Audio2::update();
 		if (state == InGameState) {
@@ -390,6 +418,7 @@ namespace {
 		}
 
 		Graphics4::begin();
+		Graphics4::setRenderTarget(screen);
         g2->begin();
 
 		if (state == InGameState) {
@@ -408,6 +437,14 @@ namespace {
         }
 
         g2->end();
+		
+		Graphics4::restoreRenderTarget();
+		g2->begin();
+		g2->setPipeline(pipeline);
+		g2->drawImage(screen, 0, 0);
+		g2->end();
+		g2->setPipeline(nullptr);
+
         Graphics4::end();
 		Graphics4::swapBuffers();
 	}
@@ -543,7 +580,9 @@ int kore(int argc, char** argv) {
 
 	System::init("Power", w, h);
     
-    g2 = new Graphics2::Graphics2(w, h);
+    g2 = new Graphics2::Graphics2(w, h, true);
+	screen = new Graphics4::RenderTarget(w, h, 0);
+	createPipeline();
 
     //Sound::init();
 	Audio1::init();
