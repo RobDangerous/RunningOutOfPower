@@ -541,7 +541,7 @@ int kore(int argc, char** argv) {
     int w = 272;
     int h = 480;
 
-	System::init("Blocks", w, h);
+	System::init("Power", w, h);
     
     g2 = new Graphics2::Graphics2(w, h);
 
