@@ -57,8 +57,8 @@ void Tileset::drawTiles(Graphics2::Graphics2* g2) {
 			int row    = (int)(index / sourceColumns);
 			int column = index % sourceColumns;
 			
-			int xOffset = column;	// TODO: should be 0
-			int yOffset = row;
+			int xOffset = 0;//column;	// TODO: should be 0
+			int yOffset = 0;//row;
 			
 			//Graphics4::Texture* tile = new Graphics4::Texture();
 			g2->drawScaledSubImage(image, column*tileWidth+xOffset, row*tileHeight+yOffset , tileWidth, tileHeight, x*tileWidth, y*tileHeight, tileWidth, tileHeight);
