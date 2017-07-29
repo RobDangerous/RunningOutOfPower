@@ -64,13 +64,15 @@ float easeOutQuart(float t) {
 	return 1 - (--t) * t * t * t;
 }
 
+#define PI 3.14159265359
+
 void main() {
 	float tx = (texCoord.x * 2 - 1) * aspect;
 	float ty = texCoord.y * 2 - 1;
 	tx = texCoord.x - player.x;
 	ty = texCoord.y - player.y;
 
-	float angle = atan(mouse.y - player.y, mouse.x - player.x);
+	float angle = atan(mouse.y - player.y, mouse.x - player.x) - PI / 2.0;
 
 	float start = angle - 0.4;
 	float end = angle + 0.4;
@@ -96,5 +98,12 @@ void main() {
 	texcolor.g *= scale;
 	texcolor.b *= clamp(fractalNoise(texCoord - anim / 500.0) * fractalNoise(texCoord + anim / 500.0) * 1.5 + scale, 0.0, 1.0);
 	
+	float mx = texCoord.x - mouse.x;
+	float my = texCoord.y - mouse.y;
+	float mdistance = sqrt(mx * mx + my * my);
+	if (mdistance < 0.01) {
+		texcolor = vec4(1.0, 0.0, 0.0, 1.0);
+	}
+
 	FragColor = texcolor;
 }

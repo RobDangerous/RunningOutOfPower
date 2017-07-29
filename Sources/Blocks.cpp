@@ -25,8 +25,8 @@ namespace {
 	const int tileWidthHeight = 128;
 	const int rows = 1;
 	const int columns = 50;
-	const int w = columns * tileWidthHeight;
-	const int h = rows * tileWidthHeight;
+	const int w = 768;// columns * tileWidthHeight;
+	const int h = 768;// rows * tileWidthHeight;
 
     Graphics2::Graphics2* g2;
 	
@@ -101,10 +101,10 @@ namespace {
 			py += 1;
 		}
 		if (left) {
-			px -= 1;
+			px -= 4;
 		}
 		if (right) {
-			px += 1;
+			px += 4;
 		}
 
 		float playerWidth = playerImage->width / 10.0f;
