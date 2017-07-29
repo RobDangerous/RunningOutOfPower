@@ -7,6 +7,7 @@
 #include <Kore/Graphics1/Image.h>
 #include <Kore/TextureImpl.h>
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -32,7 +33,7 @@ void Tileset::loadCsv(const char* csvFile, int rows, int columns) {
 	
 	char delimiter[] = ",;";
 	char* ptr = std::strtok(source, delimiter);
-	while (ptr != nullptr) {
+	while (ptr != nullptr && i < rows * columns) {
 		int num = atoi(ptr);
 		//log(Info, "%i -> %i", i, num);
 		this->source[i] = num;
