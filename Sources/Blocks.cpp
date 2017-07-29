@@ -26,6 +26,9 @@ namespace {
 
 	Graphics4::RenderTarget* screen;
 	Graphics4::PipelineState* pipeline;
+	Graphics4::ConstantLocation aspectLocation;
+	Graphics4::ConstantLocation angleLocation;
+	float angle = 0.0f;
 
 	SoundStream* music;
 
@@ -381,6 +384,9 @@ namespace {
 		pipeline->inputLayout[0] = &structure;
 		pipeline->inputLayout[1] = nullptr;
 		pipeline->compile();
+
+		aspectLocation = pipeline->getConstantLocation("aspect");
+		angleLocation = pipeline->getConstantLocation("angle");
 	}
 
 	void update() {
@@ -441,6 +447,10 @@ namespace {
 		Graphics4::restoreRenderTarget();
 		g2->begin();
 		g2->setPipeline(pipeline);
+		Graphics4::setFloat(aspectLocation, 272.0f / 480.0f);
+		angle += 0.01f;
+		if (angle > pi) angle = -pi;
+		Graphics4::setFloat(angleLocation, angle);
 		g2->drawImage(screen, 0, 0);
 		g2->end();
 		g2->setPipeline(nullptr);
