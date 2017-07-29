@@ -41,12 +41,10 @@ void Tileset::loadCsv(const char* csvFile, int rows, int columns) {
 		ptr = std::strtok(nullptr, delimiter);
 		i++;
 	}
-	
+	image = new Graphics4::Texture(tileFile);
 }
 
-void Tileset::drawTiles(Graphics2::Graphics2* g2) {
-	Graphics4::Texture* image = new Graphics4::Texture(tileFile);
-	
+void Tileset::drawTiles(Graphics2::Graphics2* g2) {	
 	const int sourceColumns = image->texWidth / tileWidth;
 	const int sourceRows = image->texHeight / tileHeight;
 	//const int numOfTiles = rows * columns;

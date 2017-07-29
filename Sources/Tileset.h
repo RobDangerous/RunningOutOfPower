@@ -16,6 +16,8 @@ private:
 	
 	int rows;
 	int columns;
+
+	Graphics4::Texture* image;
 	
 	void loadCsv(const char* csvFile, int rows, int columns);
 	
