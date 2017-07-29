@@ -15,9 +15,6 @@ float easeOutQuart(float t) {
 }
 
 void main() {
-	vec4 texcolor = texture(tex, texCoord) * color;
-	texcolor.rgb *= color.a;
-	
 	float tx = (texCoord.x * 2 - 1) * aspect;
 	float ty = texCoord.y * 2 - 1;
 	tx = texCoord.x - player.x;
@@ -38,6 +35,9 @@ void main() {
 
 	scale = easeOutQuart(scale);
 
+	vec4 texcolor = texture(tex, texCoord * (1-scale)) * color;
+	texcolor.rgb *= color.a;
+	
 	texcolor.r *= scale;
 	texcolor.g *= scale;
 	//texcolor.b *= scale;
