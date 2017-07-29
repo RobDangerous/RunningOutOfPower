@@ -22,8 +22,8 @@ using namespace Kore;
 namespace {
 	Tileset* tileset;
 	
-	const int w = 272;
-	const int h = 480;
+	const int w = 40 * 32 + 1;
+	const int h = 40 * 32 + 1;
 
     Graphics2::Graphics2* g2;
     
@@ -466,23 +466,7 @@ namespace {
 		
 		tileset->drawTiles(g2);
 
-		/*if (state == InGameState) {
-            g2->drawImage(boardImage, 0, 0);
-            
-			for (int y = 0; y < Block::ysize; ++y) for (int x = 0; x < Block::xsize; ++x) {
-				Block* block = blocked[y * Block::xsize + x];
-				if (block != nullptr) {
-					block->draw(g2);
-				}
-			}
-			if (current != nullptr) current->draw(g2);
-			if (next != nullptr) next->draw(g2);
-
-			g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px, py, playerWidth, playerHeight);
-
-        } else if (state == GameOverState) {
-            g2->drawImage(scoreImage, 0, 0);
-        }*/
+		g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px, py, playerWidth, playerHeight);
 
         g2->end();
 		
@@ -620,9 +604,6 @@ namespace {
 }
 
 int kore(int argc, char** argv) {
-    int w = 40*32+1;
-    int h = 40*32+1;
-
 	System::init("Power", w, h);
 	
 	tileset = new Tileset("Tiles/desert.csv", "Tiles/tmw_desert_spacing.png", 40, 40, 32, 32);
