@@ -128,15 +128,19 @@ namespace {
 	void keyDown(KeyCode code) {
 		switch (code) {
 		case KeyLeft:
+		case KeyA:
 			left = true;
 			break;
 		case KeyRight:
+		case KeyD:
 			right = true;
 			break;
 		case KeyDown:
+		case KeyS:
 			down_ = true;
 			break;
 		case KeyUp:
+		case KeyW:
 			up = true;
 			break;
 		default:
@@ -147,15 +151,19 @@ namespace {
 	void keyUp(KeyCode code) {
 		switch (code) {
 		case KeyLeft:
+		case KeyA:
 			left = false;
 			break;
 		case KeyRight:
+		case KeyD:
 			right = false;
 			break;
 		case KeyDown:
+		case KeyS:
 			down_ = false;
 			break;
 		case KeyUp:
+		case KeyW:
 			up = false;
 			break;
 		default:
