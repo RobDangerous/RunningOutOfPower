@@ -33,7 +33,8 @@ void Tileset::loadCsv(const char* csvFile, int rows, int columns) {
 	
 	char delimiter[] = ",;";
 	char* ptr = std::strtok(source, delimiter);
-	while (ptr != nullptr && i < rows * columns) {
+	while (ptr != nullptr) {
+		assert(i < rows * columns);
 		int num = atoi(ptr);
 		//log(Info, "%i -> %i", i, num);
 		this->source[i] = num;
