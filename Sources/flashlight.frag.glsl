@@ -9,6 +9,7 @@ uniform float aspect;
 //uniform float angle;
 uniform vec2 player;
 uniform vec2 mouse;
+uniform int anim;
 
 float easeOutQuart(float t) {
 	return 1 - (--t) * t * t * t;
@@ -35,7 +36,7 @@ void main() {
 
 	scale = easeOutQuart(scale);
 
-	vec4 texcolor = texture(tex, texCoord * (1-scale)) * color;
+	vec4 texcolor = texture(tex, texCoord + vec2(sin(anim / 20.0 + texCoord.y * 8) * 0.02 * (1.0 - scale), 0.0)) * color;
 	texcolor.rgb *= color.a;
 	
 	texcolor.r *= scale;

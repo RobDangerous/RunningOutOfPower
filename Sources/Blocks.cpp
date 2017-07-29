@@ -35,6 +35,7 @@ namespace {
 	Graphics4::ConstantLocation angleLocation;
 	Graphics4::ConstantLocation playerLocation;
 	Graphics4::ConstantLocation mouseLocation;
+	Graphics4::ConstantLocation animLocation;
 
 	float angle = 0.0f;
 
@@ -81,10 +82,14 @@ namespace {
 		angleLocation = pipeline->getConstantLocation("angle");
 		playerLocation = pipeline->getConstantLocation("player");
 		mouseLocation = pipeline->getConstantLocation("mouse");
+		animLocation = pipeline->getConstantLocation("anim");
 	}
 
 	void update() {
 		Audio2::update();
+
+		static int anim = 0;
+		++anim;
 
 		if (up) {
 			py -= 1;
@@ -136,6 +141,7 @@ namespace {
 		Graphics4::setFloat(angleLocation, angle);
 		Graphics4::setFloat2(playerLocation, vec2((px + playerWidth / 2.0f) / w, (py + playerHeight / 2.0f) / h));
 		Graphics4::setFloat2(mouseLocation, vec2(mx / w, my / h));
+		Graphics4::setInt(animLocation, anim);
 		g2->drawImage(screen, 0, 0);
 		g2->end();
 		g2->setPipeline(nullptr);
