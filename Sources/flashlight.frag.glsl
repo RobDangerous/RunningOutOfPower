@@ -11,6 +11,10 @@ uniform vec2 player;
 uniform vec2 mouse;
 uniform int anim;
 
+float easeOutQuad(float t) {
+	return t*(2-t);
+}
+
 float easeOutQuart(float t) {
 	return 1 - (--t) * t * t * t;
 }
@@ -34,7 +38,12 @@ void main() {
 
 	scale *= 1.0 - clamp(abs(angledif) * 1.5, 0.0, 1.0);
 
-	scale = easeOutQuart(scale);
+
+	scale = easeOutQuart(clamp(scale, 0.0, 1.0));
+
+	scale += easeOutQuad(1.0 - clamp(tdistance * 10.0, 0.0, 1.0));
+
+	scale = clamp(scale, 0.0, 1.0);
 
 	vec4 texcolor = texture(tex, texCoord + vec2(sin(anim / 20.0 + texCoord.y * 8) * 0.02 * (1.0 - scale), 0.0)) * color;
 	texcolor.rgb *= color.a;
