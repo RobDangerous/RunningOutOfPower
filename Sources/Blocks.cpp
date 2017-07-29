@@ -22,8 +22,11 @@ using namespace Kore;
 namespace {
 	Tileset* tileset;
 	
-	const int w = 40 * 32 + 1;
-	const int h = 40 * 32 + 1;
+	const int tileWidthHeight = 128;
+	const int rows = 1;
+	const int columns = 10;
+	const int w = columns * tileWidthHeight;
+	const int h = rows * tileWidthHeight;
 
     Graphics2::Graphics2* g2;
 	
@@ -38,8 +41,8 @@ namespace {
 
 	float angle = 0.0f;
 
-	float px = 100.0f;
-	float py = 200.0f;
+	float px = 0;
+	float py = 0;
 	float mx = 0.0f;
 	float my = 0.0f;
 
@@ -193,7 +196,7 @@ namespace {
 int kore(int argc, char** argv) {
 	System::init("Power", w, h);
 	
-	tileset = new Tileset("Tiles/desert.csv", "Tiles/tmw_desert_spacing.png", 40, 40, 32, 32);
+	tileset = new Tileset("Tiles/school.csv", "Tiles/school.png", rows, columns, tileWidthHeight, tileWidthHeight);
     
     g2 = new Graphics2::Graphics2(w, h, false);
 	screen = new Graphics4::RenderTarget(w, h, 0);
