@@ -44,7 +44,9 @@ void Tileset::loadCsv(const char* csvFile, int rows, int columns) {
 	}
 }
 
-void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY) {	
+void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights) {
+	int lightIndex = 0;
+
 	const int sourceColumns = image->texWidth / tileWidth;
 	const int sourceRows = image->texHeight / tileHeight;
 	//const int numOfTiles = rows * columns;
@@ -53,6 +55,11 @@ void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY) {
 	for(int y = 0; y < rows; ++y) {
 		for (int x = 0; x < columns; ++x) {
 			int index = source[y * (columns-1) + x];
+
+			if (index == 5) {
+				lights[lightIndex] = vec2(x * tileWidth - camX + tileWidth - 40, y * tileHeight - camY + 24);
+				++lightIndex;
+			}
 			
 			int row    = (int)(index / sourceColumns);
 			int column = index % sourceColumns;
