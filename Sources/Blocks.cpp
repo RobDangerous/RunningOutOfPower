@@ -139,6 +139,32 @@ namespace {
 		
 		g2->setColor(Graphics1::Color::White);
 	}
+	
+	bool goThroughDoor() {
+		int tile = tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2);
+		
+		if (tile == Tileset::Door) {
+			log(Info, "Go through the door");
+			return true;
+		} else {
+			sprintf(dText, "There is no door");
+			log(Info, "There is no door");
+			return false;
+		}
+	}
+	
+	bool hideInCloset() {
+		int tile = tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2);
+		
+		if (tile == Tileset::Closet) {
+			log(Info, "Hide in the closet");
+			return true;
+		} else {
+			sprintf(dText, "There is no closet");
+			log(Info, "There is no closet");
+			return false;
+		}
+	}
 
 	void update() {
 		Audio2::update();
@@ -250,20 +276,10 @@ namespace {
 			up = true;
 			break;
 		case Key1:
-			if (tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2) != Tileset::Door) {
-				sprintf(dText, "There is no door");
-				log(Info, "There is no door");
-			} else {
-				log(Info, "Go through the door");
-			}
+			goThroughDoor();
 			break;
 		case Key2:
-			if (tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2) != Tileset::Closet) {
-				sprintf(dText, "There is no closet");
-				log(Info, "There is no closet");
-			} else {
-				log(Info, "Hide in the closet");
-			}
+			hideInCloset();
 			break;
 		default:
 			break;
@@ -301,10 +317,12 @@ namespace {
 	void mousePress(int windowId, int button, int x, int y) {
 		if (x > doorButton.x() && y > doorButton.y() && x < doorButton.x() + doorButton.z() && y < doorButton.y() + doorButton.w()) {
 			log(Info, "door button pressed");
+			goThroughDoor();
 		}
 		
 		if (x > closetButton.x() && y > closetButton.y() && x < closetButton.x() + closetButton.z() && y < closetButton.y() + closetButton.w()) {
 			log(Info, "closet button pressed");
+			hideInCloset();
 		}
 		
 	}
