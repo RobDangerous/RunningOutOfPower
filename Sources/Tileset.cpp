@@ -90,7 +90,20 @@ void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* 
 	}
 }
 
-void Tileset::animateSpider(float px, float py)
+bool Tileset::isInLight(float x, float y, float px, float py, float mx, float my, float camX, float camY, float energy)
+{
+	log(Info, "%i -> %i", getFloor(y), getFloor(py));
+	// Light on
+	return energy >= 0.1f &&
+		// Same floor
+		getFloor(y) == getFloor(py) &&
+		// Distance small
+		Kore::abs(px - x) <= 200 &&
+		// Angle small
+		Kore::abs(Kore::atan2(my - (py - camY), mx - (px - camX)) - Kore::atan2(y - (py - camY), x - (px - camX))) < 0.2 * Kore::pi;
+}
+
+void Tileset::animateSpider(float px, float py, float mx, float my, float camX, float camY, float energy)
 {
 	static int frameCount = 0;
 	++frameCount;
@@ -99,14 +112,21 @@ void Tileset::animateSpider(float px, float py)
 		frameCount = 0;
 		for (int i = 0; i < spiderCountCurr; ++i)
 		{
+			log(Info, "Spider %i:", i);
 			spiderState[i] += spiderDir[i];
-			bool inRange = vec2(spiderPos[i].x() * tileWidth - px, spiderPos[i].y() * tileHeight - py).squareLength() <= tileWidth * tileHeight * 2;
+			bool inRange = vec2(spiderPos[i].x() * tileWidth - px, spiderPos[i].y() * tileHeight - py).squareLength() <= tileWidth * tileHeight * 4;
+			bool active = inRange && !isInLight(spiderPos[i].x() * tileWidth, spiderPos[i].y() * tileHeight, px, py, mx, my, camX, camY, energy);
 			if (spiderState[i] >= Spider9) spiderDir[i] = -1;
-			else if (spiderState[i] <= Spider1) spiderDir[i] = inRange ? +1 : 0;
-			else if (spiderState[i] > Spider1 && !inRange) spiderDir[i] = -1;
+			else if (spiderState[i] <= Spider1) spiderDir[i] = active ? +1 : 0;
+			else if (spiderState[i] > Spider1 && !active) spiderDir[i] = -1;
 			source[spiderPos[i].y() * (columns - 1) + spiderPos[i].x()] = spiderState[i];
 		}
 	}
+}
+
+int Tileset::getFloor(float py)
+{
+	return ((int)py) / tileHeight;
 }
 
 int Tileset::getTileID(float px, float py) {

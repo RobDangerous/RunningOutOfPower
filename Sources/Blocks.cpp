@@ -197,7 +197,7 @@ namespace {
 	}
 	
 	void animateSpider() {
-		tileset->animateSpider(px + playerWidth / 2, py + playerHeight / 2);
+		tileset->animateSpider(px + playerWidth / 2, py + playerHeight / 2, mx, my, camX, camY, energy);
 	}
 
 	void update() {
