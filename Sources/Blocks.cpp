@@ -23,8 +23,8 @@
 using namespace Kore;
 
 namespace {
-	const int w = 768;
-	const int h = 768;
+	const int w = 1280 / 2;
+	const int h = 720 / 2;
 
 	float playerWidth;
 	float playerHeight;
