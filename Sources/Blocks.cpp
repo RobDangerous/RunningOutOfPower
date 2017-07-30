@@ -82,9 +82,6 @@ namespace {
 	vec4 closetButton;
 	vec2 debugText;
 	
-	float playerWidth;
-	float playerHeight;
-
 	void createPipeline() {
 		Graphics4::VertexStructure structure;
 		structure.add("vertexPosition", Graphics4::Float3VertexData);
