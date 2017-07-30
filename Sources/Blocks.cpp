@@ -142,9 +142,13 @@ namespace {
 		g2->fillRect(0, h - 100, w, 100);
 		
 		// Draw buttons
-		g2->drawString(doorText, doorButton.x(), doorButton.y());
-		g2->drawString(closetText, closetButton.x(), closetButton.y());
-		
+		if (tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2) == Tileset::Door) {
+			g2->drawString(doorText, closetButton.x(), closetButton.y());
+		}
+		else if (tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2) == Tileset::Closet) {
+			g2->drawString(closetText, closetButton.x(), closetButton.y());
+		}
+
 		// Show debug text for 50 frames
 		g2->drawString(dText, debugText.x(), debugText.y());
 		if (dText[0] != '\0') dTime ++;
@@ -173,17 +177,18 @@ namespace {
 		int tile = tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2);
 		
 		if (tile == Tileset::Closet) {
+			inCloset = !inCloset;
+
 			if (inCloset) {
 				sprintf(closetText, "2: Get out of the closet");
-			} else {
+			}
+			else {
 				sprintf(closetText, "2: Hide in the closet");
 			}
 			
-			inCloset = !inCloset;
-			
 			return true;
 		} else {
-			sprintf(dText, "There is no closet");
+			//sprintf(dText, "There is no closet");
 			log(Info, "There is no closet");
 			return false;
 		}
@@ -376,11 +381,7 @@ namespace {
 		case KeyUp:
 		case KeyW:
 			up = true;
-			break;
-		case Key1:
 			goThroughDoor();
-			break;
-		case Key2:
 			hideInCloset();
 			break;
 		case KeySpace:
