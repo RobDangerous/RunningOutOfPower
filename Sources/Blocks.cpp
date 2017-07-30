@@ -180,6 +180,8 @@ namespace {
 		energy -= 0.001f;
 		if (energy < 0) energy = 0;
 
+		energy = 1;
+
 		//if (up) {
 		//	py -= 1;
 		//}
@@ -233,12 +235,22 @@ namespace {
 		}
 		if (left)
 			g2->drawScaledSubImage(playerImage, (runIndex+1)*playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
-		else if (right)
+		else if (right) {
 			g2->drawScaledSubImage(playerImage, runIndex*playerWidth, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+		}
 		else if (lastDirection == 0)
 			g2->drawScaledSubImage(playerImage, playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
-		else if (lastDirection == 1)
+		else if (lastDirection == 1) {
 			g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+			
+		}
+
+		float angle = Kore::atan2(my - (py - camY), mx - (px - camX));
+		float xoff = 20;
+		float yoff = 60;
+		g2->transformation = mat3::Translation(px - camX + xoff, py - camY + yoff) * mat3::RotationZ(angle) * mat3::Translation(-xoff, -yoff);
+		g2->drawScaledSubImage(playerImage, 9 * playerWidth, 0, playerWidth, playerHeight, 0, 0, playerWidth, playerHeight);
+		g2->transformation = mat3::Identity();
 
         g2->end();
 		
