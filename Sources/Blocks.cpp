@@ -196,20 +196,8 @@ namespace {
 		}
 	}
 	
-	bool animateSpider() {
-		int tile = tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2);
-		
-		if (tile >= Tileset::Spider1 && tile <= Tileset::Spider9) {
-			int frames = 5;
-			spiderIndex++;
-			if (spiderIndex > frames) {
-				spiderIndex = 0;
-				tileset->animateSpider(px + playerWidth / 2, py + playerHeight / 2);
-			}
-			return true;
-		} else {
-			return false;
-		}
+	void animateSpider() {
+		tileset->animateSpider(px + playerWidth / 2, py + playerHeight / 2);
 	}
 
 	void update() {

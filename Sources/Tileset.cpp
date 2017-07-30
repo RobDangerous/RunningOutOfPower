@@ -45,12 +45,20 @@ void Tileset::loadCsv(const char* csvFile, int rows, int columns) {
 	}
 
 	doorCount = 0;
+	spiderCountCurr = 0;
 	for (int y = 0; y < rows; ++y) {
 		for (int x = 0; x < columns - 1; ++x) {
 			int index = this->source[y * (columns - 1) + x];
 			if (index == Door) {
 				doors[doorCount] = vec2(x * tileWidth, y * tileHeight);
 				++doorCount;
+			}
+			else if (index >= Spider1 && index <= Spider9) {
+				assert(spiderCountCurr < spiderCountMax);
+				spiderPos[spiderCountCurr] = vec2i(x, y);
+				spiderState[spiderCountCurr] = Spider1;
+				spiderDir[spiderCountCurr] = 1;
+				++spiderCountCurr;
 			}
 		}
 	}
@@ -82,13 +90,23 @@ void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* 
 	}
 }
 
-void Tileset::animateSpider(float px, float py) {
-	spiderID = spiderID + as;
-	if (spiderID >= 8) as = -1;
-	else if (spiderID <= 0) as = +1;
-	int x = px / tileWidth;
-	int y = py / tileHeight;
-	source[y * (columns - 1) + x] = Spider1 + spiderID;
+void Tileset::animateSpider(float px, float py)
+{
+	static int frameCount = 0;
+	++frameCount;
+	if (frameCount >= 5)
+	{
+		frameCount = 0;
+		for (int i = 0; i < spiderCountCurr; ++i)
+		{
+			spiderState[i] += spiderDir[i];
+			bool inRange = vec2(spiderPos[i].x() * tileWidth - px, spiderPos[i].y() * tileHeight - py).squareLength() <= tileWidth * tileHeight * 2;
+			if (spiderState[i] >= Spider9) spiderDir[i] = -1;
+			else if (spiderState[i] <= Spider1) spiderDir[i] = inRange ? +1 : 0;
+			else if (spiderState[i] > Spider1 && !inRange) spiderDir[i] = -1;
+			source[spiderPos[i].y() * (columns - 1) + spiderPos[i].x()] = spiderState[i];
+		}
+	}
 }
 
 int Tileset::getTileID(float px, float py) {
