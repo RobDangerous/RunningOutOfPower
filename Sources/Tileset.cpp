@@ -14,6 +14,7 @@
 Tileset::Tileset(const char* csvFile, const char* tileFile, int rows, int columns, int tileWidth, int tileHeight) : tileFile(tileFile), rows(rows), columns(columns), tileWidth(tileWidth), tileHeight(tileHeight) {
 	
 	loadCsv(csvFile, rows, columns);
+	image = new Graphics4::Texture(tileFile);
 }
 
 void Tileset::loadCsv(const char* csvFile, int rows, int columns) {
@@ -41,7 +42,6 @@ void Tileset::loadCsv(const char* csvFile, int rows, int columns) {
 		ptr = std::strtok(nullptr, delimiter);
 		i++;
 	}
-	image = new Graphics4::Texture(tileFile);
 }
 
 void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights) {
@@ -57,7 +57,7 @@ void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* 
 			int index = source[y * (columns-1) + x];
 
 			if (index == 5) {
-				lights[lightIndex] = vec2(x * tileWidth - camX + tileWidth - 40, y * tileHeight - camY + 24);
+				lights[lightIndex] = vec2(x * tileWidth - camX + tileWidth - 40, y * tileHeight - camY + 60);
 				++lightIndex;
 			}
 			
@@ -74,6 +74,10 @@ void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* 
 	
 }
 
+int Tileset::getTileID(float px, float py) {
+
+	return -1;
+}
 
 
 
