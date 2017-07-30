@@ -137,7 +137,7 @@ namespace {
 	void drawGUI() {
 		g2->setColor(Graphics1::Color::Black);
 		
-		g2->fillRect(0, h - 100, w, 100);
+		g2->fillRect(0, h * 2 - 100, w * 2, 100);
 		
 		// Draw buttons
 		if (getTileID(px + playerWidth / 2, py + playerHeight / 2) == Door) {
@@ -242,13 +242,13 @@ namespace {
 
 		Graphics4::begin();
 		Graphics4::setRenderTarget(screen);
-        g2->begin(true);
+        g2->begin(true, w, h);
 		
 		vec2 lights[lightCount];
 		for (int i = 0; i < lightCount; ++i) {
 			lights[i] = vec2(-1000, -1000);
 		}
-		animateSpider(px + playerWidth / 2, py + playerHeight / 2);
+		animateSpider(px + playerWidth / 2, py + playerHeight / 2, mx, my, camX, camY, energy);
 		drawTiles(g2, camX, camY, lights);
 		for (int i = 0; i < lightCount; ++i) {
 			lights[i] = vec2(lights[i].x() / w, lights[i].y() / h);
@@ -320,7 +320,7 @@ namespace {
 		g2->end();
 		
 		Graphics4::restoreRenderTarget();
-		g2->begin();
+		g2->begin(false, w * 2, h * 2);
 		g2->setPipeline(pipeline);
 		Graphics4::setPipeline(pipeline);
 		Graphics4::setFloat(aspectLocation, w / h);
@@ -334,7 +334,7 @@ namespace {
 		Graphics4::setFloat(energyLocation, flakyEnergy(energy));
 		Graphics4::setFloat(topLocation, (py - camY - 32) / h);
 		Graphics4::setFloat(bottomLocation, (py - camY + 128) / h);
-		if (!inCloset) g2->drawImage(screen, 0, 0);
+		if (!inCloset) g2->drawScaledSubImage(screen, 0, 0, w, h, 0, 0, w * 2, h * 2);
 	//	g2->end();
 		g2->setPipeline(nullptr);
 		
@@ -342,11 +342,11 @@ namespace {
 		drawGUI();
 		
 		// Draw battery status
-		if (energy > 0.8f)		g2->drawScaledSubImage(batteryImage, 0,   0, 32, 64, w-40, h-80, 32, 64);
-		else if (energy > 0.6f) g2->drawScaledSubImage(batteryImage, 32,  0, 32, 64, w-40, h-80, 32, 64);
-		else if (energy > 0.4f) g2->drawScaledSubImage(batteryImage, 64,  0, 32, 64, w-40, h-80, 32, 64);
-		else if (energy > 0.2f) g2->drawScaledSubImage(batteryImage, 96,  0, 32, 64, w-40, h-80, 32, 64);
-		else					g2->drawScaledSubImage(batteryImage, 128, 0, 32, 64, w-40, h-80, 32, 64);
+		if (energy > 0.8f)		g2->drawScaledSubImage(batteryImage, 0,   0, 32, 64, w * 2 - 40, h * 2 - 80, 32, 64);
+		else if (energy > 0.6f) g2->drawScaledSubImage(batteryImage, 32,  0, 32, 64, w * 2 - 40, h * 2 - 80, 32, 64);
+		else if (energy > 0.4f) g2->drawScaledSubImage(batteryImage, 64,  0, 32, 64, w * 2 - 40, h * 2 - 80, 32, 64);
+		else if (energy > 0.2f) g2->drawScaledSubImage(batteryImage, 96,  0, 32, 64, w * 2 - 40, h * 2 - 80, 32, 64);
+		else					g2->drawScaledSubImage(batteryImage, 128, 0, 32, 64, w * 2 - 40, h * 2 - 80, 32, 64);
 		
 		g2->end();
 
@@ -415,8 +415,8 @@ namespace {
 	}
 
 	void mouseMove(int window, int x, int y, int moveX, int moveY) {
-		mx = x;
-		my = y;
+		mx = x / 2.0f;
+		my = y / 2.0f;
 	}
 	
 	void mousePress(int windowId, int button, int x, int y) {
@@ -434,7 +434,7 @@ namespace {
 }
 
 int kore(int argc, char** argv) {
-	System::init("Power", w, h);
+	System::init("Power", w * 2, h * 2);
 	
 	initTiles("Tiles/school.csv", "Tiles/school.png");
     
@@ -475,9 +475,9 @@ int kore(int argc, char** argv) {
 	sprintf(doorText, "Key Up: Go through the door");
 	sprintf(closetText, "Key Up: Hide in the closet");
 	
-	doorButton = vec4(10, h - 80, g2->getFont()->stringWidth(doorText), 20); // xPos, yPos, width, height
-	closetButton = vec4(10, h - 50, g2->getFont()->stringWidth(closetText), 20);
-	debugText = vec2(w / 2, h - 80);
+	doorButton = vec4(10, h * 2 - 80, g2->getFont()->stringWidth(doorText), 20); // xPos, yPos, width, height
+	closetButton = vec4(10, h * 2 - 50, g2->getFont()->stringWidth(closetText), 20);
+	debugText = vec2(w * 2 / 2, h * 2 - 80);
 
 	Keyboard::the()->KeyDown = keyDown;
 	Keyboard::the()->KeyUp = keyUp;
