@@ -5,6 +5,7 @@
 using namespace Kore;
 
 class Tileset {
+	enum TileID {Door = 0, Window = 1, Books = 2, Closet = 3, Table = 4, TableAndLamp = 5};
 
 private:
 	int* source;
@@ -25,5 +26,7 @@ public:
 	
 	Tileset(const char* csvFile, const char* tileFile, int rows, int columns, int tileWidth, int tileHeight);
 	void drawTiles(Graphics2::Graphics2* g2, float camX, float camY);
+	
+	int getTileID(float px, float py);
 
 };
