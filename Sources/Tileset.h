@@ -7,9 +7,6 @@ using namespace Kore;
 const int lightCount = 8;
 
 class Tileset {
-public:
-	enum TileID {Door = 0, Window = 1, Books = 2, Closet = 3, Table = 4, TableAndLamp = 5};
-
 private:
 	int* source;
 	Graphics4::Texture** tiles;
@@ -35,4 +32,6 @@ public:
 	
 	int getTileID(float px, float py);
 	vec2 findDoor();
+	
+	enum TileID {Door = 0, Window = 1, Books = 2, Closet = 3, Table = 4, TableAndLamp = 5};
 };

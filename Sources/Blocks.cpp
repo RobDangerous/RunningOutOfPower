@@ -15,6 +15,7 @@
 #include <Kore/System.h>
 #include <Kore/Log.h>
 #include <Kore/Math/Core.h>
+#include <Kore/Graphics1/Color.h>
 
 #include "Tileset.h"
 
@@ -56,7 +57,7 @@ namespace {
 	float mx = 0.0f;
 	float my = 0.0f;
 
-	int lastDirection = 0;	// 0 - left, 1 - right
+	int lastDirection = 1;	// 0 - left, 1 - right
 	bool left = false;
 	bool right = false;
 	bool down_ = false;
@@ -65,6 +66,24 @@ namespace {
 	int frameCount = 0;
 	
 	int runIndex = 0;
+	
+	Kravur* font14;
+	Kravur* font24;
+	Kravur* font34;
+	Kravur* font44;
+	
+	char dText[42];
+	float dTime = 0;
+	
+	char doorText[42];
+	char closetText[42];
+	
+	vec4 doorButton;
+	vec4 closetButton;
+	vec2 debugText;
+	
+	float playerWidth;
+	float playerHeight;
 
 	void createPipeline() {
 		Graphics4::VertexStructure structure;
@@ -102,6 +121,52 @@ namespace {
 	float flakyEnergy(float energy) {
 		int value = Random::get(0, energy * 20);
 		return value == 0 ? 0 : energy;
+	}
+	
+	void drawGUI() {
+		g2->setColor(Graphics1::Color::Black);
+		
+		g2->fillRect(0, h - 100, w, 100);
+		
+		// Draw buttons
+		g2->drawString(doorText, doorButton.x(), doorButton.y());
+		g2->drawString(closetText, closetButton.x(), closetButton.y());
+		
+		// Show debug text for 50 frames
+		g2->drawString(dText, debugText.x(), debugText.y());
+		if (dText[0] != '\0') dTime ++;
+		if (dTime > 50) {
+			sprintf(dText, "");
+			dTime = 0;
+		}
+		
+		g2->setColor(Graphics1::Color::White);
+	}
+	
+	bool goThroughDoor() {
+		int tile = tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2);
+		if (tile == Tileset::Door) {
+			vec2 door = tileset->findDoor();
+			px = door.x() + 32;
+			py = door.y() + 36;
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	bool hideInCloset() {
+		int tile = tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2);
+		
+		if (tile == Tileset::Closet) {
+			log(Info, "Hide in the closet");
+			return true;
+		} else {
+			sprintf(dText, "There is no closet");
+			log(Info, "There is no closet");
+			return false;
+		}
 	}
 
 	void update() {
@@ -174,8 +239,12 @@ namespace {
 		Graphics4::setFloats(lightsLocation, (float*)lights, lightCount * 2);
 		Graphics4::setFloat(energyLocation, flakyEnergy(energy));
 		g2->drawImage(screen, 0, 0);
-		g2->end();
+	//	g2->end();
 		g2->setPipeline(nullptr);
+		
+	//	g2->begin();
+		drawGUI();
+		g2->end();
 
         Graphics4::end();
 		Graphics4::swapBuffers();
@@ -201,15 +270,12 @@ namespace {
 		case KeyW:
 			up = true;
 			break;
-		case Key1: {
-			int tile = tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2);
-			if (tile == Tileset::Door) {
-				vec2 door = tileset->findDoor();
-				px = door.x() + 32;
-				py = door.y() + 36;
-			}
+		case Key1:
+			goThroughDoor();
 			break;
-		}
+		case Key2:
+			hideInCloset();
+			break;
 		default:
 			break;
 		}
@@ -242,6 +308,19 @@ namespace {
 		mx = x;
 		my = y;
 	}
+	
+	void mousePress(int windowId, int button, int x, int y) {
+		if (x > doorButton.x() && y > doorButton.y() && x < doorButton.x() + doorButton.z() && y < doorButton.y() + doorButton.w()) {
+			log(Info, "door button pressed");
+			goThroughDoor();
+		}
+		
+		if (x > closetButton.x() && y > closetButton.y() && x < closetButton.x() + closetButton.z() && y < closetButton.y() + closetButton.w()) {
+			log(Info, "closet button pressed");
+			hideInCloset();
+		}
+		
+	}
 }
 
 int kore(int argc, char** argv) {
@@ -263,10 +342,29 @@ int kore(int argc, char** argv) {
 	playerImage = new Graphics4::Texture("player.png");
 	playerWidth = playerImage->width / 10.0f;
 	playerHeight = playerImage->height / 2.0f;
+	px = 0;
+	py = tileHeight - playerImage->height/2;
+	
+	font14 = Kravur::load("Fonts/arial", FontStyle(), 14);
+	font24 = Kravur::load("Fonts/arial", FontStyle(), 24);
+	font34 = Kravur::load("Fonts/arial", FontStyle(), 34);
+	font44 = Kravur::load("Fonts/arial", FontStyle(), 44);
+	
+	g2->setFont(font24);
+	g2->setFontColor(Graphics1::Color::White);
+	g2->setFontSize(24);
+	
+	sprintf(doorText, "1: Go through the door");
+	sprintf(closetText, "2: Hide in the closet");
+	
+	doorButton = vec4(10, h - 80, g2->getFont()->stringWidth(doorText), 20); // xPos, yPos, width, height
+	closetButton = vec4(10, h - 50, g2->getFont()->stringWidth(closetText), 20);
+	debugText = vec2(w / 2, h - 80);
 
 	Keyboard::the()->KeyDown = keyDown;
 	Keyboard::the()->KeyUp = keyUp;
 	Mouse::the()->Move = mouseMove;
+	Mouse::the()->Press = mousePress;
 
 	Kore::System::start();
     
