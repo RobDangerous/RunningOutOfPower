@@ -34,6 +34,8 @@ namespace {
     Graphics2::Graphics2* g2;
 	
 	Graphics4::Texture* playerImage;
+	
+	Graphics4::Texture* batteryImage;
 
 	Graphics4::RenderTarget* screen;
 	Graphics4::PipelineState* pipeline;
@@ -249,6 +251,10 @@ namespace {
 		
 	//	g2->begin();
 		drawGUI();
+		
+		// Draw battery status
+		g2->drawScaledSubImage(batteryImage, 0, 0, 32, 64, w-40, h-80, 32, 64);
+		
 		g2->end();
 
         Graphics4::end();
@@ -347,6 +353,8 @@ int kore(int argc, char** argv) {
 	playerImage = new Graphics4::Texture("player.png");
 	px = 0;
 	py = tileHeight - playerImage->height/2;
+	
+	batteryImage = new Graphics4::Texture("Tiles/battery.png");
 	
 	font14 = Kravur::load("Fonts/arial", FontStyle(), 14);
 	font24 = Kravur::load("Fonts/arial", FontStyle(), 24);
