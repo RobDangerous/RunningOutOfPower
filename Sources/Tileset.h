@@ -24,6 +24,6 @@ private:
 public:
 	
 	Tileset(const char* csvFile, const char* tileFile, int rows, int columns, int tileWidth, int tileHeight);
-	void drawTiles(Graphics2::Graphics2* g2);
+	void drawTiles(Graphics2::Graphics2* g2, float camX, float camY);
 
 };

@@ -44,7 +44,7 @@ void Tileset::loadCsv(const char* csvFile, int rows, int columns) {
 	image = new Graphics4::Texture(tileFile);
 }
 
-void Tileset::drawTiles(Graphics2::Graphics2* g2) {	
+void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY) {	
 	const int sourceColumns = image->texWidth / tileWidth;
 	const int sourceRows = image->texHeight / tileHeight;
 	//const int numOfTiles = rows * columns;
@@ -61,7 +61,7 @@ void Tileset::drawTiles(Graphics2::Graphics2* g2) {
 			int yOffset = 0;//row;
 			
 			//Graphics4::Texture* tile = new Graphics4::Texture();
-			g2->drawScaledSubImage(image, column*tileWidth+xOffset, row*tileHeight+yOffset , tileWidth, tileHeight, x*tileWidth, y*tileHeight, tileWidth, tileHeight);
+			g2->drawScaledSubImage(image, column*tileWidth+xOffset, row*tileHeight+yOffset , tileWidth, tileHeight, x*tileWidth - camX, y*tileHeight - camY, tileWidth, tileHeight);
 		}
 	}
 	

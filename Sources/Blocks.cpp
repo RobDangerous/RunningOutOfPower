@@ -14,6 +14,7 @@
 #include <Kore/Math/Random.h>
 #include <Kore/System.h>
 #include <Kore/Log.h>
+#include <Kore/Math/Core.h>
 
 #include "Tileset.h"
 
@@ -110,11 +111,14 @@ namespace {
 		float playerWidth = playerImage->width / 10.0f;
 		float playerHeight = playerImage->height / 2.0f;
 
+		float camX = Kore::max(0.0f, px - w / 2 + playerWidth / 2);
+		float camY = Kore::max(0.0f, py - h / 2 + playerHeight / 2);
+
 		Graphics4::begin();
 		Graphics4::setRenderTarget(screen);
         g2->begin(true);
 		
-		tileset->drawTiles(g2);
+		tileset->drawTiles(g2, camX, camY);
 
 		frameCount++;
 		if (frameCount > 10) {
@@ -124,13 +128,13 @@ namespace {
 			runIndex++;
 		}
 		if (left)
-			g2->drawScaledSubImage(playerImage, runIndex*playerWidth, playerHeight, playerWidth, playerHeight, px, py, playerWidth, playerHeight);
+			g2->drawScaledSubImage(playerImage, runIndex*playerWidth, playerHeight, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 		else if (right)
-			g2->drawScaledSubImage(playerImage, runIndex*playerWidth, 0, playerWidth, playerHeight, px, py, playerWidth, playerHeight);
+			g2->drawScaledSubImage(playerImage, runIndex*playerWidth, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 		else if (lastDirection == 0)
-			g2->drawScaledSubImage(playerImage, 0, playerHeight, playerWidth, playerHeight, px, py, playerWidth, playerHeight);
+			g2->drawScaledSubImage(playerImage, 0, playerHeight, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 		else if (lastDirection == 1)
-			g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px, py, playerWidth, playerHeight);
+			g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 
         g2->end();
 		
@@ -142,7 +146,7 @@ namespace {
 		angle += 0.01f;
 		if (angle > pi) angle = -pi;
 		Graphics4::setFloat(angleLocation, angle);
-		Graphics4::setFloat2(playerLocation, vec2((px + playerWidth / 2.0f) / w, (py + playerHeight / 2.0f) / h));
+		Graphics4::setFloat2(playerLocation, vec2((px - camX + playerWidth / 2.0f) / w, (py - camY + playerHeight / 2.0f) / h));
 		Graphics4::setFloat2(mouseLocation, vec2(mx / w, my / h));
 		Graphics4::setInt(animLocation, anim);
 		g2->drawImage(screen, 0, 0);
