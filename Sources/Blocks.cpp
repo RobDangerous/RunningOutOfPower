@@ -232,11 +232,11 @@ namespace {
 			runIndex++;
 		}
 		if (left)
-			g2->drawScaledSubImage(playerImage, runIndex*playerWidth, playerHeight, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+			g2->drawScaledSubImage(playerImage, (runIndex+1)*playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 		else if (right)
 			g2->drawScaledSubImage(playerImage, runIndex*playerWidth, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 		else if (lastDirection == 0)
-			g2->drawScaledSubImage(playerImage, 0, playerHeight, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+			g2->drawScaledSubImage(playerImage, playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 		else if (lastDirection == 1)
 			g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 
