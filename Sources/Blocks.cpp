@@ -23,10 +23,6 @@
 using namespace Kore;
 
 namespace {
-	Tileset* tileset;
-	
-	const int rows = 5;
-	const int columns = 12;
 	const int w = 768;
 	const int h = 768;
 
@@ -144,10 +140,10 @@ namespace {
 		g2->fillRect(0, h - 100, w, 100);
 		
 		// Draw buttons
-		if (tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2) == Tileset::Door) {
+		if (getTileID(px + playerWidth / 2, py + playerHeight / 2) == Door) {
 			g2->drawString(doorText, closetButton.x(), closetButton.y());
 		}
-		else if (tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2) == Tileset::Closet) {
+		else if (getTileID(px + playerWidth / 2, py + playerHeight / 2) == Closet) {
 			g2->drawString(closetText, closetButton.x(), closetButton.y());
 		}
 
@@ -163,9 +159,9 @@ namespace {
 	}
 	
 	bool goThroughDoor() {
-		int tile = tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2);
-		if (tile == Tileset::Door) {
-			vec2 door = tileset->findDoor();
+		int tile = getTileID(px + playerWidth / 2, py + playerHeight / 2);
+		if (tile == Door) {
+			vec2 door = findDoor();
 			px = door.x() + 32;
 			py = door.y() + 36;
 			return true;
@@ -176,9 +172,9 @@ namespace {
 	}
 	
 	bool hideInTheCloset() {
-		int tile = tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2);
+		int tile = getTileID(px + playerWidth / 2, py + playerHeight / 2);
 		
-		if (tile == Tileset::Closet) {
+		if (tile == Closet) {
 			inCloset = !inCloset;
 
 			if (inCloset) {
@@ -194,10 +190,6 @@ namespace {
 			log(Info, "There is no closet");
 			return false;
 		}
-	}
-	
-	void animateSpider() {
-		tileset->animateSpider(px + playerWidth / 2, py + playerHeight / 2);
 	}
 
 	void update() {
@@ -256,8 +248,8 @@ namespace {
 		for (int i = 0; i < lightCount; ++i) {
 			lights[i] = vec2(-1000, -1000);
 		}
-		animateSpider();
-		tileset->drawTiles(g2, camX, camY, lights);
+		animateSpider(px + playerWidth / 2, py + playerHeight / 2);
+		drawTiles(g2, camX, camY, lights);
 		for (int i = 0; i < lightCount; ++i) {
 			lights[i] = vec2(lights[i].x() / w, lights[i].y() / h);
 		}
@@ -444,7 +436,7 @@ namespace {
 int kore(int argc, char** argv) {
 	System::init("Power", w, h);
 	
-	tileset = new Tileset("Tiles/school.csv", "Tiles/school.png", rows, columns, tileWidth, tileHeight);
+	initTiles("Tiles/school.csv", "Tiles/school.png");
     
     g2 = new Graphics2::Graphics2(w, h, false);
 	screen = new Graphics4::RenderTarget(w, h, 0);
@@ -463,10 +455,10 @@ int kore(int argc, char** argv) {
 	playerHeight = playerImage->height / 2.0f;
 	px = 0;
 	py = tileHeight - playerImage->height/2;
-
+	
 	Monster::init();
 	for (int i = 0; i < monsterCount; ++i) {
-		monsters[i].position();
+		monsters[i].init();
 	}
 	
 	batteryImage = new Graphics4::Texture("Tiles/battery.png");

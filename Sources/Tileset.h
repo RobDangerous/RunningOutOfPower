@@ -4,43 +4,37 @@
 
 using namespace Kore;
 
-const int lightCount = 8;
-const int spiderCountMax = 16;
-const int tileWidth = 128;
-const int tileHeight = 168;
-
-class Tileset {
-private:
-	int* source;
-	Graphics4::Texture** tiles;
-	
+namespace {
 	const char* tileFile;
-	int tileWidth;
-	int tileHeight;
+	Graphics4::Texture* image;
 	
-	int rows;
-	int columns;
-
-	vec2 doors[32];
-	int doorCount;
+	const int lightCount = 8;
+	const int spiderCountMax = 16;
+	const int tileWidth = 128;
+	const int tileHeight = 168;
+	
 	vec2i spiderPos[spiderCountMax];
 	int spiderState[spiderCountMax];
 	int spiderDir[spiderCountMax];
 	int spiderCountCurr;
+	
+	int rows = 5;
+	int columns = 12;
+	
+	int* source;
 
-	Graphics4::Texture* image;
+	vec2 doors[32];
+	int doorCount;
+}
+
+void loadCsv(const char* csvFile);
+
+void initTiles(const char* csvFile, const char* tileFile);
+void drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights);
 	
-	void loadCsv(const char* csvFile, int rows, int columns);
+int getTileID(float px, float py);
+vec2 findDoor();
 	
-public:
+void animateSpider(float px, float py);
 	
-	Tileset(const char* csvFile, const char* tileFile, int rows, int columns, int tileWidth, int tileHeight);
-	void drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights);
-	
-	int getTileID(float px, float py);
-	vec2 findDoor();
-	
-	void animateSpider(float px, float py);
-	
-	enum TileID {Door = 0, Window = 1, Books = 2, Closet = 3, Table = 4, TableAndLamp = 5, SpiderWeb = 6, Spider1 = 7, Spider2 = 8, Spider3 = 9, Spider4 = 10, Spider5 = 11, Spider6 = 12, Spider7 = 13, Spider8 = 14, Spider9 = 15};
-};
+enum TileID {Door = 0, Window = 1, Books = 2, Closet = 3, Table = 4, TableAndLamp = 5, SpiderWeb = 6, Spider1 = 7, Spider2 = 8, Spider3 = 9, Spider4 = 10, Spider5 = 11, Spider6 = 12, Spider7 = 13, Spider8 = 14, Spider9 = 15};

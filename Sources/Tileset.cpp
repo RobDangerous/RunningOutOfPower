@@ -12,34 +12,34 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-Tileset::Tileset(const char* csvFile, const char* tileFile, int rows, int columns, int tileWidth, int tileHeight) : tileFile(tileFile), rows(rows), columns(columns), tileWidth(tileWidth), tileHeight(tileHeight) {
-	
-	loadCsv(csvFile, rows, columns);
-	image = new Graphics4::Texture(tileFile);
+void initTiles(const char* csvFilePath, const char* tileFilePath) {
+	tileFile = tileFilePath;
+	loadCsv(csvFilePath);
+	image = new Graphics4::Texture(tileFilePath);
 }
 
-void Tileset::loadCsv(const char* csvFile, int rows, int columns) {
+void loadCsv(const char* csvFile) {
 	FileReader file(csvFile);
 	
 	void* data = file.readAll();
 	int length = file.size();
 	
-	char* source = new char[length + 1];
+	char* cpyData = new char[length + 1];
 	for (int i = 0; i < length; ++i) {
-		source[i] = ((char*)data)[i];
+		cpyData[i] = ((char*)data)[i];
 	}
-	source[length] = 0;
+	cpyData[length] = 0;
 	
-	this->source = new int[rows * columns];
+	source = new int[rows * columns];
 	int i = 0;
 	
 	char delimiter[] = ",;";
-	char* ptr = std::strtok(source, delimiter);
+	char* ptr = std::strtok(cpyData, delimiter);
 	while (ptr != nullptr) {
 		assert(i < rows * columns);
 		int num = atoi(ptr);
 		//log(Info, "%i -> %i", i, num);
-		this->source[i] = num;
+		source[i] = num;
 		ptr = std::strtok(nullptr, delimiter);
 		i++;
 	}
@@ -48,7 +48,7 @@ void Tileset::loadCsv(const char* csvFile, int rows, int columns) {
 	spiderCountCurr = 0;
 	for (int y = 0; y < rows; ++y) {
 		for (int x = 0; x < columns - 1; ++x) {
-			int index = this->source[y * (columns - 1) + x];
+			int index = source[y * (columns - 1) + x];
 			if (index == Door) {
 				doors[doorCount] = vec2(x * tileWidth, y * tileHeight);
 				++doorCount;
@@ -64,7 +64,7 @@ void Tileset::loadCsv(const char* csvFile, int rows, int columns) {
 	}
 }
 
-void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights) {
+void drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights) {
 	int lightIndex = 0;
 
 	const int sourceColumns = image->texWidth / tileWidth;
@@ -90,7 +90,7 @@ void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* 
 	}
 }
 
-void Tileset::animateSpider(float px, float py)
+void animateSpider(float px, float py)
 {
 	static int frameCount = 0;
 	++frameCount;
@@ -109,13 +109,13 @@ void Tileset::animateSpider(float px, float py)
 	}
 }
 
-int Tileset::getTileID(float px, float py) {
+int getTileID(float px, float py) {
 	int x = px / tileWidth;
 	int y = py / tileHeight;
 	return source[y * (columns - 1) + x];
 }
 
-vec2 Tileset::findDoor() {
+vec2 findDoor() {
 	static vec2 last = doors[0];
 	vec2 door = doors[Random::get(0, doorCount - 1)];
 	while (door == last) {
