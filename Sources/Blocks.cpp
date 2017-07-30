@@ -40,6 +40,7 @@ namespace {
 	Graphics4::ConstantLocation playerLocation;
 	Graphics4::ConstantLocation mouseLocation;
 	Graphics4::ConstantLocation animLocation;
+	Graphics4::ConstantLocation lightsLocation;
 
 	float angle = 0.0f;
 
@@ -87,6 +88,7 @@ namespace {
 		playerLocation = pipeline->getConstantLocation("player");
 		mouseLocation = pipeline->getConstantLocation("mouse");
 		animLocation = pipeline->getConstantLocation("anim");
+		lightsLocation = pipeline->getConstantLocation("lights");
 	}
 
 	void update() {
@@ -118,7 +120,14 @@ namespace {
 		Graphics4::setRenderTarget(screen);
         g2->begin(true);
 		
-		tileset->drawTiles(g2, camX, camY);
+		vec2 lights[lightCount];
+		for (int i = 0; i < lightCount; ++i) {
+			lights[i] = vec2(-1000, -1000);
+		}
+		tileset->drawTiles(g2, camX, camY, lights);
+		for (int i = 0; i < lightCount; ++i) {
+			lights[i] = vec2(lights[i].x() / w, lights[i].y() / h);
+		}
 
 		frameCount++;
 		if (frameCount > 10) {
@@ -149,6 +158,7 @@ namespace {
 		Graphics4::setFloat2(playerLocation, vec2((px - camX + playerWidth / 2.0f) / w, (py - camY + playerHeight / 2.0f) / h));
 		Graphics4::setFloat2(mouseLocation, vec2(mx / w, my / h));
 		Graphics4::setInt(animLocation, anim);
+		Graphics4::setFloats(lightsLocation, (float*)lights, lightCount * 2);
 		g2->drawImage(screen, 0, 0);
 		g2->end();
 		g2->setPipeline(nullptr);

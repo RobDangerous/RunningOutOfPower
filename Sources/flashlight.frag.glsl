@@ -10,6 +10,7 @@ uniform float aspect;
 uniform vec2 player;
 uniform vec2 mouse;
 uniform int anim;
+uniform vec2 lights[8];
 
 // noise from https://www.shadertoy.com/view/Msf3WH
 
@@ -88,6 +89,13 @@ void main() {
 	scale = easeOutQuart(clamp(scale, 0.0, 1.0));
 
 	scale += easeOutQuad(1.0 - clamp(tdistance * 10.0, 0.0, 1.0));
+
+	for (int i = 0; i < 8; ++i) {
+		float difx = texCoord.x - lights[i].x;
+		float dify = texCoord.y - lights[i].y;
+		float dist = sqrt(difx * difx + dify * dify);
+		scale += easeOutQuad(1.0 - clamp(dist * 10.0, 0.0, 1.0));
+	}
 
 	scale = clamp(scale, 0.0, 1.0);
 
