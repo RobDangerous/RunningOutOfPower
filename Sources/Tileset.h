@@ -5,6 +5,9 @@
 using namespace Kore;
 
 const int lightCount = 8;
+const int spiderCountMax = 16;
+const int tileWidth = 128;
+const int tileHeight = 168;
 
 class Tileset {
 private:
@@ -20,11 +23,12 @@ private:
 
 	vec2 doors[32];
 	int doorCount;
+	vec2i spiderPos[spiderCountMax];
+	int spiderState[spiderCountMax];
+	int spiderDir[spiderCountMax];
+	int spiderCountCurr;
 
 	Graphics4::Texture* image;
-	
-	int spiderID = 0;
-	int as = 1;
 	
 	void loadCsv(const char* csvFile, int rows, int columns);
 	
