@@ -87,6 +87,8 @@ namespace {
 	vec4 closetButton;
 	vec2 debugText;
 	
+	bool inCloset = false;
+	
 	void createPipeline() {
 		Graphics4::VertexStructure structure;
 		structure.add("vertexPosition", Graphics4::Float3VertexData);
@@ -162,7 +164,14 @@ namespace {
 		int tile = tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2);
 		
 		if (tile == Tileset::Closet) {
-			log(Info, "Hide in the closet");
+			if (inCloset) {
+				sprintf(closetText, "2: Get out of the closet");
+			} else {
+				sprintf(closetText, "2: Hide in the closet");
+			}
+			
+			inCloset = !inCloset;
+			
 			return true;
 		} else {
 			sprintf(dText, "There is no closet");
@@ -188,11 +197,13 @@ namespace {
 		//if (down_) {
 		//	py += 1;
 		//}
-		if (left) {
-			px -= 4;
-		}
-		if (right) {
-			px += 4;
+		if (!inCloset) {
+			if (left) {
+				px -= 4;
+			}
+			if (right) {
+				px += 4;
+			}
 		}
 
 		float targetCamX = Kore::max(0.0f, px - w / 2 + playerWidth / 2);
@@ -233,26 +244,26 @@ namespace {
 			runIndex = runIndex % 8;
 			runIndex++;
 		}
-		if (left)
-			g2->drawScaledSubImage(playerImage, (runIndex+1)*playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
-		else if (right) {
-			g2->drawScaledSubImage(playerImage, runIndex*playerWidth, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
-		}
-		else if (lastDirection == 0)
-			g2->drawScaledSubImage(playerImage, playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
-		else if (lastDirection == 1) {
-			g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
-			
+
+		if (!inCloset) {
+			if (left)
+				g2->drawScaledSubImage(playerImage, (runIndex+1)*playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+			else if (right)
+				g2->drawScaledSubImage(playerImage, runIndex*playerWidth, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+			else if (lastDirection == 0)
+				g2->drawScaledSubImage(playerImage, playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+			else if (lastDirection == 1)
+				g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+
+			float angle = Kore::atan2(my - (py - camY), mx - (px - camX));
+			float xoff = 20;
+			float yoff = 60;
+			g2->transformation = mat3::Translation(px - camX + xoff, py - camY + yoff) * mat3::RotationZ(angle) * mat3::Translation(-xoff, -yoff);
+			g2->drawScaledSubImage(playerImage, 9 * playerWidth, 0, playerWidth, playerHeight, 0, 0, playerWidth, playerHeight);
+			g2->transformation = mat3::Identity();
 		}
 
-		float angle = Kore::atan2(my - (py - camY), mx - (px - camX));
-		float xoff = 20;
-		float yoff = 60;
-		g2->transformation = mat3::Translation(px - camX + xoff, py - camY + yoff) * mat3::RotationZ(angle) * mat3::Translation(-xoff, -yoff);
-		g2->drawScaledSubImage(playerImage, 9 * playerWidth, 0, playerWidth, playerHeight, 0, 0, playerWidth, playerHeight);
-		g2->transformation = mat3::Identity();
-
-        g2->end();
+		g2->end();
 		
 		Graphics4::restoreRenderTarget();
 		g2->begin();
@@ -267,7 +278,7 @@ namespace {
 		Graphics4::setInt(animLocation, anim);
 		Graphics4::setFloats(lightsLocation, (float*)lights, lightCount * 2);
 		Graphics4::setFloat(energyLocation, flakyEnergy(energy));
-		g2->drawImage(screen, 0, 0);
+		if (!inCloset) g2->drawImage(screen, 0, 0);
 	//	g2->end();
 		g2->setPipeline(nullptr);
 		
@@ -275,10 +286,10 @@ namespace {
 		drawGUI();
 		
 		// Draw battery status
-		if (energy > 0.8f)		g2->drawScaledSubImage(batteryImage, 0, 0, 32, 64, w-40, h-80, 32, 64);
-		else if (energy > 0.6f) g2->drawScaledSubImage(batteryImage, 32, 0, 32, 64, w-40, h-80, 32, 64);
-		else if (energy > 0.4f) g2->drawScaledSubImage(batteryImage, 64, 0, 32, 64, w-40, h-80, 32, 64);
-		else if (energy > 0.2f) g2->drawScaledSubImage(batteryImage, 96, 0, 32, 64, w-40, h-80, 32, 64);
+		if (energy > 0.8f)		g2->drawScaledSubImage(batteryImage, 0,   0, 32, 64, w-40, h-80, 32, 64);
+		else if (energy > 0.6f) g2->drawScaledSubImage(batteryImage, 32,  0, 32, 64, w-40, h-80, 32, 64);
+		else if (energy > 0.4f) g2->drawScaledSubImage(batteryImage, 64,  0, 32, 64, w-40, h-80, 32, 64);
+		else if (energy > 0.2f) g2->drawScaledSubImage(batteryImage, 96,  0, 32, 64, w-40, h-80, 32, 64);
 		else					g2->drawScaledSubImage(batteryImage, 128, 0, 32, 64, w-40, h-80, 32, 64);
 		
 		g2->end();
