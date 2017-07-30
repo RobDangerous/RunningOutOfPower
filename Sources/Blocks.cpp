@@ -135,7 +135,7 @@ namespace {
 	}
 	
 	void drawGUI() {
-		g2->setColor(Graphics1::Color::Black);
+		g2->setColor(0x77000000);
 		
 		g2->fillRect(0, h * 2 - 100, w * 2, 100);
 		
