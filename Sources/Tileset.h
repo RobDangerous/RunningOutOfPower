@@ -6,6 +6,8 @@ using namespace Kore;
 
 const int lightCount = 8;
 const int spiderCountMax = 16;
+const int tileWidth = 128;
+const int tileHeight = 168;
 
 class Tileset {
 private:
