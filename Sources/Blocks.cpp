@@ -245,7 +245,11 @@ namespace {
 		drawGUI();
 		
 		// Draw battery status
-		g2->drawScaledSubImage(batteryImage, 0, 0, 32, 64, w-40, h-80, 32, 64);
+		if (energy > 0.8f)		g2->drawScaledSubImage(batteryImage, 0, 0, 32, 64, w-40, h-80, 32, 64);
+		else if (energy > 0.6f) g2->drawScaledSubImage(batteryImage, 32, 0, 32, 64, w-40, h-80, 32, 64);
+		else if (energy > 0.4f) g2->drawScaledSubImage(batteryImage, 64, 0, 32, 64, w-40, h-80, 32, 64);
+		else if (energy > 0.2f) g2->drawScaledSubImage(batteryImage, 96, 0, 32, 64, w-40, h-80, 32, 64);
+		else					g2->drawScaledSubImage(batteryImage, 128, 0, 32, 64, w-40, h-80, 32, 64);
 		
 		g2->end();
 
