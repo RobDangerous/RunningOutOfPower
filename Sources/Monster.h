@@ -12,4 +12,8 @@ public:
 	static void init();
 	void update();
 	void render(Kore::Graphics2::Graphics2* g2, float camX, float camY);
+private:
+	enum Status {
+		WalkingLeft, WalkingRight
+	} status;
 };

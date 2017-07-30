@@ -18,6 +18,7 @@ Monster::Monster() : x(400), y(0) {
 
 void Monster::position() {
 	y = tileHeight - height;
+	status = WalkingRight;
 }
 
 void Monster::init() {
@@ -27,11 +28,35 @@ void Monster::init() {
 }
 
 void Monster::update() {
-	x += 1;
-	++anim;
+	switch (status) {
+	case WalkingLeft:
+		x -= 1;
+		++anim;
+		if (x < 100) {
+			status = WalkingRight;
+		}
+		break;
+	case WalkingRight:
+		x += 1;
+		++anim;
+		if (x > 1200) {
+			status = WalkingLeft;
+		}
+		break;
+	}
 }
 
 void Monster::render(Kore::Graphics2::Graphics2* g2, float camX, float camY) {
-	int animIndex = (anim / 10) % 8 + 1;
-	g2->drawScaledSubImage(texture, animIndex * width, height, width, height, x - camX, y - camY, width, height);
+	switch (status) {
+	case WalkingRight: {
+		int animIndex = (anim / 10) % 8 + 1;
+		g2->drawScaledSubImage(texture, animIndex * width, height, width, height, x - camX, y - camY, width, height);
+		break;
+	}
+	case WalkingLeft: {
+		int animIndex = (anim / 10) % 8 + 1;
+		g2->drawScaledSubImage(texture, animIndex * width, 0, width, height, x - camX, y - camY, width, height);
+		break;
+	}
+	}
 }

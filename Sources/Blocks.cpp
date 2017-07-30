@@ -275,6 +275,9 @@ namespace {
 		}
 
 		for (int i = 0; i < monsterCount; ++i) {
+			//if (Kore::abs(px - monsters[i].x) < 100 && mx > px) {
+
+			//}
 			monsters[i].update();
 		}
 
