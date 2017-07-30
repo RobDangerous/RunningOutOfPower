@@ -41,6 +41,9 @@ namespace {
 	Graphics4::ConstantLocation mouseLocation;
 	Graphics4::ConstantLocation animLocation;
 	Graphics4::ConstantLocation lightsLocation;
+	Graphics4::ConstantLocation energyLocation;
+
+	float energy = 1.0;
 
 	float angle = 0.0f;
 
@@ -89,6 +92,12 @@ namespace {
 		mouseLocation = pipeline->getConstantLocation("mouse");
 		animLocation = pipeline->getConstantLocation("anim");
 		lightsLocation = pipeline->getConstantLocation("lights");
+		energyLocation = pipeline->getConstantLocation("energy");
+	}
+
+	float flakyEnergy(float energy) {
+		int value = Random::get(0, energy * 20);
+		return value == 0 ? 0 : energy;
 	}
 
 	void update() {
@@ -96,6 +105,9 @@ namespace {
 
 		static int anim = 0;
 		++anim;
+
+		energy -= 0.001f;
+		if (energy < 0) energy = 0;
 
 		if (up) {
 			py -= 1;
@@ -159,6 +171,7 @@ namespace {
 		Graphics4::setFloat2(mouseLocation, vec2(mx / w, my / h));
 		Graphics4::setInt(animLocation, anim);
 		Graphics4::setFloats(lightsLocation, (float*)lights, lightCount * 2);
+		Graphics4::setFloat(energyLocation, flakyEnergy(energy));
 		g2->drawImage(screen, 0, 0);
 		g2->end();
 		g2->setPipeline(nullptr);
