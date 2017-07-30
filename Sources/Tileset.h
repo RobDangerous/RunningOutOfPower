@@ -38,5 +38,5 @@ public:
 	
 	void animateSpider(float px, float py);
 	
-	enum TileID {Door = 0, Window = 1, Books = 2, Closet = 3, Table = 4, TableAndLamp = 5, SpiderWeb = 6, Spider1 = 7, Spider2 = 8, Spider3 = 9};
+	enum TileID {Door = 0, Window = 1, Books = 2, Closet = 3, Table = 4, TableAndLamp = 5, SpiderWeb = 6, Spider1 = 7, Spider2 = 8, Spider3 = 9, Spider4 = 10, Spider5 = 11, Spider6 = 12, Spider7 = 13, Spider8 = 14, Spider9 = 15};
 };

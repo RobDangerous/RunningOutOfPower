@@ -84,7 +84,7 @@ void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* 
 
 void Tileset::animateSpider(float px, float py) {
 	spiderID = spiderID + as;
-	if (spiderID >= 2) as = -1;
+	if (spiderID >= 8) as = -1;
 	else if (spiderID <= 0) as = +1;
 	int x = px / tileWidth;
 	int y = py / tileHeight;

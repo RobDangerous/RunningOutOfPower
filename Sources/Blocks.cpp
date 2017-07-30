@@ -173,17 +173,17 @@ namespace {
 		}
 	}
 	
-	bool hideInCloset() {
+	bool hideInTheCloset() {
 		int tile = tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2);
 		
 		if (tile == Tileset::Closet) {
 			inCloset = !inCloset;
 
 			if (inCloset) {
-				sprintf(closetText, "2: Get out of the closet");
+				sprintf(closetText, "Key Down: Get out of the closet");
 			}
 			else {
-				sprintf(closetText, "2: Hide in the closet");
+				sprintf(closetText, "Key Up: Hide in the closet");
 			}
 			
 			return true;
@@ -197,8 +197,8 @@ namespace {
 	bool animateSpider() {
 		int tile = tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2);
 		
-		if (tile == Tileset::Spider1 || tile == Tileset::Spider2 || tile == Tileset::Spider3) {
-			int frames = 50;
+		if (tile >= Tileset::Spider1 && tile <= Tileset::Spider9) {
+			int frames = 5;
 			spiderIndex++;
 			if (spiderIndex > frames) {
 				spiderIndex = 0;
@@ -377,12 +377,13 @@ namespace {
 		case KeyDown:
 		case KeyS:
 			down_ = true;
+			hideInTheCloset();
 			break;
 		case KeyUp:
 		case KeyW:
 			up = true;
 			goThroughDoor();
-			hideInCloset();
+			hideInTheCloset();
 			break;
 		case KeySpace:
 			left = false;
@@ -433,7 +434,7 @@ namespace {
 		
 		if (x > closetButton.x() && y > closetButton.y() && x < closetButton.x() + closetButton.z() && y < closetButton.y() + closetButton.w()) {
 			log(Info, "closet button pressed");
-			hideInCloset();
+			hideInTheCloset();
 		}
 		
 	}
@@ -473,8 +474,8 @@ int kore(int argc, char** argv) {
 	g2->setFontColor(Graphics1::Color::White);
 	g2->setFontSize(24);
 	
-	sprintf(doorText, "1: Go through the door");
-	sprintf(closetText, "2: Hide in the closet");
+	sprintf(doorText, "Key Up: Go through the door");
+	sprintf(closetText, "Key Up: Hide in the closet");
 	
 	doorButton = vec4(10, h - 80, g2->getFont()->stringWidth(doorText), 20); // xPos, yPos, width, height
 	closetButton = vec4(10, h - 50, g2->getFont()->stringWidth(closetText), 20);
