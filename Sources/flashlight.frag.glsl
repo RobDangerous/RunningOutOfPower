@@ -94,7 +94,7 @@ void main() {
 		float difx = texCoord.x - lights[i].x;
 		float dify = texCoord.y - lights[i].y;
 		float dist = sqrt(difx * difx + dify * dify);
-		scale += easeOutQuad(1.0 - clamp(dist * 10.0, 0.0, 1.0));
+		scale += easeOutQuad(1.0 - clamp(dist * 15.0, 0.0, 1.0));
 	}
 
 	scale = clamp(scale, 0.0, 1.0);

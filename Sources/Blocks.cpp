@@ -23,8 +23,9 @@ using namespace Kore;
 namespace {
 	Tileset* tileset;
 	
-	const int tileWidthHeight = 128;
-	const int rows = 6;
+	const int tileWidth = 128;
+	const int tileHeight = 168;
+	const int rows = 5;
 	const int columns = 12;
 	const int w = 768;
 	const int h = 768;
@@ -224,7 +225,7 @@ namespace {
 int kore(int argc, char** argv) {
 	System::init("Power", w, h);
 	
-	tileset = new Tileset("Tiles/school.csv", "Tiles/school.png", rows, columns, tileWidthHeight, tileWidthHeight);
+	tileset = new Tileset("Tiles/school.csv", "Tiles/school.png", rows, columns, tileWidth, tileHeight);
     
     g2 = new Graphics2::Graphics2(w, h, false);
 	screen = new Graphics4::RenderTarget(w, h, 0);

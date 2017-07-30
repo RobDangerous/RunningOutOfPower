@@ -57,7 +57,7 @@ void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* 
 			int index = source[y * (columns-1) + x];
 
 			if (index == 5) {
-				lights[lightIndex] = vec2(x * tileWidth - camX + tileWidth - 40, y * tileHeight - camY + 24);
+				lights[lightIndex] = vec2(x * tileWidth - camX + tileWidth - 40, y * tileHeight - camY + 60);
 				++lightIndex;
 			}
 			
