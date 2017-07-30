@@ -25,8 +25,6 @@ using namespace Kore;
 namespace {
 	Tileset* tileset;
 	
-	const int tileWidth = 128;
-	const int tileHeight = 168;
 	const int rows = 5;
 	const int columns = 12;
 	const int w = 768;
@@ -96,6 +94,9 @@ namespace {
 	bool inCloset = false;
 	
 	int spiderIndex = 0;
+
+	const int monsterCount = 1;
+	Monster monsters[monsterCount];
 	
 	void createPipeline() {
 		Graphics4::VertexStructure structure;
@@ -273,6 +274,10 @@ namespace {
 			lights[i] = vec2(lights[i].x() / w, lights[i].y() / h);
 		}
 
+		for (int i = 0; i < monsterCount; ++i) {
+			monsters[i].update();
+		}
+
 		frameCount++;
 		if (frameCount > 10) {
 			frameCount = 0;
@@ -323,6 +328,10 @@ namespace {
 				}
 				g2->transformation = mat3::Identity();
 			}
+		}
+
+		for (int i = 0; i < monsterCount; ++i) {
+			monsters[i].render(g2, camX, camY);
 		}
 
 		g2->end();
@@ -465,6 +474,9 @@ int kore(int argc, char** argv) {
 	py = tileHeight - playerImage->height/2;
 
 	Monster::init();
+	for (int i = 0; i < monsterCount; ++i) {
+		monsters[i].position();
+	}
 	
 	batteryImage = new Graphics4::Texture("Tiles/battery.png");
 	
