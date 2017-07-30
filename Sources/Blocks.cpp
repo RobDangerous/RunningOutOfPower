@@ -31,6 +31,9 @@ namespace {
 	const int w = 768;
 	const int h = 768;
 
+	float playerWidth;
+	float playerHeight;
+
     Graphics2::Graphics2* g2;
 	
 	Graphics4::Texture* playerImage;
@@ -81,9 +84,6 @@ namespace {
 	vec4 closetButton;
 	vec2 debugText;
 	
-	float playerWidth;
-	float playerHeight;
-
 	void createPipeline() {
 		Graphics4::VertexStructure structure;
 		structure.add("vertexPosition", Graphics4::Float3VertexData);
@@ -144,13 +144,13 @@ namespace {
 	
 	bool goThroughDoor() {
 		int tile = tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2);
-		
 		if (tile == Tileset::Door) {
-			log(Info, "Go through the door");
+			vec2 door = tileset->findDoor();
+			px = door.x() + 32;
+			py = door.y() + 36;
 			return true;
-		} else {
-			sprintf(dText, "There is no door");
-			log(Info, "There is no door");
+		}
+		else {
 			return false;
 		}
 	}
@@ -190,16 +190,8 @@ namespace {
 			px += 4;
 		}
 
-		playerWidth = playerImage->width / 10.0f;
-		playerHeight = playerImage->height / 2.0f;
-
 		float camX = Kore::max(0.0f, px - w / 2 + playerWidth / 2);
 		float camY = Kore::max(0.0f, py - h / 2 + playerHeight / 2);
-
-		int tile = tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2);
-		if (tile == Tileset::Door) {
-
-		}
 
 		Graphics4::begin();
 		Graphics4::setRenderTarget(screen);
@@ -351,6 +343,8 @@ int kore(int argc, char** argv) {
 	Kore::System::setCallback(update);
 
 	playerImage = new Graphics4::Texture("player.png");
+	playerWidth = playerImage->width / 10.0f;
+	playerHeight = playerImage->height / 2.0f;
 	px = 0;
 	py = tileHeight - playerImage->height/2;
 	

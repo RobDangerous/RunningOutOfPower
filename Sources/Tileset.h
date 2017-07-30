@@ -18,6 +18,9 @@ private:
 	int rows;
 	int columns;
 
+	vec2 doors[32];
+	int doorCount;
+
 	Graphics4::Texture* image;
 	
 	void loadCsv(const char* csvFile, int rows, int columns);
@@ -28,6 +31,7 @@ public:
 	void drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights);
 	
 	int getTileID(float px, float py);
+	vec2 findDoor();
 	
 	enum TileID {Door = 0, Window = 1, Books = 2, Closet = 3, Table = 4, TableAndLamp = 5};
 };
