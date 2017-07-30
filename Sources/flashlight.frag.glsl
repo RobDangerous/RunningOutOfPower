@@ -12,6 +12,8 @@ uniform vec2 mouse;
 uniform int anim;
 uniform vec2 lights[8];
 uniform float energy;
+uniform float top;
+uniform float bottom;
 
 // noise from https://www.shadertoy.com/view/Msf3WH
 
@@ -86,6 +88,10 @@ void main() {
 	float angledif = atan(cos(tangle - angle), sin(tangle - angle));
 
 	scale *= 1.0 - clamp(abs(angledif) * 1.5 / energy, 0.0, 1.0);
+
+	if (texCoord.y < top || texCoord.y > bottom) {
+		scale = 0.0;
+	}
 
 	scale = easeOutQuart(clamp(scale, 0.0, 1.0));
 
