@@ -33,12 +33,12 @@ void loadCsv(const char* csvFile) {
 	source = new int[rows * columns];
 	int i = 0;
 	
-	char delimiter[] = ",;";
+	char delimiter[] = ",;\n";
 	char* ptr = std::strtok(cpyData, delimiter);
 	while (ptr != nullptr) {
 		assert(i < rows * columns);
 		int num = atoi(ptr);
-		//log(Info, "%i -> %i", i, num);
+		log(Info, "%i -> %i", i, num);
 		source[i] = num;
 		ptr = std::strtok(nullptr, delimiter);
 		i++;
@@ -47,8 +47,8 @@ void loadCsv(const char* csvFile) {
 	doorCount = 0;
 	spiderCountCurr = 0;
 	for (int y = 0; y < rows; ++y) {
-		for (int x = 0; x < columns - 1; ++x) {
-			int index = source[y * (columns - 1) + x];
+		for (int x = 0; x < columns; ++x) {
+			int index = source[y * columns + x];
 			if (index == Door) {
 				doors[doorCount] = vec2(x * tileWidth, y * tileHeight);
 				++doorCount;
@@ -73,8 +73,8 @@ void drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights) {
 	//tiles = new Graphics4::Texture*[numOfTiles];
 	
 	for(int y = 0; y < rows; ++y) {
-		for (int x = 0; x < columns - 1; ++x) {
-			int index = source[y * (columns-1) + x];
+		for (int x = 0; x < columns; ++x) {
+			int index = source[y * columns + x];
 
 			if (index == TableAndLamp) {
 				lights[lightIndex] = vec2(x * tileWidth - camX + tileWidth - 40, y * tileHeight - camY + 60);
@@ -104,7 +104,7 @@ void animateSpider(float px, float py)
 			if (spiderState[i] >= Spider9) spiderDir[i] = -1;
 			else if (spiderState[i] <= Spider1) spiderDir[i] = inRange ? +1 : 0;
 			else if (spiderState[i] > Spider1 && !inRange) spiderDir[i] = -1;
-			source[spiderPos[i].y() * (columns - 1) + spiderPos[i].x()] = spiderState[i];
+			source[spiderPos[i].y() * columns + spiderPos[i].x()] = spiderState[i];
 		}
 	}
 }
@@ -112,7 +112,7 @@ void animateSpider(float px, float py)
 int getTileID(float px, float py) {
 	int x = px / tileWidth;
 	int y = py / tileHeight;
-	return source[y * (columns - 1) + x];
+	return source[y * columns  + x];
 }
 
 vec2 findDoor() {

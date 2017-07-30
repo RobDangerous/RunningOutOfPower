@@ -458,7 +458,7 @@ int kore(int argc, char** argv) {
 	
 	Monster::init();
 	for (int i = 0; i < monsterCount; ++i) {
-		monsters[i].init();
+		monsters[i].position();
 	}
 	
 	batteryImage = new Graphics4::Texture("Tiles/battery.png");
