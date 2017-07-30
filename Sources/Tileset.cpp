@@ -7,6 +7,7 @@
 #include <Kore/Graphics1/Image.h>
 #include <Kore/TextureImpl.h>
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -33,18 +34,17 @@ void Tileset::loadCsv(const char* csvFile, int rows, int columns) {
 	char delimiter[] = ",;";
 	char* ptr = std::strtok(source, delimiter);
 	while (ptr != nullptr) {
+		assert(i < rows * columns);
 		int num = atoi(ptr);
 		//log(Info, "%i -> %i", i, num);
 		this->source[i] = num;
 		ptr = std::strtok(nullptr, delimiter);
 		i++;
 	}
-	
+	image = new Graphics4::Texture(tileFile);
 }
 
-void Tileset::drawTiles(Graphics2::Graphics2* g2) {
-	Graphics4::Texture* image = new Graphics4::Texture(tileFile);
-	
+void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY) {	
 	const int sourceColumns = image->texWidth / tileWidth;
 	const int sourceRows = image->texHeight / tileHeight;
 	//const int numOfTiles = rows * columns;
@@ -57,11 +57,11 @@ void Tileset::drawTiles(Graphics2::Graphics2* g2) {
 			int row    = (int)(index / sourceColumns);
 			int column = index % sourceColumns;
 			
-			int xOffset = column;	// TODO: should be 0
-			int yOffset = row;
+			int xOffset = 0;//column;	// TODO: should be 0
+			int yOffset = 0;//row;
 			
 			//Graphics4::Texture* tile = new Graphics4::Texture();
-			g2->drawScaledSubImage(image, column*tileWidth+xOffset, row*tileHeight+yOffset , tileWidth, tileHeight, x*tileWidth, y*tileHeight, tileWidth, tileHeight);
+			g2->drawScaledSubImage(image, column*tileWidth+xOffset, row*tileHeight+yOffset , tileWidth, tileHeight, x*tileWidth - camX, y*tileHeight - camY, tileWidth, tileHeight);
 		}
 	}
 	
