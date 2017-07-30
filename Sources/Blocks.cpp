@@ -23,11 +23,12 @@ using namespace Kore;
 namespace {
 	Tileset* tileset;
 	
-	const int tileWidthHeight = 128;
-	const int rows = 6;
-	const int columns = 6;
-	const int w = columns * tileWidthHeight;
-	const int h = rows * tileWidthHeight;
+	const int tileWidth = 128;
+	const int tileHeight = 168;
+	const int rows = 5;
+	const int columns = 12;
+	const int w = 768;
+	const int h = 768;
 
     Graphics2::Graphics2* g2;
 	
@@ -40,6 +41,10 @@ namespace {
 	Graphics4::ConstantLocation playerLocation;
 	Graphics4::ConstantLocation mouseLocation;
 	Graphics4::ConstantLocation animLocation;
+	Graphics4::ConstantLocation lightsLocation;
+	Graphics4::ConstantLocation energyLocation;
+
+	float energy = 1.0;
 
 	float angle = 0.0f;
 
@@ -87,6 +92,13 @@ namespace {
 		playerLocation = pipeline->getConstantLocation("player");
 		mouseLocation = pipeline->getConstantLocation("mouse");
 		animLocation = pipeline->getConstantLocation("anim");
+		lightsLocation = pipeline->getConstantLocation("lights");
+		energyLocation = pipeline->getConstantLocation("energy");
+	}
+
+	float flakyEnergy(float energy) {
+		int value = Random::get(0, energy * 20);
+		return value == 0 ? 0 : energy;
 	}
 
 	void update() {
@@ -94,6 +106,9 @@ namespace {
 
 		static int anim = 0;
 		++anim;
+
+		energy -= 0.001f;
+		if (energy < 0) energy = 0;
 
 		if (up) {
 			py -= 1;
@@ -118,7 +133,14 @@ namespace {
 		Graphics4::setRenderTarget(screen);
         g2->begin(true);
 		
-		tileset->drawTiles(g2, camX, camY);
+		vec2 lights[lightCount];
+		for (int i = 0; i < lightCount; ++i) {
+			lights[i] = vec2(-1000, -1000);
+		}
+		tileset->drawTiles(g2, camX, camY, lights);
+		for (int i = 0; i < lightCount; ++i) {
+			lights[i] = vec2(lights[i].x() / w, lights[i].y() / h);
+		}
 
 		frameCount++;
 		if (frameCount > 10) {
@@ -149,6 +171,8 @@ namespace {
 		Graphics4::setFloat2(playerLocation, vec2((px - camX + playerWidth / 2.0f) / w, (py - camY + playerHeight / 2.0f) / h));
 		Graphics4::setFloat2(mouseLocation, vec2(mx / w, my / h));
 		Graphics4::setInt(animLocation, anim);
+		Graphics4::setFloats(lightsLocation, (float*)lights, lightCount * 2);
+		Graphics4::setFloat(energyLocation, flakyEnergy(energy));
 		g2->drawImage(screen, 0, 0);
 		g2->end();
 		g2->setPipeline(nullptr);
@@ -214,7 +238,7 @@ namespace {
 int kore(int argc, char** argv) {
 	System::init("Power", w, h);
 	
-	tileset = new Tileset("Tiles/school.csv", "Tiles/school.png", rows, columns, tileWidthHeight, tileWidthHeight);
+	tileset = new Tileset("Tiles/school.csv", "Tiles/school.png", rows, columns, tileWidth, tileHeight);
     
     g2 = new Graphics2::Graphics2(w, h, false);
 	screen = new Graphics4::RenderTarget(w, h, 0);

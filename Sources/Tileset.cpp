@@ -14,6 +14,7 @@
 Tileset::Tileset(const char* csvFile, const char* tileFile, int rows, int columns, int tileWidth, int tileHeight) : tileFile(tileFile), rows(rows), columns(columns), tileWidth(tileWidth), tileHeight(tileHeight) {
 	
 	loadCsv(csvFile, rows, columns);
+	image = new Graphics4::Texture(tileFile);
 }
 
 void Tileset::loadCsv(const char* csvFile, int rows, int columns) {
@@ -41,10 +42,11 @@ void Tileset::loadCsv(const char* csvFile, int rows, int columns) {
 		ptr = std::strtok(nullptr, delimiter);
 		i++;
 	}
-	image = new Graphics4::Texture(tileFile);
 }
 
-void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY) {	
+void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights) {
+	int lightIndex = 0;
+
 	const int sourceColumns = image->texWidth / tileWidth;
 	const int sourceRows = image->texHeight / tileHeight;
 	//const int numOfTiles = rows * columns;
@@ -53,6 +55,11 @@ void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY) {
 	for(int y = 0; y < rows; ++y) {
 		for (int x = 0; x < columns; ++x) {
 			int index = source[y * (columns-1) + x];
+
+			if (index == 5) {
+				lights[lightIndex] = vec2(x * tileWidth - camX + tileWidth - 40, y * tileHeight - camY + 60);
+				++lightIndex;
+			}
 			
 			int row    = (int)(index / sourceColumns);
 			int column = index % sourceColumns;
@@ -67,6 +74,10 @@ void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY) {
 	
 }
 
+int Tileset::getTileID(float px, float py) {
+
+	return -1;
+}
 
 
 
