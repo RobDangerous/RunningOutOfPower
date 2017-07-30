@@ -72,9 +72,7 @@ void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* 
 }
 
 int Tileset::getTileID(float px, float py) {
-	
-	return -1;
+	int x = px / tileWidth;
+	int y = py / tileHeight;
+	return source[y * (columns - 1) + x];
 }
-
-
-

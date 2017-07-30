@@ -7,7 +7,6 @@ using namespace Kore;
 const int lightCount = 8;
 
 class Tileset {
-
 private:
 	int* source;
 	Graphics4::Texture** tiles;

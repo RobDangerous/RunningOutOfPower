@@ -43,6 +43,9 @@ namespace {
 	Graphics4::ConstantLocation mouseLocation;
 	Graphics4::ConstantLocation animLocation;
 	Graphics4::ConstantLocation lightsLocation;
+	Graphics4::ConstantLocation energyLocation;
+
+	float energy = 1.0;
 
 	float angle = 0.0f;
 
@@ -75,6 +78,9 @@ namespace {
 	vec4 doorButton;
 	vec4 closetButton;
 	vec2 debugText;
+	
+	float playerWidth;
+	float playerHeight;
 
 	void createPipeline() {
 		Graphics4::VertexStructure structure;
@@ -106,6 +112,12 @@ namespace {
 		mouseLocation = pipeline->getConstantLocation("mouse");
 		animLocation = pipeline->getConstantLocation("anim");
 		lightsLocation = pipeline->getConstantLocation("lights");
+		energyLocation = pipeline->getConstantLocation("energy");
+	}
+
+	float flakyEnergy(float energy) {
+		int value = Random::get(0, energy * 20);
+		return value == 0 ? 0 : energy;
 	}
 	
 	void drawGUI() {
@@ -134,12 +146,15 @@ namespace {
 		static int anim = 0;
 		++anim;
 
-		if (up) {
-			py -= 1;
-		}
-		if (down_) {
-			py += 1;
-		}
+		energy -= 0.001f;
+		if (energy < 0) energy = 0;
+
+		//if (up) {
+		//	py -= 1;
+		//}
+		//if (down_) {
+		//	py += 1;
+		//}
 		if (left) {
 			px -= 4;
 		}
@@ -147,11 +162,16 @@ namespace {
 			px += 4;
 		}
 
-		float playerWidth = playerImage->width / 10.0f;
-		float playerHeight = playerImage->height / 2.0f;
+		playerWidth = playerImage->width / 10.0f;
+		playerHeight = playerImage->height / 2.0f;
 
 		float camX = Kore::max(0.0f, px - w / 2 + playerWidth / 2);
 		float camY = Kore::max(0.0f, py - h / 2 + playerHeight / 2);
+
+		int tile = tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2);
+		if (tile == Tileset::Door) {
+
+		}
 
 		Graphics4::begin();
 		Graphics4::setRenderTarget(screen);
@@ -181,8 +201,6 @@ namespace {
 			g2->drawScaledSubImage(playerImage, 0, playerHeight, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 		else if (lastDirection == 1)
 			g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
-		
-		tileset->getTileID(px, py);
 
         g2->end();
 		
@@ -198,6 +216,7 @@ namespace {
 		Graphics4::setFloat2(mouseLocation, vec2(mx / w, my / h));
 		Graphics4::setInt(animLocation, anim);
 		Graphics4::setFloats(lightsLocation, (float*)lights, lightCount * 2);
+		Graphics4::setFloat(energyLocation, flakyEnergy(energy));
 		g2->drawImage(screen, 0, 0);
 	//	g2->end();
 		g2->setPipeline(nullptr);
@@ -231,19 +250,19 @@ namespace {
 			up = true;
 			break;
 		case Key1:
-			log(Info, "Go through the door");
-				
-			if (tileset->getTileID(px, py) != Tileset::Door) {
+			if (tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2) != Tileset::Door) {
 				sprintf(dText, "There is no door");
 				log(Info, "There is no door");
+			} else {
+				log(Info, "Go through the door");
 			}
 			break;
 		case Key2:
-			log(Info, "Hide in the closet");
-				
-			if (tileset->getTileID(px, py) != Tileset::Closet) {
+			if (tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2) != Tileset::Closet) {
 				sprintf(dText, "There is no closet");
 				log(Info, "There is no closet");
+			} else {
+				log(Info, "Hide in the closet");
 			}
 			break;
 		default:
