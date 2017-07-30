@@ -17,6 +17,7 @@
 #include <Kore/Math/Core.h>
 #include <Kore/Graphics1/Color.h>
 
+#include "Monster.h"
 #include "Tileset.h"
 
 using namespace Kore;
@@ -462,6 +463,8 @@ int kore(int argc, char** argv) {
 	playerHeight = playerImage->height / 2.0f;
 	px = 0;
 	py = tileHeight - playerImage->height/2;
+
+	Monster::init();
 	
 	batteryImage = new Graphics4::Texture("Tiles/battery.png");
 	
