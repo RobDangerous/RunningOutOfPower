@@ -80,7 +80,15 @@ void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* 
 			g2->drawScaledSubImage(image, column * tileWidth, row * tileHeight , tileWidth, tileHeight, x * tileWidth - camX, y * tileHeight - camY, tileWidth, tileHeight);
 		}
 	}
-	
+}
+
+void Tileset::animateSpider(float px, float py) {
+	spiderID = spiderID + as;
+	if (spiderID >= 2) as = -1;
+	else if (spiderID <= 0) as = +1;
+	int x = px / tileWidth;
+	int y = py / tileHeight;
+	source[y * (columns - 1) + x] = Spider1 + spiderID;
 }
 
 int Tileset::getTileID(float px, float py) {

@@ -23,6 +23,9 @@ private:
 
 	Graphics4::Texture* image;
 	
+	int spiderID = 0;
+	int as = 1;
+	
 	void loadCsv(const char* csvFile, int rows, int columns);
 	
 public:
@@ -33,5 +36,7 @@ public:
 	int getTileID(float px, float py);
 	vec2 findDoor();
 	
-	enum TileID {Door = 0, Window = 1, Books = 2, Closet = 3, Table = 4, TableAndLamp = 5};
+	void animateSpider(float px, float py);
+	
+	enum TileID {Door = 0, Window = 1, Books = 2, Closet = 3, Table = 4, TableAndLamp = 5, SpiderWeb = 6, Spider1 = 7, Spider2 = 8, Spider3 = 9};
 };

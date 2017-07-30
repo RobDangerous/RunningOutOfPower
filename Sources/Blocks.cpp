@@ -89,6 +89,8 @@ namespace {
 	
 	bool inCloset = false;
 	
+	int spiderIndex = 0;
+	
 	void createPipeline() {
 		Graphics4::VertexStructure structure;
 		structure.add("vertexPosition", Graphics4::Float3VertexData);
@@ -179,6 +181,22 @@ namespace {
 			return false;
 		}
 	}
+	
+	bool animateSpider() {
+		int tile = tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2);
+		
+		if (tile == Tileset::Spider1 || tile == Tileset::Spider2 || tile == Tileset::Spider3) {
+			int frames = 50;
+			spiderIndex++;
+			if (spiderIndex > frames) {
+				spiderIndex = 0;
+				tileset->animateSpider(px + playerWidth / 2, py + playerHeight / 2);
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	void update() {
 		Audio2::update();
@@ -230,6 +248,7 @@ namespace {
 		for (int i = 0; i < lightCount; ++i) {
 			lights[i] = vec2(-1000, -1000);
 		}
+		animateSpider();
 		tileset->drawTiles(g2, camX, camY, lights);
 		for (int i = 0; i < lightCount; ++i) {
 			lights[i] = vec2(lights[i].x() / w, lights[i].y() / h);
