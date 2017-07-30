@@ -52,6 +52,8 @@ namespace {
 	Graphics4::ConstantLocation animLocation;
 	Graphics4::ConstantLocation lightsLocation;
 	Graphics4::ConstantLocation energyLocation;
+	Graphics4::ConstantLocation topLocation;
+	Graphics4::ConstantLocation bottomLocation;
 
 	float energy = 1.0;
 
@@ -122,6 +124,8 @@ namespace {
 		animLocation = pipeline->getConstantLocation("anim");
 		lightsLocation = pipeline->getConstantLocation("lights");
 		energyLocation = pipeline->getConstantLocation("energy");
+		topLocation = pipeline->getConstantLocation("top");
+		bottomLocation = pipeline->getConstantLocation("bottom");
 	}
 
 	float flakyEnergy(float energy) {
@@ -207,6 +211,8 @@ namespace {
 		energy -= 0.001f;
 		if (energy < 0) energy = 0;
 
+		energy = 1;
+
 		//if (up) {
 		//	py -= 1;
 		//}
@@ -271,9 +277,24 @@ namespace {
 				g2->drawScaledSubImage(playerImage, playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 			else if (lastDirection == 1)
 				g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+
+			float angle = Kore::atan2(my - (py - camY), mx - (px - camX));
+			if (left || lastDirection == 0) {
+				float xoff = 60;
+				float yoff = 60;
+				g2->transformation = mat3::Translation(px - camX + xoff, py - camY + yoff) * mat3::RotationZ(angle + pi) * mat3::Translation(-xoff, -yoff);
+				g2->drawScaledSubImage(playerImage, 10 * playerWidth, 0, -playerWidth, playerHeight, 0, 0, playerWidth, playerHeight);
+			}
+			else {
+				float xoff = 20;
+				float yoff = 60;
+				g2->transformation = mat3::Translation(px - camX + xoff, py - camY + yoff) * mat3::RotationZ(angle) * mat3::Translation(-xoff, -yoff);
+				g2->drawScaledSubImage(playerImage, 9 * playerWidth, 0, playerWidth, playerHeight, 0, 0, playerWidth, playerHeight);
+			}
+			g2->transformation = mat3::Identity();
 		}
 
-        g2->end();
+		g2->end();
 		
 		Graphics4::restoreRenderTarget();
 		g2->begin();
@@ -288,6 +309,8 @@ namespace {
 		Graphics4::setInt(animLocation, anim);
 		Graphics4::setFloats(lightsLocation, (float*)lights, lightCount * 2);
 		Graphics4::setFloat(energyLocation, flakyEnergy(energy));
+		Graphics4::setFloat(topLocation, (py - camY - 32) / h);
+		Graphics4::setFloat(bottomLocation, (py - camY + 128) / h);
 		if (!inCloset) g2->drawImage(screen, 0, 0);
 	//	g2->end();
 		g2->setPipeline(nullptr);
