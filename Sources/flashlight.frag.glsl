@@ -113,12 +113,12 @@ void main() {
 	texcolor.g *= scale;
 	texcolor.b *= clamp(fractalNoise(texCoord - anim / 500.0) * fractalNoise(texCoord + anim / 500.0) * 1.5 + scale, 0.0, 1.0);
 	
-	float mx = texCoord.x - mouse.x;
+	/*float mx = texCoord.x - mouse.x;
 	float my = texCoord.y - mouse.y;
 	float mdistance = sqrt(mx * mx + my * my);
 	if (mdistance < 0.01) {
 		texcolor = vec4(1.0, 0.0, 0.0, 1.0);
-	}
+	}*/
 
 	FragColor = texcolor;
 }

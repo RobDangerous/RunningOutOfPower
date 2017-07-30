@@ -40,7 +40,8 @@ namespace {
     Graphics2::Graphics2* g2;
 	
 	Graphics4::Texture* playerImage;
-	
+	Graphics4::Texture* playerChargeImage;
+
 	Graphics4::Texture* batteryImage;
 
 	Graphics4::RenderTarget* screen;
@@ -69,10 +70,12 @@ namespace {
 	bool right = false;
 	bool down_ = false;
 	bool up = false;
+	bool charging = false;
 	
 	int frameCount = 0;
 	
 	int runIndex = 0;
+	int chargeIndex = 0;
 	
 	Kravur* font14;
 	Kravur* font24;
@@ -190,10 +193,14 @@ namespace {
 		static int anim = 0;
 		++anim;
 
-		energy -= 0.001f;
-		if (energy < 0) energy = 0;
-
-		energy = 1;
+		if (charging) {
+			energy += 0.001f;
+			if (energy > 1) energy = 1;
+		}
+		else {
+			energy -= 0.001f;
+			if (energy < 0) energy = 0;
+		}
 
 		//if (up) {
 		//	py -= 1;
@@ -247,32 +254,50 @@ namespace {
 			
 			runIndex = runIndex % 8;
 			runIndex++;
+
+			++chargeIndex;
+			chargeIndex %= 4;
 		}
 
 		if (!inCloset) {
-			if (left)
-				g2->drawScaledSubImage(playerImage, (runIndex+1)*playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
-			else if (right)
-				g2->drawScaledSubImage(playerImage, runIndex*playerWidth, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
-			else if (lastDirection == 0)
-				g2->drawScaledSubImage(playerImage, playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
-			else if (lastDirection == 1)
-				g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
-
-			float angle = Kore::atan2(my - (py - camY), mx - (px - camX));
-			if (left || lastDirection == 0) {
-				float xoff = 60;
-				float yoff = 60;
-				g2->transformation = mat3::Translation(px - camX + xoff, py - camY + yoff) * mat3::RotationZ(angle + pi) * mat3::Translation(-xoff, -yoff);
-				g2->drawScaledSubImage(playerImage, 10 * playerWidth, 0, -playerWidth, playerHeight, 0, 0, playerWidth, playerHeight);
+			if (charging) {
+				my = py - camY + playerHeight / 2;
+				if (left || lastDirection == 0) {
+					mx = px - camX - 100;
+					g2->drawScaledSubImage(playerChargeImage, (chargeIndex + 1) * playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+					g2->drawScaledSubImage(playerChargeImage, playerWidth * 2, playerHeight, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+				}
+				else {
+					mx = px - camX + 100;
+					g2->drawScaledSubImage(playerChargeImage, chargeIndex * playerWidth, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+					g2->drawScaledSubImage(playerChargeImage, playerWidth, playerHeight, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+				}
 			}
 			else {
-				float xoff = 20;
-				float yoff = 60;
-				g2->transformation = mat3::Translation(px - camX + xoff, py - camY + yoff) * mat3::RotationZ(angle) * mat3::Translation(-xoff, -yoff);
-				g2->drawScaledSubImage(playerImage, 9 * playerWidth, 0, playerWidth, playerHeight, 0, 0, playerWidth, playerHeight);
+				if (left)
+					g2->drawScaledSubImage(playerImage, (runIndex + 1)*playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+				else if (right)
+					g2->drawScaledSubImage(playerImage, runIndex*playerWidth, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+				else if (lastDirection == 0)
+					g2->drawScaledSubImage(playerImage, playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+				else if (lastDirection == 1)
+					g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+
+				float angle = Kore::atan2(my - (py - camY), mx - (px - camX));
+				if (left || lastDirection == 0) {
+					float xoff = 60;
+					float yoff = 60;
+					g2->transformation = mat3::Translation(px - camX + xoff, py - camY + yoff) * mat3::RotationZ(angle + pi) * mat3::Translation(-xoff, -yoff);
+					g2->drawScaledSubImage(playerImage, 10 * playerWidth, 0, -playerWidth, playerHeight, 0, 0, playerWidth, playerHeight);
+				}
+				else {
+					float xoff = 20;
+					float yoff = 60;
+					g2->transformation = mat3::Translation(px - camX + xoff, py - camY + yoff) * mat3::RotationZ(angle) * mat3::Translation(-xoff, -yoff);
+					g2->drawScaledSubImage(playerImage, 9 * playerWidth, 0, playerWidth, playerHeight, 0, 0, playerWidth, playerHeight);
+				}
+				g2->transformation = mat3::Identity();
 			}
-			g2->transformation = mat3::Identity();
 		}
 
 		g2->end();
@@ -313,6 +338,7 @@ namespace {
 	}
 
 	void keyDown(KeyCode code) {
+		charging = false;
 		switch (code) {
 		case KeyLeft:
 		case KeyA:
@@ -338,6 +364,11 @@ namespace {
 		case Key2:
 			hideInCloset();
 			break;
+		case KeySpace:
+			left = false;
+			right = false;
+			charging = true;
+			break;
 		default:
 			break;
 		}
@@ -360,6 +391,9 @@ namespace {
 		case KeyUp:
 		case KeyW:
 			up = false;
+			break;
+		case KeySpace:
+			charging = false;
 			break;
 		default:
 			break;
@@ -402,6 +436,7 @@ int kore(int argc, char** argv) {
 	Kore::System::setCallback(update);
 
 	playerImage = new Graphics4::Texture("player.png");
+	playerChargeImage = new Graphics4::Texture("playerRechargeAnim.png");
 	playerWidth = playerImage->width / 10.0f;
 	playerHeight = playerImage->height / 2.0f;
 	px = 0;
