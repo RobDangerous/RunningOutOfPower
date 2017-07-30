@@ -110,12 +110,12 @@ namespace {
 		energy -= 0.001f;
 		if (energy < 0) energy = 0;
 
-		if (up) {
-			py -= 1;
-		}
-		if (down_) {
-			py += 1;
-		}
+		//if (up) {
+		//	py -= 1;
+		//}
+		//if (down_) {
+		//	py += 1;
+		//}
 		if (left) {
 			px -= 4;
 		}
@@ -128,6 +128,11 @@ namespace {
 
 		float camX = Kore::max(0.0f, px - w / 2 + playerWidth / 2);
 		float camY = Kore::max(0.0f, py - h / 2 + playerHeight / 2);
+
+		int tile = tileset->getTileID(px + playerWidth / 2, py + playerHeight / 2);
+		if (tile == Tileset::Door) {
+
+		}
 
 		Graphics4::begin();
 		Graphics4::setRenderTarget(screen);
