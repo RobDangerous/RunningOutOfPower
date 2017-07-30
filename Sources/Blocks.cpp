@@ -34,6 +34,9 @@ namespace {
 	float playerWidth;
 	float playerHeight;
 
+	float camX = 0;
+	float camY = 0;
+
     Graphics2::Graphics2* g2;
 	
 	Graphics4::Texture* playerImage;
@@ -188,8 +191,23 @@ namespace {
 			px += 4;
 		}
 
-		float camX = Kore::max(0.0f, px - w / 2 + playerWidth / 2);
-		float camY = Kore::max(0.0f, py - h / 2 + playerHeight / 2);
+		float targetCamX = Kore::max(0.0f, px - w / 2 + playerWidth / 2);
+		float targetCamY = Kore::max(0.0f, py - h / 2 + playerHeight / 2);
+
+		vec2 cam(camX, camY);
+		vec2 target(targetCamX, targetCamY);
+
+		vec2 dir = target - cam;
+		if (dir.getLength() < 6.0f) {
+			camX = targetCamX;
+			camY = targetCamY;
+		}
+		else {
+			dir.setLength(5.0f);
+			cam = cam + dir;
+			camX = cam.x();
+			camY = cam.y();
+		}
 
 		Graphics4::begin();
 		Graphics4::setRenderTarget(screen);
