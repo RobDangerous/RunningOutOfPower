@@ -56,7 +56,7 @@ void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* 
 		for (int x = 0; x < columns; ++x) {
 			int index = source[y * (columns-1) + x];
 
-			if (index == 5) {
+			if (index == TableAndLamp) {
 				lights[lightIndex] = vec2(x * tileWidth - camX + tileWidth - 40, y * tileHeight - camY + 60);
 				++lightIndex;
 			}
@@ -64,18 +64,15 @@ void Tileset::drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* 
 			int row    = (int)(index / sourceColumns);
 			int column = index % sourceColumns;
 			
-			int xOffset = 0;//column;	// TODO: should be 0
-			int yOffset = 0;//row;
-			
 			//Graphics4::Texture* tile = new Graphics4::Texture();
-			g2->drawScaledSubImage(image, column*tileWidth+xOffset, row*tileHeight+yOffset , tileWidth, tileHeight, x*tileWidth - camX, y*tileHeight - camY, tileWidth, tileHeight);
+			g2->drawScaledSubImage(image, column * tileWidth, row * tileHeight , tileWidth, tileHeight, x * tileWidth - camX, y * tileHeight - camY, tileWidth, tileHeight);
 		}
 	}
 	
 }
 
 int Tileset::getTileID(float px, float py) {
-
+	
 	return -1;
 }
 
