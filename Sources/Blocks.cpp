@@ -50,6 +50,8 @@ namespace {
 	
 	Graphics4::Texture* spiderAnimImage;
 
+	Graphics4::Texture* winImage;
+
 	Graphics4::RenderTarget* screen;
 	Graphics4::PipelineState* pipeline;
 	Graphics4::ConstantLocation aspectLocation;
@@ -511,7 +513,7 @@ namespace {
 			energy = 0;
 			
 			int tile = getTileID(px + playerWidth / 2, py + playerHeight / 2);
-			if (tile >= Spider1 && tile < Spider9) {
+			if (tile >= Spider1 && tile <= Spider9) {
 				if (fightIndex < 6) fightIndex = frameCount / 10;
 				//g2->drawScaledSubImage(spiderAnimImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX - 20, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
 				g2->drawScaledSubImage(spiderAnimImage, fightIndex * playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
@@ -520,6 +522,10 @@ namespace {
 				fightIndex = (frameCount / 10) % 4;
 				g2->drawScaledSubImage(fightImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX - 20, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
 			}
+		}
+
+		if (state == End) {
+			g2->drawImage(winImage, 0, 0);
 		}
 		
 		g2->end();
@@ -564,7 +570,7 @@ namespace {
 			Graphics4::setBool(lightOnLocation, lightOn);
 		}
 		else {
-			if (anim - 60 * 4 > 600.0f) {
+			if (state == Start && anim - 60 * 4 > 600.0f) {
 				state = Game;
 				energy = 1;
 			}
@@ -705,6 +711,7 @@ int kore(int argc, char** argv) {
 
 	Kore::System::setCallback(update);
 
+	winImage = new Graphics4::Texture("win.png");
 	intro = new Graphics4::Texture("schoolClass.png");
 	playerImage = new Graphics4::Texture("player.png");
 	playerChargeImage = new Graphics4::Texture("playerRechargeAnim.png");
