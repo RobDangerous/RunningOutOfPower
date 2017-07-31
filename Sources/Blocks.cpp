@@ -329,7 +329,7 @@ namespace {
 				}
 			}
 
-			if (!inCloset) {
+			if (!inCloset && !doorAnim) {
 				if (left && px >= -10) {
 					px -= 4;
 					playerCenter = vec3(px + playerWidth / 2, py + playerHeight / 2, 0.f);
