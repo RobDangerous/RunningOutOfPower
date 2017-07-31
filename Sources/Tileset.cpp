@@ -111,13 +111,7 @@ void animateSpider(float px, float py, float mx, float my, float camX, float cam
 		frameCount = 0;
 		for (int i = 0; i < spiderCountCurr; ++i)
 		{
-<<<<<<< HEAD
-			//log(Info, "Spider %i:", i);
-			spiderState[i] += spiderDir[i];
-			bool inRange = vec2(spiderPos[i].x() * tileWidth - px, spiderPos[i].y() * tileHeight - py).squareLength() <= tileWidth * tileHeight * 4;
-=======
 			bool inRange = vec2(spiderPos[i].x() * tileWidth - px, spiderPos[i].y() * tileHeight - py).squareLength() <= tileWidth * tileHeight;
->>>>>>> 82e64abdfdfa16bed88394df0fcd804b8339c573
 			bool active = inRange && !isInLight(spiderPos[i].x() * tileWidth, spiderPos[i].y() * tileHeight, px, py, mx, my, camX, camY, energy);
 			if (active && spiderState[i] < Spider9) ++spiderState[i];
 			else if (!active && spiderState[i] > Spider1) --spiderState[i];
