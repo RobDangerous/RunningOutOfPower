@@ -11,29 +11,44 @@
 using namespace Kore;
 
 namespace {
-	Graphics4::Texture* texture;
-	int width, height;
+	Graphics4::Texture* textures[3];
+	int widths[3], heights[3];
 }
 
-SmallMonster::SmallMonster() : initX(400), initY(0) {
+SmallMonster::SmallMonster() : monsterIndex(2) {
 
 }
 
-void SmallMonster::reset() {
-	x = initX;
-	y = initY;
+void SmallMonster::reset(int row) {
+	x = Random::get(200, tileWidth * columns - 100);
+	y = startY = row * tileHeight + 50;
 	anim = 0;
 	status = WalkingRight;
+	monsterIndex = Random::get(0, 2);
 }
 
 void SmallMonster::init() {
-	texture = new Graphics4::Texture("eye.png");
-	width = texture->width / 2;
-	height = texture->height / 1;
+	textures[0] = new Graphics4::Texture("eye.png");
+	textures[1] = new Graphics4::Texture("beard.png");
+	textures[2] = new Graphics4::Texture("pac.png");
+	widths[0] = textures[0]->width / 2;
+	heights[0] = textures[0]->height / 1;
+	widths[1] = textures[1]->width / 2;
+	heights[1] = textures[1]->height / 1;
+	widths[2] = textures[2]->width / 2;
+	heights[2] = textures[2]->height / 1;
 }
 
 bool SmallMonster::update(float px, float py, float fx, float fy, float mx_world, float my_world, float energy) {
-	bool inLight = isInLight(x + width / 2, y, y + height / 2, fx, fy, mx_world, my_world, energy);
+	bool inLight = isInLight(x + widths[monsterIndex] / 2, y, y + heights[monsterIndex] / 2, fx, fy, mx_world, my_world, energy);
+	
+	if (inLight && fx < x) {
+		status = WalkingRight;
+	}
+	else if (inLight && fx > x + widths[monsterIndex]) {
+		status = WalkingLeft;
+	}
+
 	if (status == WalkingRight && x > columns * tileWidth - 100) {
 		status = WalkingLeft;
 	}
@@ -46,19 +61,17 @@ bool SmallMonster::update(float px, float py, float fx, float fy, float mx_world
 	else {
 		x -= 2;
 	}
-	y = Kore::sin(x / 50.0f) * 20 + 50;
-	return (Kore::abs(x + width / 2 - px) < tileWidth * 0.25f && getFloor(y + height / 2) == getFloor(py));
+	y = Kore::sin(x / 50.0f) * 20 + 50 + startY;
+	return (Kore::abs(x + widths[monsterIndex] / 2 - px) < tileWidth * 0.25f && getFloor(y + heights[monsterIndex] / 2) == getFloor(py));
 }
 
 void SmallMonster::render(Kore::Graphics2::Graphics2* g2, float camX, float camY) {
-	static int anim = 0;
 	++anim;
-	int index = anim / 20 % 2;
-	index = 0;
+	int index = (anim / 10) % 2;
 	if (status == WalkingLeft) {
-		g2->drawScaledSubImage(texture, width * index, 0, width, height, x - camX, y - camY, width, height);
+		g2->drawScaledSubImage(textures[monsterIndex], widths[monsterIndex] * index, 0, widths[monsterIndex], heights[monsterIndex], x - camX, y - camY, widths[monsterIndex], heights[monsterIndex]);
 	}
 	else {
-		g2->drawScaledSubImage(texture, width * (index + 1), 0, -width, height, x - camX, y - camY, width, height);
+		g2->drawScaledSubImage(textures[monsterIndex], widths[monsterIndex] * (index + 1), 0, -widths[monsterIndex], heights[monsterIndex], x - camX, y - camY, widths[monsterIndex], heights[monsterIndex]);
 	}
 }

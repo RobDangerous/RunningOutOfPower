@@ -124,7 +124,7 @@ namespace {
 	Monster* janitor2;
 	Monster* book;
 	
-	const int smallMonsterCount = 1;
+	const int smallMonsterCount = rows;
 	SmallMonster smallMonsters[smallMonsterCount];
 	
 	bool lightOn = false;
@@ -178,9 +178,10 @@ namespace {
 			monsters[i]->reset(i == 0 ? true : false);
 		}
 		for (int i = 0; i < smallMonsterCount; ++i) {
-			smallMonsters[i].reset();
+			smallMonsters[i].reset(i);
 		}
 		resetSpiders();
+		shuffleDoors();
 	}
 	
 	void createPipeline() {
@@ -329,7 +330,7 @@ namespace {
 				}
 			}
 
-			if (!inCloset) {
+			if (!inCloset && !doorAnim) {
 				if (left && px >= -10) {
 					px -= 4;
 					playerCenter = vec3(px + playerWidth / 2, py + playerHeight / 2, 0.f);
