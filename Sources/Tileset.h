@@ -14,6 +14,7 @@ namespace {
 	const int tileHeight = 168;
 	const int spiderCooldownMax = 30;
 
+	int spiderFrameCount = 0;
 	vec2i spiderPos[spiderCountMax];
 	int spiderState[spiderCountMax];
 	int spiderCooldownCurr[spiderCountMax];

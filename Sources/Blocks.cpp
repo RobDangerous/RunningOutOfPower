@@ -34,6 +34,7 @@ namespace {
 
     Graphics2::Graphics2* g2;
 	
+	Graphics4::Texture* intro;
 	Graphics4::Texture* playerImage;
 	Graphics4::Texture* playerChargeImage;
 	Graphics4::Texture* playerDoorImage;
@@ -57,7 +58,7 @@ namespace {
 	Graphics4::ConstantLocation lightOnLocation;
 
 	bool dead = false;
-	float energy = 1.0;
+	float energy = 1.0f;
 	
 	float px = 0;
 	float py = 0;
@@ -84,6 +85,8 @@ namespace {
 	const char* const resetText = "Press R to Restart";
 	
 	int frameCount = 0;
+	int anim = 0;
+	float red = 0.f;
 	
 	int runIndex = 0;
 	int chargeIndex = 0;
@@ -106,6 +109,12 @@ namespace {
 	Monster monsters[monsterCount];
 	
 	bool lightOn = false;
+
+	enum State {
+		Start,
+		Game,
+		End
+	} state;
 
 	void reset()
 	{
@@ -131,6 +140,8 @@ namespace {
 		doorAnim = false;
 
 		frameCount = 0;
+		anim = 0;
+		red = 0.f;
 
 		runIndex = 0;
 		chargeIndex = 0;
@@ -141,6 +152,8 @@ namespace {
 		dTime = 0;
 
 		lightOn = false;
+
+		state = Start;
 
 		for (int i = 0; i < monsterCount; ++i) {
 			monsters[i].reset();
@@ -259,12 +272,11 @@ namespace {
 
 		float flxoff = 0;
 		float flyoff = 0;
-		static int anim = 0;
 		++frameCount;
-		if (!dead)
-		{
-			++anim;
+		++anim;
 
+		if (!dead && state == Game)
+		{
 			helpText = nullptr;
 
 			if (charging) {
@@ -412,7 +424,7 @@ namespace {
 			lights[i] = vec2(lights[i].x() / w, lights[i].y() / h);
 		}
 
-		if (!inCloset && !dead) {
+		if (!inCloset && !dead && state == Game) {
 			if (charging) {
 				if (left || lastDirection == 0) {
 					g2->drawScaledSubImage(playerChargeImage, (chargeIndex + 1) * playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
@@ -470,13 +482,15 @@ namespace {
 		for (int i = 0; i < monsterCount; ++i) {
 			monsters[i].render(g2, camX, camY);
 		}
-
-		static float red = 0;
+		
+		if (state == Start) {
+			g2->drawImage(intro, 0, 0);
+		}
 		if (dead) {
 			fightIndex = (frameCount / 10) % 4;
 			energy = 0;
 			
-			g2->drawScaledSubImage(fightImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
+			g2->drawScaledSubImage(fightImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX - 20, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
 			
 			//red = Kore::min(red + 0.1f, 1.f);
 		}
@@ -490,13 +504,19 @@ namespace {
 		Graphics4::setFloat(aspectLocation, (float)w / (float)h);
 		vec2 mouse(mx / w, my / h);
 		vec2 player((px - camX + playerWidth / 2.0f) / w, (py - camY + playerHeight / 2.0f) / h);
+		if (state == Start) {
+			Graphics4::setFloat(angleLocation, 0.0f);
+			Graphics4::setFloat4(playerLocation, vec4(10.76f, 10.22f, 0.76f, 0.145f));
+		}
+		else {
 #ifdef KORE_DIRECT3D
-		Graphics4::setFloat(angleLocation, Kore::atan2(mouse.x() - player.x(), mouse.y() - player.y()));
+			Graphics4::setFloat(angleLocation, Kore::atan2(mouse.x() - player.x(), mouse.y() - player.y()));
 #else
-		Graphics4::setFloat(angleLocation, Kore::atan2(mouse.y() - player.y(), mouse.x() - player.x()) - pi / 2.0f);
+			Graphics4::setFloat(angleLocation, Kore::atan2(mouse.y() - player.y(), mouse.x() - player.x()) - pi / 2.0f);
 #endif
-		Graphics4::setFloat4(playerLocation, vec4(player.x(), player.y(),
-			(px - camX + playerWidth / 2.0f + flxoff) / w, (py - camY + playerHeight / 2.0f + flyoff) / h));
+			Graphics4::setFloat4(playerLocation, vec4(player.x(), player.y(),
+				(px - camX + playerWidth / 2.0f + flxoff) / w, (py - camY + playerHeight / 2.0f + flyoff) / h));
+		}
 		Graphics4::setFloat2(mouseLocation, mouse);
 		Graphics4::setInt(animLocation, anim);
 		Graphics4::setFloat(redLocation, red);
@@ -510,16 +530,32 @@ namespace {
 #else
 		Graphics4::setFloats(lightsLocation, (float*)lights, lightCount * 2);
 #endif
-		Graphics4::setFloat(energyLocation, flakyEnergy(energy));
-		Graphics4::setFloat(topLocation, (py - camY - 32) / h);
-		Graphics4::setFloat(bottomLocation, (py - camY + 128) / h);
-		Graphics4::setBool(lightOnLocation, lightOn);
+		if (state == Game) {
+			Graphics4::setFloat(energyLocation, flakyEnergy(energy));
+			Graphics4::setFloat(topLocation, (py - camY - 32) / h);
+			Graphics4::setFloat(bottomLocation, (py - camY + 128) / h);
+			Graphics4::setBool(lightOnLocation, lightOn);
+		}
+		else {
+			if (anim - 60 * 4 > 600.0f) {
+				state = Game;
+				energy = 1;
+			}
+			else {
+				Graphics4::setFloat(energyLocation, flakyEnergy(0.6f - (anim - 60 * 4) / 1000.0f));
+				Graphics4::setFloat(topLocation, 0);
+				Graphics4::setFloat(bottomLocation, 1);
+				Graphics4::setBool(lightOnLocation, anim < 60 * 4);
+			}
+		}
 		if (!inCloset) g2->drawScaledSubImage(screen, 0, 0, w, h, 0, 0, w * 2, h * 2);
 	//	g2->end();
 		g2->setPipeline(nullptr);
 		
 	//	g2->begin();
-		drawGUI();
+		if (state == Game) {
+			drawGUI();
+		}
 		
 		// Draw battery status
 		if (energy > 0.8f)		g2->drawScaledSubImage(batteryImage, 0,   0, 32, 64, w * 2 - 40, h * 2 - 80, 32, 64);
@@ -534,7 +570,7 @@ namespace {
 		Graphics4::swapBuffers();
 	}
 
-	void keyDown(KeyCode code) {
+	void keyDown(KeyCode code) {		
 		if (dead) return;
 
 		charging = false;
@@ -632,6 +668,7 @@ int kore(int argc, char** argv) {
 
 	Kore::System::setCallback(update);
 
+	intro = new Graphics4::Texture("schoolClass.png");
 	playerImage = new Graphics4::Texture("player.png");
 	playerChargeImage = new Graphics4::Texture("playerRechargeAnim.png");
 	playerDoorImage = new Graphics4::Texture("playerDoorAnim.png");
