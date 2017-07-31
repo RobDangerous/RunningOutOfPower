@@ -245,8 +245,8 @@ namespace {
 				}
 			}
 
-			float targetCamX = Kore::max(0.0f, px - w / 2 + playerWidth / 2);
-			float targetCamY = Kore::max(0.0f, py - h / 2 + playerHeight / 2);
+			float targetCamX = Kore::min(Kore::max(0.0f, px - w / 2 + playerWidth / 2), 1.f * columns * tileWidth - w);
+			float targetCamY = Kore::min(Kore::max(0.0f, py - h / 2 + playerHeight / 2), 1.f * rows * tileHeight - h);
 
 			vec2 cam(camX, camY);
 			vec2 target(targetCamX, targetCamY);
