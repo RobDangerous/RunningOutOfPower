@@ -92,15 +92,14 @@ void drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights) {
 
 bool isInLight(float x, float y, float fx, float fy, float mx, float my, float camX, float camY, float energy)
 {
-	//log(Info, "%i -> %i", getFloor(y), getFloor(py));
 	// Light on
 	return energy >= 0.1f &&
 		// Same floor
 		getFloor(y) == getFloor(fy) &&
 		// Distance small
-		Kore::abs(fx - x) <= 5 * energy * tileWidth &&
+		Kore::abs(fx - x) <= 3 * energy * tileWidth &&
 		// Angle small
-		Kore::abs(Kore::atan2(my - (fy - camY), mx - (fx - camX)) - Kore::atan2(y - fy, x - fx)) < 0.15 * Kore::pi;
+		Kore::abs(Kore::atan2(my - (fy - camY), mx - (fx - camX)) - Kore::atan2(y - fy, x - fx)) < 0.2 * Kore::pi;
 }
 
 bool animateSpider(float px, float py, float fx, float fy, float mx, float my, float camX, float camY, float energy)
