@@ -66,6 +66,12 @@ namespace {
 	bool down_ = false;
 	bool up = false;
 	bool charging = false;
+
+	const char* helpText;
+	const char* const chargeText = "Hold space to charge";
+	const char* const doorText = "Key Up: Go through the door";
+	const char* const closetInText = "Key Up: Hide in the closet";
+	const char* const closetOutText = "Key Down: Get out of the closet";
 	
 	int frameCount = 0;
 	
@@ -79,10 +85,7 @@ namespace {
 	
 	char dText[42];
 	float dTime = 0;
-	
-	char doorText[42];
-	char closetText[42];
-	
+		
 	vec4 doorButton;
 	vec4 closetButton;
 	vec2 debugText;
@@ -139,12 +142,8 @@ namespace {
 		
 		g2->fillRect(0, h * 2 - 100, w * 2, 100);
 		
-		// Draw buttons
-		if (getTileID(px + playerWidth / 2, py + playerHeight / 2) == Door) {
-			g2->drawString(doorText, closetButton.x(), closetButton.y());
-		}
-		else if (getTileID(px + playerWidth / 2, py + playerHeight / 2) == Closet) {
-			g2->drawString(closetText, closetButton.x(), closetButton.y());
+		if (helpText != nullptr) {
+			g2->drawString(helpText, closetButton.x(), closetButton.y());
 		}
 
 		// Show debug text for 50 frames
@@ -176,14 +175,6 @@ namespace {
 		
 		if (tile == Closet) {
 			inCloset = !inCloset;
-
-			if (inCloset) {
-				sprintf(closetText, "Key Down: Get out of the closet");
-			}
-			else {
-				sprintf(closetText, "Key Up: Hide in the closet");
-			}
-			
 			return true;
 		} else {
 			//sprintf(dText, "There is no closet");
@@ -198,13 +189,31 @@ namespace {
 		static int anim = 0;
 		++anim;
 
+		helpText = nullptr;
+
 		if (charging) {
 			energy += 0.002f;
 			if (energy > 1) energy = 1;
 		}
 		else {
 			energy -= 0.0005f;
+			if (energy < 0.2f) {
+				helpText = chargeText;
+			}
 			if (energy < 0) energy = 0;
+		}
+		
+		// Draw buttons
+		if (getTileID(px + playerWidth / 2, py + playerHeight / 2) == Door) {
+			helpText = doorText;
+		}
+		else if (getTileID(px + playerWidth / 2, py + playerHeight / 2) == Closet) {
+			if (inCloset) {
+				helpText = closetOutText;
+			}
+			else {
+				helpText = closetInText;
+			}
 		}
 
 		//if (up) {
@@ -475,11 +484,8 @@ int kore(int argc, char** argv) {
 	g2->setFontColor(Graphics1::Color::White);
 	g2->setFontSize(24);
 	
-	sprintf(doorText, "Key Up: Go through the door");
-	sprintf(closetText, "Key Up: Hide in the closet");
-	
 	doorButton = vec4(10, h * 2 - 80, g2->getFont()->stringWidth(doorText), 20); // xPos, yPos, width, height
-	closetButton = vec4(10, h * 2 - 50, g2->getFont()->stringWidth(closetText), 20);
+	closetButton = vec4(10, h * 2 - 50, g2->getFont()->stringWidth(closetInText), 20);
 	debugText = vec2(w * 2 / 2, h * 2 - 80);
 
 	Keyboard::the()->KeyDown = keyDown;
