@@ -54,6 +54,9 @@ namespace {
 
 	Graphics4::Texture* winImage;
 
+	SoundStream* music1;
+	SoundStream* music2;
+
 	Graphics4::RenderTarget* screen;
 	Graphics4::PipelineState* pipeline;
 	Graphics4::ConstantLocation aspectLocation;
@@ -118,13 +121,13 @@ namespace {
 	vec2 debugText;
 	vec4 skipButton;
 	
-	const int monsterCount = 2;
-	//Monster monsters[monsterCount];
+	const int monsterCount = 3;
 	Monster** monsters;
-	Monster* janitor;
+	Monster* janitor1;
+	Monster* janitor2;
 	Monster* book;
 	
-	const int smallMonsterCount = 1;
+	const int smallMonsterCount = rows;
 	SmallMonster smallMonsters[smallMonsterCount];
 	
 	bool lightOn = false;
@@ -170,15 +173,17 @@ namespace {
 		sprintf(dText, "");
 		dTime = 0;
 
-		lightOn = true;//false;
+		lightOn = false;
 
 		state = Start;
+		Audio1::stop(music2);
+		Audio1::play(music1);
 
 		for (int i = 0; i < monsterCount; ++i) {
-			monsters[i]->reset();
+			monsters[i]->reset(i == 0 ? true : false);
 		}
 		for (int i = 0; i < smallMonsterCount; ++i) {
-			smallMonsters[i].reset();
+			smallMonsters[i].reset(i);
 		}
 		resetSpiders();
 		shuffleDoors();
@@ -671,6 +676,8 @@ namespace {
 		else {
 			if (state == Start && anim - 60 * 4 > 600.0f) {
 				state = Game;
+				Audio1::stop(music1);
+				Audio1::play(music2);
 				energy = 1;
 			}
 			else {
@@ -742,7 +749,12 @@ namespace {
 
 	void keyUp(KeyCode code) {
 		if (code == KeyR && state != Start) reset();
-		if (code == KeyEscape && state == Start) state = Game;
+		if (code == KeyEscape && state == Start) {
+			state = Game;
+			Audio1::stop(music1);
+			Audio1::play(music2);
+			energy = 1;
+		}
 		if (dead) return;
 
 		switch (code) {
@@ -790,13 +802,16 @@ namespace {
 		if (x > skipButton.x() && y > skipButton.y() && x < skipButton.x() + skipButton.z() && y < skipButton.y() + skipButton.w()) {
 			log(Info, "skip button pressed");
 			state = Game;
+			Audio1::stop(music1);
+			Audio1::play(music2);
+			energy = 1;
 		}
 		
 	}
 }
 
 int kore(int argc, char** argv) {
-	System::init("Power", w * 2, h * 2);
+	System::init("Lightmare", w * 2, h * 2);
 	Random::init(static_cast<int>(System::time() * 1000));
 	startTime = System::time();
 	
@@ -819,14 +834,20 @@ int kore(int argc, char** argv) {
 	playerDoorImage = new Graphics4::Texture("playerDoorAnim.png");
 	playerWidth = playerImage->width / 10.0f;
 	playerHeight = playerImage->height / 2.0f;
-	
+
+	music1 = new SoundStream("loop.ogg", true);
+	music2 = new SoundStream("loop2.ogg", true);
+
 	monsters = new Monster*[monsterCount];
-	janitor = new Monster();
-	janitor->init("janitor.png", 4);
-	monsters[0] = janitor;
+	janitor1 = new Monster();
+	janitor1->init("janitor.png", 4);
+	monsters[0] = janitor1;
+	janitor2 = new Monster();
+	janitor2->init("janitor.png", 4);
+	monsters[1] = janitor2;
 	book = new Monster();
 	book->init("book.png", 8);
-	monsters[1] = book;
+	monsters[2] = book;
 	SmallMonster::init();
 	reset();
 	
@@ -835,9 +856,6 @@ int kore(int argc, char** argv) {
 	fightImage = new Graphics4::Texture("Tiles/fight.png");
 	spiderAnimImage = new Graphics4::Texture("playerSpiderAnim.png");
 
-	SoundStream* music = new SoundStream("loop.ogg", true);
-	Audio1::play(music);
-	
 	font14 = Kravur::load("Fonts/arial", FontStyle(), 14);
 	font24 = Kravur::load("Fonts/arial", FontStyle(), 24);
 	font34 = Kravur::load("Fonts/arial", FontStyle(), 34);
