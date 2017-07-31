@@ -51,26 +51,13 @@ bool Monster::update(float px, float py, float fx, float fy, float mx_world, flo
 		log(Info, "Monster at floor %i", getFloor(y));
 	}*/
 	
-	/*if (directionLock == 0) {
-		int r = Random::get(0, 4);
-		switch (status) {
-			case 0:
-				status = WalkingLeft;
-				break;
-			case 1:
-				status = WalkingRight;
-				break;
-			case 2:
-				if
-				status = WalkingRight;
-				break;
-			case 3:
-				status = WalkingRight;
-				break;
-			default:
-				break;
+	if (directionLock == 0) {
+		int r = Random::get(0, 1);
+		if (r) {
+			if (status == WalkingRight) status = WalkingLeft;
+			else if (status == WalkingLeft) status = WalkingRight;
 		}
-	}*/
+	}
 
 	bool inLight = isInLight(x + width / 2, y, y + height / 2, fx, fy, mx_world, my_world, energy);
 	switch (status) {
@@ -115,7 +102,7 @@ bool Monster::update(float px, float py, float fx, float fy, float mx_world, flo
 	}
 	
 	++ frameCount;
-	directionLock = frameCount % 300;
+	directionLock = frameCount % 200;
 	
 	return (Kore::abs(x + width / 2 - px) < tileWidth * 0.25f && getFloor(y + height / 2) == getFloor(py));
 }
