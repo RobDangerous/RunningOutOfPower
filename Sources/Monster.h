@@ -10,13 +10,13 @@ public:
 	Monster();
 	void position();
 	static void init();
-	void update();
+	bool update(float px, float py, float fx, float fy, float mx, float my, float camX, float camY, float energy);
 	void render(Kore::Graphics2::Graphics2* g2, float camX, float camY);
 	void changeFloor();
 
 private:
 	
 	enum Status {
-		WalkingLeft, WalkingRight
+		WalkingLeft, WalkingRight, StandingLeft, StandingRight
 	} status;
 };
