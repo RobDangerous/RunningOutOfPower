@@ -12,12 +12,20 @@ Monster::Monster() : initX(400), initY(0) {
 	
 }
 
-void Monster::reset() {
-	x = Random::get(0, columns * tileWidth);
-	y = Random::get(0, rows) * tileHeight + tileHeight - height;
+void Monster::reset(bool firstFloor) {	
+	if (firstFloor) {
+		x = 100;
+		y = tileHeight - height;
+	} else {
+		x = Random::get(0, columns * tileWidth);
+		y = Random::get(1, rows) * tileHeight + tileHeight - height;
+	}
 	
 	anim = 0;
 	status = WalkingRight;
+	
+	frameCount = 0;
+	directionLock = 0;
 	
 	log(Info, "Monster at floor %i", getFloor(y));
 }
@@ -26,12 +34,12 @@ void Monster::init(const char* textureName, int animTiles) {
 	texture = new Graphics4::Texture(textureName);
 	width = texture->width / animTiles;
 	height = texture->height / 1;
-	doorLock = 0;
+	//doorLock = 0;
 	this->animTiles = animTiles;
 }
 
 bool Monster::update(float px, float py, float fx, float fy, float mx_world, float my_world, float energy) {
-	doorLock ++;
+	/*doorLock ++;
 	int tile = getTileID(x + width / 2, y + height / 2);
 	if (tile == Door && doorLock > 1000 && Random::get(0, 1)) {
 		vec2 door = findDoor(x + width / 2, y + height / 2);
@@ -41,7 +49,28 @@ bool Monster::update(float px, float py, float fx, float fy, float mx_world, flo
 		doorLock = 0;
 		
 		log(Info, "Monster at floor %i", getFloor(y));
-	}
+	}*/
+	
+	/*if (directionLock == 0) {
+		int r = Random::get(0, 4);
+		switch (status) {
+			case 0:
+				status = WalkingLeft;
+				break;
+			case 1:
+				status = WalkingRight;
+				break;
+			case 2:
+				if
+				status = WalkingRight;
+				break;
+			case 3:
+				status = WalkingRight;
+				break;
+			default:
+				break;
+		}
+	}*/
 
 	bool inLight = isInLight(x + width / 2, y, y + height / 2, fx, fy, mx_world, my_world, energy);
 	switch (status) {
@@ -84,6 +113,10 @@ bool Monster::update(float px, float py, float fx, float fy, float mx_world, flo
 		}
 		break;
 	}
+	
+	++ frameCount;
+	directionLock = frameCount % 300;
+	
 	return (Kore::abs(x + width / 2 - px) < tileWidth * 0.25f && getFloor(y + height / 2) == getFloor(py));
 }
 
