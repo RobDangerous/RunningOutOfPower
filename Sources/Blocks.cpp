@@ -39,6 +39,8 @@ namespace {
 	Graphics4::Texture* playerDoorImage;
 
 	Graphics4::Texture* batteryImage;
+	
+	Graphics4::Texture* fightImage;
 
 	Graphics4::RenderTarget* screen;
 	Graphics4::PipelineState* pipeline;
@@ -86,6 +88,7 @@ namespace {
 	int runIndex = 0;
 	int chargeIndex = 0;
 	int doorIndex = 0;
+	int fightIndex = 0;
 	
 	Kravur* font14;
 	Kravur* font24;
@@ -216,6 +219,7 @@ namespace {
 		float flxoff = 0;
 		float flyoff = 0;
 		static int anim = 0;
+		++frameCount;
 		if (!dead)
 		{
 			++anim;
@@ -337,7 +341,6 @@ namespace {
 				monsters[i].update();
 			}
 
-			frameCount++;
 			if (frameCount > 10) {
 				frameCount = 0;
 
@@ -371,7 +374,7 @@ namespace {
 			lights[i] = vec2(lights[i].x() / w, lights[i].y() / h);
 		}
 
-		if (!inCloset) {
+		if (!inCloset && !dead) {
 			if (charging) {
 				if (left || lastDirection == 0) {
 					g2->drawScaledSubImage(playerChargeImage, (chargeIndex + 1) * playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
@@ -425,15 +428,23 @@ namespace {
 				g2->transformation = mat3::Identity();
 			}
 		}
-
+		
 		for (int i = 0; i < monsterCount; ++i) {
 			monsters[i].render(g2, camX, camY);
 		}
 
+		static float red = 0;
+		if (dead) {
+			fightIndex = (frameCount / 10) % 4;
+			energy = 0;
+			
+			g2->drawScaledSubImage(fightImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
+			
+			//red = Kore::min(red + 0.1f, 1.f);
+		}
+		
 		g2->end();
 		
-		static float red = 0;
-		if (dead) red = Kore::min(red + 0.1f, 1.f);
 		Graphics4::restoreRenderTarget();
 		g2->begin(false, w * 2, h * 2);
 		g2->setPipeline(pipeline);
@@ -604,6 +615,8 @@ int kore(int argc, char** argv) {
 	}
 	
 	batteryImage = new Graphics4::Texture("Tiles/battery.png");
+	
+	fightImage = new Graphics4::Texture("Tiles/fight.png");
 
 	SoundStream* music = new SoundStream("loop.ogg", true);
 	Audio1::play(music);
