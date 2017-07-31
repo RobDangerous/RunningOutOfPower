@@ -20,11 +20,11 @@ SmallMonster::SmallMonster() : monsterIndex(2) {
 }
 
 void SmallMonster::reset(int row) {
-	x = Random::get(200, tileWidth * columns - 100);
-	y = startY = row * tileHeight + 50;
 	anim = 0;
 	status = WalkingRight;
 	monsterIndex = Random::get(0, 2);
+	x = Random::get(200, tileWidth * columns - 100);
+	y = startY = row * tileHeight + tileHeight - heights[monsterIndex];
 }
 
 void SmallMonster::init() {
@@ -55,13 +55,19 @@ bool SmallMonster::update(float px, float py, float fx, float fy, float mx_world
 	else if (status == WalkingLeft && x < 100) {
 		status = WalkingRight;
 	}
+
 	if (status == WalkingRight) {
-		x += 2;
+		if (x < columns * tileWidth - 102) {
+			x += 2;
+		}
 	}
 	else {
-		x -= 2;
+		if (x > 102) {
+			x -= 2;
+		}
 	}
-	y = Kore::sin(x / 50.0f) * 20 + 50 + startY;
+	
+	y = -Kore::abs(Kore::sin(x / 50.0f)) * 20 + startY;
 	return (Kore::abs(x + widths[monsterIndex] / 2 - px) < tileWidth * 0.25f && getFloor(y + heights[monsterIndex] / 2) == getFloor(py));
 }
 
