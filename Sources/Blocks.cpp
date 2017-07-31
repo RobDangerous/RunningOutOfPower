@@ -513,7 +513,7 @@ namespace {
 			energy = 0;
 			
 			int tile = getTileID(px + playerWidth / 2, py + playerHeight / 2);
-			if (tile >= Spider1 && tile < Spider9) {
+			if (tile >= Spider1 && tile <= Spider9) {
 				if (fightIndex < 6) fightIndex = frameCount / 10;
 				//g2->drawScaledSubImage(spiderAnimImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX - 20, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
 				g2->drawScaledSubImage(spiderAnimImage, fightIndex * playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
