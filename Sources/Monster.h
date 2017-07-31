@@ -8,7 +8,7 @@ public:
 	Monster();
 	void reset();
 	static void init();
-	bool update(float px, float py, float fx, float fy, float mx, float my, float camX, float camY, float energy);
+	bool update(float px, float py, float fx, float fy, float mx_world, float my_world, float energy);
 	void render(Kore::Graphics2::Graphics2* g2, float camX, float camY);
 	void changeFloor();
 

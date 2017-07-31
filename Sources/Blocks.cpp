@@ -28,6 +28,7 @@ namespace {
 	const int h = 720 / 2;
 	
 	const double fps = 1.l / 60.l;
+	const float minergy = 0.15f;
 
 	double startTime;
 	double lastTime;
@@ -298,29 +299,44 @@ namespace {
 
 		Audio2::update();
 
-		float flxoff = 0;
-		float flyoff = 0;
 		++frameCount;
 		++anim;
 
+		vec3 playerCenter;
+		vec3 flashlightPosRel;
+		vec3 flashlightPosAbs;
+		vec3 flashlightRay0;
+		vec3 flashlightRay1;
+		vec3 flashlightRay2;
 		if (!dead && state == Game)
 		{
 			helpText = nullptr;
 
 			if (charging) {
+				if (energy < minergy) energy = minergy;
 				energy += 0.002f;
 				if (energy > 1) energy = 1;
 			}
 			else {
 				energy -= 0.0005f;
-				if (energy < 0.2f) {
+				if (energy < minergy) {
 					helpText = chargeText;
+					energy = 0;
 				}
-				if (energy < 0) energy = 0;
+			}
+
+			if (!inCloset) {
+				if (left && px >= -10) {
+					px -= 4;
+				}
+				if (right && px <= columns * tileWidth - 70) {
+					px += 4;
+				}
 			}
 		
 			// Draw buttons
-			int tile = getTileID(px + playerWidth / 2, py + playerHeight / 2);
+			playerCenter = vec3(px + playerWidth / 2, py + playerHeight / 2, 0.f);
+			int tile = getTileID(playerCenter.x(), playerCenter.y());
 			if (tile == Door) {
 				helpText = doorText;
 			}
@@ -336,15 +352,6 @@ namespace {
 					helpText = switchLighOffText;
 				else
 					helpText = switchLighOnText;
-			}
-
-			if (!inCloset) {
-				if (left && px >= -10) {
-					px -= 4;
-				}
-				if (right && px <= columns * tileWidth - 70) {
-					px += 4;
-				}
 			}
 
 			float targetCamX = Kore::min(Kore::max(0.0f, px - w / 2 + playerWidth / 2), 1.f * columns * tileWidth - w);
@@ -370,57 +377,79 @@ namespace {
 				if (charging) {
 					my = py - camY + playerHeight / 2;
 					if (left || lastDirection == 0) {
-						flxoff = -10;
-						flyoff = 0;
+						vec3 flashlightRoot(20, 0, 0);
+						flashlightRay0 = vec3(-30, 0, 0);
+						flashlightPosRel = flashlightRoot + flashlightRay0;
+
+						flashlightRay1 = mat3::RotationZ(pi - 0.15 * energy * Kore::pi) * flashlightRay0;
+						flashlightRay2 = mat3::RotationZ(pi + 0.15 * energy * Kore::pi) * flashlightRay0;
+						flashlightRay0.normalize();
+						flashlightRay1.normalize();
+						flashlightRay2.normalize();
 						mx = px - camX - 100;
 					}
 					else {
-						flxoff = 10;
-						flyoff = 0;
+						vec3 flashlightRoot(-20, 0, 0);
+						flashlightRay0 = vec3(30, 0, 0);
+						flashlightPosRel = flashlightRoot + flashlightRay0;
+
+						flashlightRay1 = mat3::RotationZ(0.15 * energy * Kore::pi) * flashlightRay0;
+						flashlightRay2 = mat3::RotationZ(0.15 * energy * Kore::pi) * flashlightRay0;
+						flashlightRay0.normalize();
+						flashlightRay1.normalize();
+						flashlightRay2.normalize();
 						mx = px - camX + 100;
 					}
 				}
 				else if (doorAnim) {
 					if (left || lastDirection == 0) {
-						mx = px + playerWidth / 2 - camX - 100;
+						mx = playerCenter.x() - camX - 100;
 					}
 					else {
-						mx = px + playerWidth / 2 - camX + 100;
+						mx = playerCenter.x() - camX + 100;
 					}
 				}
 				else {
-					float angle = Kore::atan2(my - (py + playerHeight / 2 - camY), mx - (px + playerWidth / 2 - camX));
+					float angle = Kore::atan2(my - (playerCenter.y() - camY), mx - (playerCenter.x() - camX));
 					if (left || lastDirection == 0) {
-						vec3 c(20, 0, 0);
-						vec3 d(-30, 0, 0);
-						vec3 r = c + mat3::RotationZ(angle + pi) * d;
-						flxoff = r.x();
-						flyoff = r.y();
+						vec3 flashlightRoot(20, 0, 0);
+						flashlightRay0 = mat3::RotationZ(angle + pi) * vec3(-30, 0, 0);
+						flashlightPosRel = flashlightRoot + flashlightRay0;
+						
+						flashlightRay1 = mat3::RotationZ(- 0.15 * energy * Kore::pi) * flashlightRay0;
+						flashlightRay2 = mat3::RotationZ(+ 0.15 * energy * Kore::pi) * flashlightRay0;
+						flashlightRay0.normalize();
+						flashlightRay1.normalize();
+						flashlightRay2.normalize();
 					}
 					else {
-						vec3 c(-20, 0, 0);
-						vec3 d(30, 0, 0);
-						vec3 r = c + mat3::RotationZ(angle) * d;
-						flxoff = r.x();
-						flyoff = r.y();
+						vec3 flashlightRoot(-20, 0, 0);
+						flashlightRay0 = mat3::RotationZ(angle) * vec3(30, 0, 0);
+						flashlightPosRel = flashlightRoot + flashlightRay0;
+
+						flashlightRay1 = mat3::RotationZ(- 0.15 * energy * Kore::pi) * flashlightRay0;
+						flashlightRay2 = mat3::RotationZ(+ 0.15 * energy * Kore::pi) * flashlightRay0;
+						flashlightRay0.normalize();
+						flashlightRay1.normalize();
+						flashlightRay2.normalize();
 					}
 				}
 			}
-
-			dead = animateSpider(px + playerWidth / 2, py + playerHeight / 2, px + playerWidth / 2 + flxoff, py + playerHeight / 2 + flyoff, mx, my, camX, camY, energy);
+			flashlightPosAbs = playerCenter + flashlightPosRel;
+			dead = animateSpider(playerCenter.x(), playerCenter.y(), flashlightPosAbs.x(), flashlightPosAbs.y(), mx + camX, my + camY, energy);
 
 			for (int i = 0; i < monsterCount; ++i) {
 				//if (Kore::abs(px - monsters[i].x) < 100 && mx > px) {
 
 				//}
-				dead |= (monsters[i].update(px + playerWidth / 2, py + playerHeight / 2, px + playerWidth / 2 + flxoff, py + playerHeight / 2 + flyoff, mx, my, camX, camY, energy) && !inCloset);
+				dead |= (monsters[i].update(playerCenter.x(), playerCenter.y(), flashlightPosAbs.x(), flashlightPosAbs.y(), mx + camX, my + camY, energy) && !inCloset);
 			}
 
 			for (int i = 0; i < smallMonsterCount; ++i) {
 				//if (Kore::abs(px - monsters[i].x) < 100 && mx > px) {
 
 				//}
-				dead |= (smallMonsters[i].update(px + playerWidth / 2, py + playerHeight / 2, px + playerWidth / 2 + flxoff, py + playerHeight / 2 + flyoff, mx, my, camX, camY, energy) && !inCloset);
+				dead |= (smallMonsters[i].update(playerCenter.x(), playerCenter.y(), flashlightPosAbs.x(), flashlightPosAbs.y(), mx + camX, my + camY, energy) && !inCloset);
 			}
 
 			if (frameCount > 10) {
@@ -490,7 +519,7 @@ namespace {
 				else if (lastDirection == 1)
 					g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 
-				float angle = Kore::atan2(my - (py + playerHeight / 2 - camY), mx - (px + playerWidth / 2 - camX));
+				float angle = Kore::atan2(my - (playerCenter.y() - camY), mx - (playerCenter.x() - camX));
 				mat3 m = mat3::Identity();
 				if (left || lastDirection == 0) {
 					if (Kore::abs(angle) < Kore::pi * 0.5f)
@@ -528,8 +557,8 @@ namespace {
 		if (dead) {
 			energy = 0;
 			
-			int tile = getTileID(px + playerWidth / 2, py + playerHeight / 2);
-			if (tile >= Spider1 && tile <= Spider9) {
+			int tile = getTileID(playerCenter.x(), playerCenter.y());
+			if (tile >= Spider1 && tile < Spider9) {
 				if (fightIndex < 6) fightIndex = frameCount / 10;
 				//g2->drawScaledSubImage(spiderAnimImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX - 20, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
 				g2->drawScaledSubImage(spiderAnimImage, fightIndex * playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
@@ -539,6 +568,12 @@ namespace {
 				g2->drawScaledSubImage(fightImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX - 20, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
 			}
 		}
+
+		vec2 f(flashlightPosAbs.x() - camX, flashlightPosAbs.y() - camY);
+		g2->fillRect(f.x() - 2, f.y() - 2, 4, 4);
+		g2->drawLine(f.x(), f.y(), f.x() + flashlightRay0.x() * 1000, f.y() + flashlightRay0.y() * 1000);
+		g2->drawLine(f.x(), f.y(), f.x() + flashlightRay1.x() * 1000, f.y() + flashlightRay1.y() * 1000);
+		g2->drawLine(f.x(), f.y(), f.x() + flashlightRay2.x() * 1000, f.y() + flashlightRay2.y() * 1000);
 
 		if (state == End) {
 			g2->drawImage(winImage, 0, 0);
@@ -552,7 +587,7 @@ namespace {
 		Graphics4::setPipeline(pipeline);
 		Graphics4::setFloat(aspectLocation, (float)w / (float)h);
 		vec2 mouse(mx / w, my / h);
-		vec2 player((px - camX + playerWidth / 2.0f) / w, (py - camY + playerHeight / 2.0f) / h);
+		vec2 player((playerCenter.x() - camX) / w, (playerCenter.y() - camY) / h);
 		if (state == Start) {
 			Graphics4::setFloat(angleLocation, 0.0f);
 			Graphics4::setFloat4(playerLocation, vec4(10.76f, 10.22f, 0.76f, 0.145f));
@@ -564,7 +599,7 @@ namespace {
 			Graphics4::setFloat(angleLocation, Kore::atan2(mouse.y() - player.y(), mouse.x() - player.x()) - pi / 2.0f);
 #endif
 			Graphics4::setFloat4(playerLocation, vec4(player.x(), player.y(),
-				(px - camX + playerWidth / 2.0f + flxoff) / w, (py - camY + playerHeight / 2.0f + flyoff) / h));
+				(flashlightPosAbs.x() - camX) / w, (flashlightPosAbs.y() - camY) / h));
 		}
 		Graphics4::setFloat2(mouseLocation, mouse);
 		Graphics4::setInt(animLocation, anim);

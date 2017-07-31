@@ -37,7 +37,7 @@ void Monster::init() {
 	doorLock = 0;
 }
 
-bool Monster::update(float px, float py, float fx, float fy, float mx, float my, float camX, float camY, float energy) {
+bool Monster::update(float px, float py, float fx, float fy, float mx_world, float my_world, float energy) {
 	doorLock ++;
 	int tile = getTileID(x + width / 2, y + height / 2);
 	if (tile == Door && doorLock > 50 && Random::get(0, 1)) {
@@ -48,9 +48,7 @@ bool Monster::update(float px, float py, float fx, float fy, float mx, float my,
 		doorLock = 0;
 	}
 
-	bool inLight = isInLight(x + width / 2, y, fx, fy, mx, my, camX, camY, energy) ||
-		isInLight(x + 3 * width / 4, y + height / 2, fx, fy, mx, my, camX, camY, energy) ||
-		isInLight(x + width / 2, y + height / 2, fx, fy, mx, my, camX, camY, energy);
+	bool inLight = isInLight(x + width / 2, y, y + height / 2, fx, fy, mx_world, my_world, energy);
 	switch (status) {
 	case WalkingLeft:
 		x -= 2;

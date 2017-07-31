@@ -30,7 +30,7 @@ void SmallMonster::init() {
 	height = texture->height / 1;
 }
 
-bool SmallMonster::update(float px, float py, float fx, float fy, float mx, float my, float camX, float camY, float energy) {
+bool SmallMonster::update(float px, float py, float fx, float fy, float mx_world, float my_world, float energy) {
 	x += 2;
 	y = Kore::sin(x / 50.0f) * 20 + 50;
 	return false;

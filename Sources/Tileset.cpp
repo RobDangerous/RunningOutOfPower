@@ -100,19 +100,30 @@ void drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights) {
 	}
 }
 
-bool isInLight(float x, float y, float fx, float fy, float mx, float my, float camX, float camY, float energy)
+bool isInLight(float x, float yMin, float yMax, float fx, float fy, float mx_world, float my_world, float energy)
 {
 	// Light on
-	return energy >= 0.1f &&
-		// Same floor
-		getFloor(y) == getFloor(fy) &&
-		// Distance small
-		Kore::abs(fx - x) <= 3 * energy * tileWidth &&
-		// Angle small
-		Kore::abs(Kore::atan2(my - (fy - camY), mx - (fx - camX)) - Kore::atan2(y - fy, x - fx)) < 0.2 * Kore::pi;
+	if (energy < 0.1f)
+		return false;
+	// Same floor
+	if (getFloor(yMin) != getFloor(fy))
+		return false;
+	// Distance small
+	if (Kore::abs(fx - x) > 3 * energy * tileWidth)
+		return false;
+	// Angles have different signs -> flashlight must be between positions
+	float angleMin = Kore::atan2(yMin - fy, x - fx);
+	float angleMax = Kore::atan2(yMax - fy, x - fx);
+	if (angleMin * angleMax <= 0.1f)
+		return true;
+	// Angles small otherwise
+	float maxAngle = 0.15 * energy * Kore::pi;
+	float angleFlashlight = Kore::atan2(my_world - fy, mx_world - fx);
+
+	return Kore::abs(angleFlashlight - angleMin) < maxAngle || Kore::abs(angleFlashlight - angleMax) < maxAngle;
 }
 
-bool animateSpider(float px, float py, float fx, float fy, float mx, float my, float camX, float camY, float energy)
+bool animateSpider(float px, float py, float fx, float fy, float mx_world, float my_world, float energy)
 {
 	bool caughtPlayer = false;
 	++spiderFrameCount;
@@ -127,21 +138,23 @@ bool animateSpider(float px, float py, float fx, float fy, float mx, float my, f
 	for (int i = 0; i < spiderCountCurr; ++i)
 	{
 		int collx = (spiderPos[i].x() + .5f) * tileWidth;
-		int colly = spiderPos[i].y() * tileHeight + 9 + (spiderState[i] - Spider1) * 11 + 14;
+		int collyMin = spiderPos[i].y() * tileHeight + 9 + (spiderState[i] - Spider1) * 11;
+		int collyMax = collyMin + 28;
 		spiderCooldownCurr[i] -= 1;
 		if (doMove)
 		{
-			int collynext = colly + 11;
-			bool inRange = collx - px <= tileWidth && getFloor(colly) == getFloor(py);
-			bool inLight = isInLight(collx, colly, fx, fy, mx, my, camX, camY, energy);
+			int collynextMin = collyMin + 11;
+			int collynextMax = collyMax + 11;
+			bool inRange = collx - px <= tileWidth && getFloor(collyMin) == getFloor(py);
+			bool inLight = isInLight(collx, collyMin, collyMax, fx, fy, mx_world, my_world, energy);
 			if (inLight)
 				spiderCooldownCurr[i] = spiderCooldownMax;
 			bool active = inRange && !inLight;
-			if (active && spiderState[i] < Spider9 && !isInLight(collx, collynext, fx, fy, mx, my, camX, camY, energy) && spiderCooldownCurr[i] <= 0) ++spiderState[i];
+			if (active && spiderState[i] < Spider9 && !isInLight(collx, collynextMin, collynextMax, fx, fy, mx_world, my_world, energy) && spiderCooldownCurr[i] <= 0) ++spiderState[i];
 			else if (!active && spiderState[i] > Spider1) --spiderState[i];
 			source[spiderPos[i].y() * columns  + spiderPos[i].x()] = spiderState[i];
 		}
-		caughtPlayer |= (spiderState[i] >= Spider3 && Kore::abs(collx - px) < tileWidth * 0.25f && getFloor(colly) == getFloor(py));
+		caughtPlayer |= (spiderState[i] >= Spider3 && Kore::abs(collx - px) < tileWidth * 0.25f && getFloor(collyMin) == getFloor(py));
 	}
 	return caughtPlayer;
 }
