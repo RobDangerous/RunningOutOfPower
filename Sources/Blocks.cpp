@@ -237,10 +237,10 @@ namespace {
 			//	py += 1;
 			//}
 			if (!inCloset) {
-				if (left) {
+				if (left && px >= -10) {
 					px -= 4;
 				}
-				if (right) {
+				if (right && px <= columns * tileWidth - 70) {
 					px += 4;
 				}
 			}
