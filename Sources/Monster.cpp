@@ -40,12 +40,14 @@ void Monster::init() {
 bool Monster::update(float px, float py, float fx, float fy, float mx_world, float my_world, float energy) {
 	doorLock ++;
 	int tile = getTileID(x + width / 2, y + height / 2);
-	if (tile == Door && doorLock > 50 && Random::get(0, 1)) {
+	if (tile == Door && doorLock > 1000 && Random::get(0, 1)) {
 		vec2 door = findDoor(x + width / 2, y + height / 2);
 		x = door.x() + 32;
 		y = door.y() + tileHeight - height;
 		
 		doorLock = 0;
+		
+		log(Info, "Monster at floor %i", getFloor(y));
 	}
 
 	bool inLight = isInLight(x + width / 2, y, y + height / 2, fx, fy, mx_world, my_world, energy);
