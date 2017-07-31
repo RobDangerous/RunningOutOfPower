@@ -213,6 +213,8 @@ namespace {
 	void update() {
 		Audio2::update();
 
+		float flxoff = 0;
+		float flyoff = 0;
 		static int anim = 0;
 		if (!dead)
 		{
@@ -284,7 +286,49 @@ namespace {
 				camY = cam.y();
 			}
 
-			dead = animateSpider(px + playerWidth / 2, py + playerHeight / 2, mx, my, camX, camY, energy);
+			// Flashlight position
+			if (!inCloset) {
+				if (charging) {
+					my = py - camY + playerHeight / 2;
+					if (left || lastDirection == 0) {
+						flxoff = -10;
+						flyoff = 0;
+						mx = px - camX - 100;
+					}
+					else {
+						flxoff = 10;
+						flyoff = 0;
+						mx = px - camX + 100;
+					}
+				}
+				else if (doorAnim) {
+					if (left || lastDirection == 0) {
+						mx = px + playerWidth / 2 - camX - 100;
+					}
+					else {
+						mx = px + playerWidth / 2 - camX + 100;
+					}
+				}
+				else {
+					float angle = Kore::atan2(my - (py + playerHeight / 2 - camY), mx - (px + playerWidth / 2 - camX));
+					if (left || lastDirection == 0) {
+						vec3 c(20, 0, 0);
+						vec3 d(-30, 0, 0);
+						vec3 r = c + mat3::RotationZ(angle + pi) * d;
+						flxoff = r.x();
+						flyoff = r.y();
+					}
+					else {
+						vec3 c(-20, 0, 0);
+						vec3 d(30, 0, 0);
+						vec3 r = c + mat3::RotationZ(angle) * d;
+						flxoff = r.x();
+						flyoff = r.y();
+					}
+				}
+			}
+
+			dead = animateSpider(px + playerWidth / 2, py + playerHeight / 2, px + playerWidth / 2 + flxoff, py + playerHeight / 2 + flyoff, mx, my, camX, camY, energy);
 
 			for (int i = 0; i < monsterCount; ++i) {
 				//if (Kore::abs(px - monsters[i].x) < 100 && mx > px) {
@@ -327,36 +371,23 @@ namespace {
 			lights[i] = vec2(lights[i].x() / w, lights[i].y() / h);
 		}
 
-		float flxoff = 0;
-		float flyoff = 0;
 		if (!inCloset) {
 			if (charging) {
-				my = py - camY + playerHeight / 2;
 				if (left || lastDirection == 0) {
-					flxoff = -10;
-					flyoff = 0;
-
-					mx = px - camX - 100;
 					g2->drawScaledSubImage(playerChargeImage, (chargeIndex + 1) * playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 					g2->drawScaledSubImage(playerChargeImage, playerWidth * 2, playerHeight, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 				}
 				else {
-					flxoff = 10;
-					flyoff = 0;
-
-					mx = px - camX + 100;
 					g2->drawScaledSubImage(playerChargeImage, chargeIndex * playerWidth, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 					g2->drawScaledSubImage(playerChargeImage, playerWidth, playerHeight, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 				}
 			}
 			else if(doorAnim) {
 				if (left || lastDirection == 0) {
-					mx = px + playerWidth / 2 - camX - 100;
 					g2->drawScaledSubImage(playerDoorImage, (doorIndex + 1) * playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 					g2->drawScaledSubImage(playerDoorImage, (doorIndex + 1) * playerWidth * 2, playerHeight, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 				}
 				else {
-					mx = px + playerWidth / 2 - camX + 100;
 					g2->drawScaledSubImage(playerDoorImage, doorIndex * playerWidth, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 					g2->drawScaledSubImage(playerDoorImage, doorIndex * playerWidth, playerHeight, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 				}
@@ -378,11 +409,6 @@ namespace {
 						m[1][1] = -1;
 					float xoff = 60;
 					float yoff = 60;
-					vec3 c(20, 0, 0);
-					vec3 d(-30, 0, 0);
-					vec3 r = c + mat3::RotationZ(angle + pi) * d;
-					flxoff = r.x();
-					flyoff = r.y();
 
 					g2->transformation = mat3::Translation(px - camX + xoff, py - camY + yoff) * mat3::RotationZ(angle + pi) * m * mat3::Translation(-xoff, -yoff);
 					g2->drawScaledSubImage(playerImage, 10 * playerWidth, 0, -playerWidth, playerHeight, 0, 0, playerWidth, playerHeight);
@@ -392,11 +418,6 @@ namespace {
 						m[1][1] = -1;
 					float xoff = 20;
 					float yoff = 60;
-					vec3 c(-20, 0, 0);
-					vec3 d(30, 0, 0);
-					vec3 r = c + mat3::RotationZ(angle) * d;
-					flxoff = r.x();
-					flyoff = r.y();
 
 					g2->transformation = mat3::Translation(px - camX + xoff, py - camY + yoff) * mat3::RotationZ(angle) * m * mat3::Translation(-xoff, -yoff);
 					g2->drawScaledSubImage(playerImage, 9 * playerWidth, 0, playerWidth, playerHeight, 0, 0, playerWidth, playerHeight);

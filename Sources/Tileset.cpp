@@ -57,6 +57,7 @@ void loadCsv(const char* csvFile) {
 				assert(spiderCountCurr < spiderCountMax);
 				spiderPos[spiderCountCurr] = vec2i(x, y);
 				spiderState[spiderCountCurr] = Spider1;
+				spiderCooldownCurr[spiderCountCurr] = 0;
 				++spiderCountCurr;
 			}
 		}
@@ -89,20 +90,20 @@ void drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights) {
 	}
 }
 
-bool isInLight(float x, float y, float px, float py, float mx, float my, float camX, float camY, float energy)
+bool isInLight(float x, float y, float fx, float fy, float mx, float my, float camX, float camY, float energy)
 {
 	//log(Info, "%i -> %i", getFloor(y), getFloor(py));
 	// Light on
 	return energy >= 0.1f &&
 		// Same floor
-		getFloor(y) == getFloor(py) &&
+		getFloor(y) == getFloor(fy) &&
 		// Distance small
-		Kore::abs(px - x) <= 200 &&
+		Kore::abs(fx - x) <= 5 * energy * tileWidth &&
 		// Angle small
-		Kore::abs(Kore::atan2(my - (py - camY), mx - (px - camX)) - Kore::atan2(y - py, x - px)) < 0.15 * Kore::pi;
+		Kore::abs(Kore::atan2(my - (fy - camY), mx - (fx - camX)) - Kore::atan2(y - fy, x - fx)) < 0.15 * Kore::pi;
 }
 
-bool animateSpider(float px, float py, float mx, float my, float camX, float camY, float energy)
+bool animateSpider(float px, float py, float fx, float fy, float mx, float my, float camX, float camY, float energy)
 {
 	bool caughtPlayer = false;
 	static int frameCount = 0;
@@ -119,12 +120,16 @@ bool animateSpider(float px, float py, float mx, float my, float camX, float cam
 	{
 		int collx = (spiderPos[i].x() + .5f) * tileWidth;
 		int colly = spiderPos[i].y() * tileHeight + 9 + (spiderState[i] - Spider1) * 11 + 14;
+		spiderCooldownCurr[i] -= 1;
 		if (doMove)
 		{
 			int collynext = colly + 11;
 			bool inRange = collx - px <= tileWidth && getFloor(colly) == getFloor(py);
-			bool active = inRange && !isInLight(collx, colly, px, py, mx, my, camX, camY, energy);
-			if (active && spiderState[i] < Spider9 && !isInLight(collx, collynext, px, py, mx, my, camX, camY, energy)) ++spiderState[i];
+			bool inLight = isInLight(collx, colly, fx, fy, mx, my, camX, camY, energy);
+			if (inLight)
+				spiderCooldownCurr[i] = spiderCooldownMax;
+			bool active = inRange && !inLight;
+			if (active && spiderState[i] < Spider9 && !isInLight(collx, collynext, fx, fy, mx, my, camX, camY, energy) && spiderCooldownCurr[i] <= 0) ++spiderState[i];
 			else if (!active && spiderState[i] > Spider1) --spiderState[i];
 			source[spiderPos[i].y() * columns  + spiderPos[i].x()] = spiderState[i];
 		}
