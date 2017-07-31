@@ -24,6 +24,9 @@ void Monster::reset(bool firstFloor) {
 	anim = 0;
 	status = WalkingRight;
 	
+	frameCount = 0;
+	directionLock = 0;
+	
 	log(Info, "Monster at floor %i", getFloor(y));
 }
 
@@ -31,7 +34,7 @@ void Monster::init(const char* textureName, int animTiles) {
 	texture = new Graphics4::Texture(textureName);
 	width = texture->width / animTiles;
 	height = texture->height / 1;
-	doorLock = 0;
+	//doorLock = 0;
 	this->animTiles = animTiles;
 }
 
@@ -46,6 +49,27 @@ bool Monster::update(float px, float py, float fx, float fy, float mx_world, flo
 		doorLock = 0;
 		
 		log(Info, "Monster at floor %i", getFloor(y));
+	}*/
+	
+	/*if (directionLock == 0) {
+		int r = Random::get(0, 4);
+		switch (status) {
+			case 0:
+				status = WalkingLeft;
+				break;
+			case 1:
+				status = WalkingRight;
+				break;
+			case 2:
+				if
+				status = WalkingRight;
+				break;
+			case 3:
+				status = WalkingRight;
+				break;
+			default:
+				break;
+		}
 	}*/
 
 	bool inLight = isInLight(x + width / 2, y, y + height / 2, fx, fy, mx_world, my_world, energy);
@@ -89,6 +113,10 @@ bool Monster::update(float px, float py, float fx, float fy, float mx_world, flo
 		}
 		break;
 	}
+	
+	++ frameCount;
+	directionLock = frameCount % 300;
+	
 	return (Kore::abs(x + width / 2 - px) < tileWidth * 0.25f && getFloor(y + height / 2) == getFloor(py));
 }
 

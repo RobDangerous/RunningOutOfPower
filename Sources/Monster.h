@@ -23,7 +23,9 @@ private:
 	Kore::Graphics4::Texture* texture;
 	int width, height;
 	
-	int doorLock;
+	int frameCount;
+	//int doorLock;
+	int directionLock;
 	
 	enum Status {
 		WalkingLeft, WalkingRight, StandingLeft, StandingRight
