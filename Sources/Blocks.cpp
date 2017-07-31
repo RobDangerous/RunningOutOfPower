@@ -117,7 +117,7 @@ namespace {
 	vec2 debugText;
 	vec4 skipButton;
 	
-	const int monsterCount = 1;
+	const int monsterCount = 3;
 	Monster monsters[monsterCount];
 	const int smallMonsterCount = 1;
 	SmallMonster smallMonsters[smallMonsterCount];
