@@ -623,7 +623,8 @@ namespace {
 	}
 
 	void keyUp(KeyCode code) {
-		if (code == KeyR) reset();
+		if (code == KeyR && state != Start) reset();
+		if (code == KeyEscape && state == Start) state = Game;
 		if (dead) return;
 
 		switch (code) {
