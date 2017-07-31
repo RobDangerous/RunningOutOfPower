@@ -20,6 +20,7 @@ SmallMonster::SmallMonster() : monsterIndex(2) {
 }
 
 void SmallMonster::reset(int row) {
+	pause = 0;
 	anim = 0;
 	status = WalkingRight;
 	monsterIndex = Random::get(0, 2);
@@ -41,6 +42,11 @@ void SmallMonster::init() {
 
 bool SmallMonster::update(float px, float py, float fx, float fy, float mx_world, float my_world, float energy) {
 	bool inLight = isInLight(x + widths[monsterIndex] / 2, y, y + heights[monsterIndex] / 2, fx, fy, mx_world, my_world, energy);
+
+	if (pause > 0) {
+		--pause;
+		return false;
+	}
 	
 	if (inLight && fx < x) {
 		status = WalkingRight;
@@ -50,21 +56,31 @@ bool SmallMonster::update(float px, float py, float fx, float fy, float mx_world
 	}
 
 	if (status == WalkingRight && x > columns * tileWidth - 100) {
-		status = WalkingLeft;
+		if (inLight) pause = 120;
+		else status = WalkingLeft;
 	}
 	else if (status == WalkingLeft && x < 100) {
-		status = WalkingRight;
+		if (inLight) pause = 120;
+		else status = WalkingRight;
 	}
 
 	if (status == WalkingRight) {
-		if (x < columns * tileWidth - 50) {
+		//if (x < columns * tileWidth - 50) {
 			x += 2;
-		}
+		//}
+		//else {
+		//	status = WalkingLeft;
+		//	pause = 120;
+		//}
 	}
 	else {
-		if (x > 50) {
+		//if (x > 50) {
 			x -= 2;
-		}
+		//}
+		//else {
+		//	status = WalkingRight;
+		//	pause = 120;
+		//}
 	}
 	
 	y = -Kore::abs(Kore::sin(x / 50.0f)) * 20 + startY;

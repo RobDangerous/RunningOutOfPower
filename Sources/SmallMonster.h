@@ -21,4 +21,5 @@ private:
 	enum Status {
 		WalkingLeft, WalkingRight
 	} status;
+	int pause;
 };
