@@ -25,6 +25,11 @@ using namespace Kore;
 namespace {
 	const int w = 1280 / 2;
 	const int h = 720 / 2;
+	
+	const double fps = 1.l / 60.l;
+
+	double startTime;
+	double lastTime;
 
 	float playerWidth;
 	float playerHeight;
@@ -268,6 +273,14 @@ namespace {
 	}
 
 	void update() {
+		double t = System::time() - startTime;
+		double deltaT = t - lastTime;
+
+		if (deltaT <= fps)
+			return;
+
+		lastTime = t;
+
 		Audio2::update();
 
 		float flxoff = 0;
@@ -654,6 +667,7 @@ namespace {
 
 int kore(int argc, char** argv) {
 	System::init("Power", w * 2, h * 2);
+	startTime = System::time();
 	
 	initTiles("Tiles/school.csv", "Tiles/school.png");
     
