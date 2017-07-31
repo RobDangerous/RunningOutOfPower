@@ -46,6 +46,8 @@ void loadCsv(const char* csvFile) {
 
 	doorCount = 0;
 	spiderCountCurr = 0;
+	int expectedDoorCount = (rows - 1) * 2; // Two for each floor other than the first and second to last
+	doors = new vec2[(rows - 1) * 2];
 	for (int y = 0; y < rows; ++y) {
 		for (int x = 0; x < columns; ++x) {
 			int index = source[y * columns + x];
@@ -60,6 +62,35 @@ void loadCsv(const char* csvFile) {
 				spiderCooldownCurr[spiderCountCurr] = 0;
 				++spiderCountCurr;
 			}
+		}
+	}
+	assert(doorCount == expectedDoorCount);
+	shuffleDoors();
+}
+
+void shuffleDoors()
+{
+	// Shuffle floors
+	for (int i = 1; i < rows * 2; ++i)
+	{
+		int r = Random::get(1, rows - 2);
+		int r2 = Random::get(1, rows - 2);
+		vec2 t1 = doors[1 + (r - 1)];
+		vec2 t2 = doors[2 + (r - 1)];
+		doors[1 + (r - 1)] = doors[1 + (r2 - 1)];
+		doors[2 + (r - 1)] = doors[2 + (r2 - 1)];
+		doors[1 + (r2 - 1)] = t1;
+		doors[2 + (r2 - 1)] = t2;
+	}
+
+	// Flip floors
+	for (int r = 1; r < rows - 1; ++r)
+	{
+		if (Random::get(0, 1))
+		{
+			vec2 t1 = doors[1 + (r - 1)];
+			doors[1 + (r - 1)] = doors[2 + (r - 1)];
+			doors[2 + (r - 1)] = t1;
 		}
 	}
 }
@@ -170,10 +201,25 @@ int getTileID(float px, float py) {
 	return source[y * columns  + x];
 }
 
-vec2 findDoor(float lastX, float lastY) {
-	vec2 door = doors[Random::get(0, doorCount - 1)];
-	while (Kore::abs(door.x() - lastX) <= 0.0001 && Kore::abs(door.y() - lastY) <= 0.0001) {
-		door = doors[Random::get(0, doorCount - 1)];
+int getTileIndex(float px, float py) {
+	int x = px / tileWidth;
+	int y = py / tileHeight;
+	return y * columns + x;
+}
+
+vec2 findDoor(float lastX, float lastY)
+{
+	int compIndex = getTileIndex(lastX, lastY);
+	for (int i = 0; i < doorCount; ++i)
+	{
+		int index = getTileIndex(doors[i].x(), doors[i].y());
+		if (index == compIndex)
+		{
+			if (i % 2 == 0)
+				return doors[i + 1];
+			else
+				return doors[i - 1];
+		}
 	}
-	return door;
+	return doors[doorCount - 1];
 }
