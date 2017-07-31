@@ -322,12 +322,12 @@ namespace {
 			}
 			else if(doorAnim) {
 				if (left || lastDirection == 0) {
-					mx = px - camX - 100;
+					mx = px + playerWidth / 2 - camX - 100;
 					g2->drawScaledSubImage(playerDoorImage, (doorIndex + 1) * playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 					g2->drawScaledSubImage(playerDoorImage, (doorIndex + 1) * playerWidth * 2, playerHeight, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 				}
 				else {
-					mx = px - camX + 100;
+					mx = px + playerWidth / 2 - camX + 100;
 					g2->drawScaledSubImage(playerDoorImage, doorIndex * playerWidth, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 					g2->drawScaledSubImage(playerDoorImage, doorIndex * playerWidth, playerHeight, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 				}
@@ -342,7 +342,7 @@ namespace {
 				else if (lastDirection == 1)
 					g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 
-				float angle = Kore::atan2(my - (py - camY), mx - (px - camX));
+				float angle = Kore::atan2(my - (py + playerHeight / 2 - camY), mx - (px + playerWidth / 2 - camX));
 				if (left || lastDirection == 0) {
 					float xoff = 60;
 					float yoff = 60;
