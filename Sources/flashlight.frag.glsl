@@ -14,6 +14,7 @@ uniform vec2 lights[8];
 uniform float energy;
 uniform float top;
 uniform float bottom;
+uniform float red;
 
 // noise from https://www.shadertoy.com/view/Msf3WH
 
@@ -124,5 +125,6 @@ void main() {
 		texcolor = vec4(1.0, 0.0, 0.0, 1.0);
 	}*/
 
+	texcolor.r = max(texcolor.r, red);
 	FragColor = texcolor;
 }
