@@ -17,14 +17,17 @@ namespace {
 }
 
 Monster::Monster() : initX(400), initY(0) {
-
+	reset();
 }
 
 void Monster::reset() {
-	x = initX;
-	y = initY + tileHeight - height;
+	x = Random::get(0, columns * tileWidth);
+	y = Random::get(0, rows) * tileHeight + tileHeight - height;
+	
 	anim = 0;
 	status = WalkingRight;
+	
+	log(Info, "Monster at floor %i", getFloor(y));
 }
 
 void Monster::init() {
@@ -34,10 +37,10 @@ void Monster::init() {
 	doorLock = 0;
 }
 
-bool Monster::update(float px, float py, float fx, float fy, float mx, float my, float camX, float camY, float energy) {
+bool Monster::update(float px, float py, float fx, float fy, float mx_world, float my_world, float energy) {
 	doorLock ++;
 	int tile = getTileID(x + width / 2, y + height / 2);
-	if (tile == Door && doorLock > 50) {
+	if (tile == Door && doorLock > 50 && Random::get(0, 1)) {
 		vec2 door = findDoor(x + width / 2, y + height / 2);
 		x = door.x() + 32;
 		y = door.y() + tileHeight - height;
@@ -45,9 +48,7 @@ bool Monster::update(float px, float py, float fx, float fy, float mx, float my,
 		doorLock = 0;
 	}
 
-	bool inLight = isInLight(x + width / 2, y, fx, fy, mx, my, camX, camY, energy) ||
-		isInLight(x + 3 * width / 4, y + height / 2, fx, fy, mx, my, camX, camY, energy) ||
-		isInLight(x + width / 2, y + height / 2, fx, fy, mx, my, camX, camY, energy);
+	bool inLight = isInLight(x + width / 2, y, y + height / 2, fx, fy, mx_world, my_world, energy);
 	switch (status) {
 	case WalkingLeft:
 		x -= 2;

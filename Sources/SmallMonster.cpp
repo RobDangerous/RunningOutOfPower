@@ -32,7 +32,7 @@ void SmallMonster::init() {
 	height = texture->height / 1;
 }
 
-bool SmallMonster::update(float px, float py, float fx, float fy, float mx, float my, float camX, float camY, float energy) {
+bool SmallMonster::update(float px, float py, float fx, float fy, float mx_world, float my_world, float energy) {
 	if (status == WalkingRight && x > 1000) {
 		status = WalkingLeft;
 	}
