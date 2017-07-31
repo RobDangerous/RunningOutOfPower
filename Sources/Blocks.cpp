@@ -118,10 +118,10 @@ namespace {
 	vec2 debugText;
 	vec4 skipButton;
 	
-	const int monsterCount = 2;
-	//Monster monsters[monsterCount];
+	const int monsterCount = 3;
 	Monster** monsters;
-	Monster* janitor;
+	Monster* janitor1;
+	Monster* janitor2;
 	Monster* book;
 	
 	const int smallMonsterCount = 1;
@@ -175,7 +175,7 @@ namespace {
 		state = Start;
 
 		for (int i = 0; i < monsterCount; ++i) {
-			monsters[i]->reset();
+			monsters[i]->reset(i == 0 ? true : false);
 		}
 		for (int i = 0; i < smallMonsterCount; ++i) {
 			smallMonsters[i].reset();
@@ -781,12 +781,15 @@ int kore(int argc, char** argv) {
 	playerHeight = playerImage->height / 2.0f;
 	
 	monsters = new Monster*[monsterCount];
-	janitor = new Monster();
-	janitor->init("janitor.png", 4);
-	monsters[0] = janitor;
+	janitor1 = new Monster();
+	janitor1->init("janitor.png", 4);
+	monsters[0] = janitor1;
+	janitor2 = new Monster();
+	janitor2->init("janitor.png", 4);
+	monsters[1] = janitor2;
 	book = new Monster();
 	book->init("book.png", 8);
-	monsters[1] = book;
+	monsters[2] = book;
 	SmallMonster::init();
 	reset();
 	
