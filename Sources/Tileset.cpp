@@ -99,7 +99,7 @@ bool isInLight(float x, float y, float px, float py, float mx, float my, float c
 		// Distance small
 		Kore::abs(px - x) <= 200 &&
 		// Angle small
-		Kore::abs(Kore::atan2(my - (py - camY), mx - (px - camX)) - Kore::atan2(y - (py - camY), x - (px - camX))) < 0.2 * Kore::pi;
+		Kore::abs(Kore::atan2(my - (py - camY), mx - (px - camX)) - Kore::atan2(y - py, x - px)) < 0.3 * Kore::pi;
 }
 
 void animateSpider(float px, float py, float mx, float my, float camX, float camY, float energy)
@@ -111,9 +111,13 @@ void animateSpider(float px, float py, float mx, float my, float camX, float cam
 		frameCount = 0;
 		for (int i = 0; i < spiderCountCurr; ++i)
 		{
+			int colly = spiderPos[i].y() * tileHeight + 9 + (spiderState[i] - Spider1) * 11 + 14;
+			int collynext = colly + 11;
+			int collx = (spiderPos[i].x() + .5f) * tileWidth;
+
 			bool inRange = vec2(spiderPos[i].x() * tileWidth - px, spiderPos[i].y() * tileHeight - py).squareLength() <= tileWidth * tileHeight;
-			bool active = inRange && !isInLight(spiderPos[i].x() * tileWidth, spiderPos[i].y() * tileHeight, px, py, mx, my, camX, camY, energy);
-			if (active && spiderState[i] < Spider9) ++spiderState[i];
+			bool active = inRange && !isInLight(collx, colly, px, py, mx, my, camX, camY, energy);
+			if (active && spiderState[i] < Spider9 && !isInLight(collx, collynext, px, py, mx, my, camX, camY, energy)) ++spiderState[i];
 			else if (!active && spiderState[i] > Spider1) --spiderState[i];
 			source[spiderPos[i].y() * columns  + spiderPos[i].x()] = spiderState[i];
 		}
