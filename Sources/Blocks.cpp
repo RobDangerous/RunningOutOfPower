@@ -47,6 +47,8 @@ namespace {
 	Graphics4::Texture* batteryImage;
 	
 	Graphics4::Texture* fightImage;
+	
+	Graphics4::Texture* spiderAnimImage;
 
 	Graphics4::RenderTarget* screen;
 	Graphics4::PipelineState* pipeline;
@@ -506,12 +508,18 @@ namespace {
 		}
 
 		if (dead) {
-			fightIndex = (frameCount / 10) % 4;
 			energy = 0;
 			
-			g2->drawScaledSubImage(fightImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX - 20, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
-			
-			//red = Kore::min(red + 0.1f, 1.f);
+			int tile = getTileID(px + playerWidth / 2, py + playerHeight / 2);
+			if (tile >= Spider1 && tile < Spider9) {
+				if (fightIndex < 6) fightIndex = frameCount / 10;
+				//g2->drawScaledSubImage(spiderAnimImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX - 20, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
+				g2->drawScaledSubImage(spiderAnimImage, fightIndex * playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+				g2->drawScaledSubImage(spiderAnimImage, fightIndex * playerWidth * 2, playerHeight, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+			} else {
+				fightIndex = (frameCount / 10) % 4;
+				g2->drawScaledSubImage(fightImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX - 20, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
+			}
 		}
 		
 		g2->end();
@@ -574,17 +582,17 @@ namespace {
 	//	g2->begin();
 		if (state == Game) {
 			drawGUI();
+
+			// Draw battery status
+			if (energy > 0.8f)		g2->drawScaledSubImage(batteryImage, 0, 0, 32, 64, w * 2 - 40, h * 2 - 80, 32, 64);
+			else if (energy > 0.6f) g2->drawScaledSubImage(batteryImage, 32, 0, 32, 64, w * 2 - 40, h * 2 - 80, 32, 64);
+			else if (energy > 0.4f) g2->drawScaledSubImage(batteryImage, 64, 0, 32, 64, w * 2 - 40, h * 2 - 80, 32, 64);
+			else if (energy > 0.2f) g2->drawScaledSubImage(batteryImage, 96, 0, 32, 64, w * 2 - 40, h * 2 - 80, 32, 64);
+			else					g2->drawScaledSubImage(batteryImage, 128, 0, 32, 64, w * 2 - 40, h * 2 - 80, 32, 64);
 		} else if (state == Start) {
 			g2->setFontColor(Graphics1::Color::White);
 			g2->drawString(skipText, skipButton.x(), skipButton.y());
 		}
-		
-		// Draw battery status
-		if (energy > 0.8f)		g2->drawScaledSubImage(batteryImage, 0, 0, 32, 64, w * 2 - 40, h * 2 - 80, 32, 64);
-		else if (energy > 0.6f) g2->drawScaledSubImage(batteryImage, 32, 0, 32, 64, w * 2 - 40, h * 2 - 80, 32, 64);
-		else if (energy > 0.4f) g2->drawScaledSubImage(batteryImage, 64, 0, 32, 64, w * 2 - 40, h * 2 - 80, 32, 64);
-		else if (energy > 0.2f) g2->drawScaledSubImage(batteryImage, 96, 0, 32, 64, w * 2 - 40, h * 2 - 80, 32, 64);
-		else					g2->drawScaledSubImage(batteryImage, 128, 0, 32, 64, w * 2 - 40, h * 2 - 80, 32, 64);
 		
 		g2->end();
 
@@ -626,7 +634,8 @@ namespace {
 	}
 
 	void keyUp(KeyCode code) {
-		if (code == KeyR) reset();
+		if (code == KeyR && state != Start) reset();
+		if (code == KeyEscape && state == Start) state = Game;
 		if (dead) return;
 
 		switch (code) {
@@ -709,6 +718,7 @@ int kore(int argc, char** argv) {
 	batteryImage = new Graphics4::Texture("Tiles/battery.png");
 	
 	fightImage = new Graphics4::Texture("Tiles/fight.png");
+	spiderAnimImage = new Graphics4::Texture("playerSpiderAnim.png");
 
 	SoundStream* music = new SoundStream("loop.ogg", true);
 	Audio1::play(music);
