@@ -462,6 +462,9 @@ int kore(int argc, char** argv) {
 	}
 	
 	batteryImage = new Graphics4::Texture("Tiles/battery.png");
+
+	SoundStream* music = new SoundStream("loop.ogg", true);
+	Audio1::play(music);
 	
 	font14 = Kravur::load("Fonts/arial", FontStyle(), 14);
 	font24 = Kravur::load("Fonts/arial", FontStyle(), 24);
