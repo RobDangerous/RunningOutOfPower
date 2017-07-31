@@ -15,7 +15,6 @@ namespace {
 	
 	vec2i spiderPos[spiderCountMax];
 	int spiderState[spiderCountMax];
-	int spiderDir[spiderCountMax];
 	int spiderCountCurr;
 	
 	int rows = 5;

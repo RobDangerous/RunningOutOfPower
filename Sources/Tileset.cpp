@@ -57,7 +57,6 @@ void loadCsv(const char* csvFile) {
 				assert(spiderCountCurr < spiderCountMax);
 				spiderPos[spiderCountCurr] = vec2i(x, y);
 				spiderState[spiderCountCurr] = Spider1;
-				spiderDir[spiderCountCurr] = 1;
 				++spiderCountCurr;
 			}
 		}
@@ -112,14 +111,10 @@ void animateSpider(float px, float py, float mx, float my, float camX, float cam
 		frameCount = 0;
 		for (int i = 0; i < spiderCountCurr; ++i)
 		{
-			log(Info, "Spider %i:", i);
-			spiderState[i] += spiderDir[i];
-			bool inRange = vec2(spiderPos[i].x() * tileWidth - px, spiderPos[i].y() * tileHeight - py).squareLength() <= tileWidth * tileHeight * 4;
+			bool inRange = vec2(spiderPos[i].x() * tileWidth - px, spiderPos[i].y() * tileHeight - py).squareLength() <= tileWidth * tileHeight;
 			bool active = inRange && !isInLight(spiderPos[i].x() * tileWidth, spiderPos[i].y() * tileHeight, px, py, mx, my, camX, camY, energy);
-			if (spiderState[i] >= Spider9) spiderDir[i] = -1;
-
-			else if (spiderState[i] <= Spider1) spiderDir[i] = active ? +1 : 0;
-			else if (spiderState[i] > Spider1 && !active) spiderDir[i] = -1;
+			if (active && spiderState[i] < Spider9) ++spiderState[i];
+			else if (!active && spiderState[i] > Spider1) --spiderState[i];
 			source[spiderPos[i].y() * columns  + spiderPos[i].x()] = spiderState[i];
 		}
 	}
