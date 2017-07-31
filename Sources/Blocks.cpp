@@ -208,11 +208,11 @@ namespace {
 		++anim;
 
 		if (charging) {
-			energy += 0.001f;
+			energy += 0.002f;
 			if (energy > 1) energy = 1;
 		}
 		else {
-			energy -= 0.001f;
+			energy -= 0.0005f;
 			if (energy < 0) energy = 0;
 		}
 
@@ -353,7 +353,7 @@ namespace {
 		g2->begin(false, w * 2, h * 2);
 		g2->setPipeline(pipeline);
 		Graphics4::setPipeline(pipeline);
-		Graphics4::setFloat(aspectLocation, w / h);
+		Graphics4::setFloat(aspectLocation, (float)w / (float)h);
 		angle += 0.01f;
 		if (angle > pi) angle = -pi;
 		Graphics4::setFloat(angleLocation, angle);
@@ -494,6 +494,9 @@ int kore(int argc, char** argv) {
 	}
 	
 	batteryImage = new Graphics4::Texture("Tiles/battery.png");
+
+	SoundStream* music = new SoundStream("loop.ogg", true);
+	Audio1::play(music);
 	
 	font14 = Kravur::load("Fonts/arial", FontStyle(), 14);
 	font24 = Kravur::load("Fonts/arial", FontStyle(), 24);
