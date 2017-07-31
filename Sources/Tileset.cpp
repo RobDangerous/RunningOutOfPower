@@ -64,6 +64,31 @@ void loadCsv(const char* csvFile) {
 			}
 		}
 	}
+
+	// Shuffle floors
+	for (int i = 1; i < rows * 2; ++i)
+	{
+		int r = Random::get(1, rows - 2);
+		int r2 = Random::get(1, rows - 2);
+		vec2 t1 = doors[1 + (r - 1)];
+		vec2 t2 = doors[2 + (r - 1)];
+		doors[1 + (r - 1)] = doors[1 + (r2 - 1)];
+		doors[2 + (r - 1)] = doors[2 + (r2 - 1)];
+		doors[1 + (r2 - 1)] = t1;
+		doors[2 + (r2 - 1)] = t2;
+	}
+
+	// Flip floors
+	for (int r = 1; r < rows - 1; ++r)
+	{
+		if (Random::get(0, 1))
+		{
+			vec2 t1 = doors[1 + (r - 1)];
+			doors[1 + (r - 1)] = doors[2 + (r - 1)];
+			doors[2 + (r - 1)] = t1;
+		}
+	}
+
 	assert(doorCount == expectedDoorCount);
 }
 
