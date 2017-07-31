@@ -439,7 +439,7 @@ namespace {
 		for (int i = 0; i < monsterCount; ++i) {
 			monsters[i].render(g2, camX, camY);
 		}
-
+		
 		if (state == Start) {
 			g2->drawImage(intro, 0, 0);
 		}
@@ -448,7 +448,7 @@ namespace {
 			fightIndex = (frameCount / 10) % 4;
 			energy = 0;
 			
-			g2->drawScaledSubImage(fightImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
+			g2->drawScaledSubImage(fightImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX - 20, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
 			
 			//red = Kore::min(red + 0.1f, 1.f);
 		}
@@ -528,7 +528,7 @@ namespace {
 		Graphics4::swapBuffers();
 	}
 
-	void keyDown(KeyCode code) {
+	void keyDown(KeyCode code) {		
 		if (dead) return;
 
 		charging = false;
