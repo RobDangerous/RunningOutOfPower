@@ -18,6 +18,7 @@
 #include <Kore/Graphics1/Color.h>
 
 #include "Monster.h"
+#include "SmallMonster.h"
 #include "Tileset.h"
 
 using namespace Kore;
@@ -118,6 +119,8 @@ namespace {
 	
 	const int monsterCount = 1;
 	Monster monsters[monsterCount];
+	const int smallMonsterCount = 1;
+	SmallMonster smallMonsters[smallMonsterCount];
 	
 	bool lightOn = false;
 
@@ -168,6 +171,9 @@ namespace {
 
 		for (int i = 0; i < monsterCount; ++i) {
 			monsters[i].reset();
+		}
+		for (int i = 0; i < smallMonsterCount; ++i) {
+			smallMonsters[i].reset();
 		}
 		resetSpiders();
 	}
@@ -410,6 +416,13 @@ namespace {
 				dead |= (monsters[i].update(px + playerWidth / 2, py + playerHeight / 2, px + playerWidth / 2 + flxoff, py + playerHeight / 2 + flyoff, mx, my, camX, camY, energy) && !inCloset);
 			}
 
+			for (int i = 0; i < smallMonsterCount; ++i) {
+				//if (Kore::abs(px - monsters[i].x) < 100 && mx > px) {
+
+				//}
+				dead |= (smallMonsters[i].update(px + playerWidth / 2, py + playerHeight / 2, px + playerWidth / 2 + flxoff, py + playerHeight / 2 + flyoff, mx, my, camX, camY, energy) && !inCloset);
+			}
+
 			if (frameCount > 10) {
 				frameCount = 0;
 
@@ -504,7 +517,10 @@ namespace {
 		for (int i = 0; i < monsterCount; ++i) {
 			monsters[i].render(g2, camX, camY);
 		}
-		
+		for (int i = 0; i < smallMonsterCount; ++i) {
+			smallMonsters[i].render(g2, camX, camY);
+		}
+
 		if (state == Start) {
 			g2->drawImage(intro, 0, 0);
 		}
@@ -720,6 +736,7 @@ int kore(int argc, char** argv) {
 	playerHeight = playerImage->height / 2.0f;
 	
 	Monster::init();
+	SmallMonster::init();
 	reset();
 	
 	batteryImage = new Graphics4::Texture("Tiles/battery.png");
