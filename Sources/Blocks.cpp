@@ -336,14 +336,39 @@ namespace {
 				}
 			}
 
+			float targetCamX = Kore::min(Kore::max(0.0f, px - w / 2 + playerWidth / 2), 1.f * columns * tileWidth - w);
+			float targetCamY = Kore::min(Kore::max(0.0f, py - h / 2 + playerHeight / 2), 1.f * rows * tileHeight - h);
+			//float targetCamX = Kore::min(Kore::max(0.0f, monsters[0]->x - w / 2 + playerWidth / 2), 1.f * columns * tileWidth - w);
+			//float targetCamY = Kore::min(Kore::max(0.0f, monsters[0]->y - h / 2 + playerHeight / 2), 1.f * rows * tileHeight - h);
+
+
+			vec2 cam(camX, camY);
+			vec2 target(targetCamX, targetCamY);
+
+			vec2 dir = target - cam;
+			if (dir.getLength() < 16.0f) {
+				camX = targetCamX;
+				camY = targetCamY;
+			}
+			else {
+				dir.setLength(15.0f);
+				cam = cam + dir;
+				camX = cam.x();
+				camY = cam.y();
+			}
+
 			if (!inCloset && !doorAnim) {
-				if (left && px >= -10) {
-					px -= 4;
-					playerCenter = vec3(px + playerWidth / 2, py + playerHeight / 2, 0.f);
-				}
-				if (right && px <= columns * tileWidth - 70) {
-					px += 4;
-					playerCenter = vec3(px + playerWidth / 2, py + playerHeight / 2, 0.f);
+				static int i = 0;
+				log(Info, "move %i", i++);
+				if ((target - cam).getLength() < 16.0f) {
+					if (left && px >= -10) {
+						px -= 4;
+						playerCenter = vec3(px + playerWidth / 2, py + playerHeight / 2, 0.f);
+					}
+					if (right && px <= columns * tileWidth - 70) {
+						px += 4;
+						playerCenter = vec3(px + playerWidth / 2, py + playerHeight / 2, 0.f);
+					}
 				}
 			}
 		
@@ -403,27 +428,6 @@ namespace {
 					helpText = switchLighOffText;
 				else
 					helpText = switchLighOnText;
-			}
-
-			float targetCamX = Kore::min(Kore::max(0.0f, px - w / 2 + playerWidth / 2), 1.f * columns * tileWidth - w);
-			float targetCamY = Kore::min(Kore::max(0.0f, py - h / 2 + playerHeight / 2), 1.f * rows * tileHeight - h);
-			//float targetCamX = Kore::min(Kore::max(0.0f, monsters[0]->x - w / 2 + playerWidth / 2), 1.f * columns * tileWidth - w);
-			//float targetCamY = Kore::min(Kore::max(0.0f, monsters[0]->y - h / 2 + playerHeight / 2), 1.f * rows * tileHeight - h);
-
-
-			vec2 cam(camX, camY);
-			vec2 target(targetCamX, targetCamY);
-
-			vec2 dir = target - cam;
-			if (dir.getLength() < 16.0f) {
-				camX = targetCamX;
-				camY = targetCamY;
-			}
-			else {
-				dir.setLength(15.0f);
-				cam = cam + dir;
-				camX = cam.x();
-				camY = cam.y();
 			}
 
 			// Flashlight position
