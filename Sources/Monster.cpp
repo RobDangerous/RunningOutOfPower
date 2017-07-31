@@ -26,9 +26,9 @@ void Monster::position() {
 }
 
 void Monster::init() {
-	texture = new Graphics4::Texture("fishy.png");
-	width = texture->width / 9;
-	height = texture->height / 2;
+	texture = new Graphics4::Texture("janitor.png");
+	width = texture->width / 4;
+	height = texture->height / 1;
 	doorLock = 0;
 }
 
@@ -48,7 +48,7 @@ bool Monster::update(float px, float py, float fx, float fy, float mx, float my,
 		isInLight(x + width / 2, y + height / 2, fx, fy, mx, my, camX, camY, energy);
 	switch (status) {
 	case WalkingLeft:
-		x -= 4;
+		x -= 2;
 		++anim;
 		if (x < 0 || (inLight && fx < x)) {
 			if (x > 1300)
@@ -62,7 +62,7 @@ bool Monster::update(float px, float py, float fx, float fy, float mx, float my,
 		}
 		break;
 	case WalkingRight:
-		x += 4;
+		x += 2;
 		++anim;
 		if (x > 1350 || (inLight && fx > x)) {
 			if (x < 50)
@@ -96,16 +96,15 @@ void Monster::changeFloor() {
 }
 
 void Monster::render(Kore::Graphics2::Graphics2* g2, float camX, float camY) {
+	int animIndex = (anim / 10) % 4;
 	switch (status) {
 	case WalkingRight:
 	case StandingRight: {
-		int animIndex = (anim / 10) % 8 + 1;
-		g2->drawScaledSubImage(texture, animIndex * width, height, width, height, x - camX, y - camY, width, height);
+		g2->drawScaledSubImage(texture, (animIndex + 1) * width, 0, -width, height, x - camX, y - camY, width, height);
 		break;
 	}
 	case WalkingLeft:
     case StandingLeft: {
-		int animIndex = (anim / 10) % 8 + 1;
 		g2->drawScaledSubImage(texture, animIndex * width, 0, width, height, x - camX, y - camY, width, height);
 		break;
 	}
