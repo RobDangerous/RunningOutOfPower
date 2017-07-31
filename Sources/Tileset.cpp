@@ -132,7 +132,7 @@ bool animateSpider(float px, float py, float fx, float fy, float mx, float my, f
 			else if (!active && spiderState[i] > Spider1) --spiderState[i];
 			source[spiderPos[i].y() * columns  + spiderPos[i].x()] = spiderState[i];
 		}
-		caughtPlayer |= (spiderState[i] >= Spider3 && Kore::abs(collx - px) < tileWidth * 0.25f);
+		caughtPlayer |= (spiderState[i] >= Spider3 && Kore::abs(collx - px) < tileWidth * 0.25f && getFloor(colly) == getFloor(py));
 	}
 	return caughtPlayer;
 }

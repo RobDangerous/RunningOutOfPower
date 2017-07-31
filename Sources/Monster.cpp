@@ -86,7 +86,7 @@ bool Monster::update(float px, float py, float fx, float fy, float mx, float my,
 		}
 		break;
 	}
-	return (Kore::abs(x + width / 2 - px) < tileWidth * 0.25f);
+	return (Kore::abs(x + width / 2 - px) < tileWidth * 0.25f && getFloor(y + height / 2) == getFloor(py));
 }
 
 void Monster::changeFloor() {
