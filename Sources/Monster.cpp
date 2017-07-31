@@ -56,7 +56,7 @@ bool Monster::update(float px, float py, float fx, float fy, float mx_world, flo
 		x -= 2;
 		++anim;
 		if (x < 0 || (inLight && fx < x)) {
-			if (x > 1300)
+			if (x > columns * tileWidth - 100)
 			{
 				status = StandingRight;
 			}
@@ -69,7 +69,7 @@ bool Monster::update(float px, float py, float fx, float fy, float mx_world, flo
 	case WalkingRight:
 		x += 2;
 		++anim;
-		if (x > 1350 || (inLight && fx > x)) {
+		if (x > columns * tileWidth - 50 || (inLight && fx > x)) {
 			if (x < 50)
 			{
 				status = StandingLeft;

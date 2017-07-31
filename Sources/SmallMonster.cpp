@@ -33,7 +33,8 @@ void SmallMonster::init() {
 }
 
 bool SmallMonster::update(float px, float py, float fx, float fy, float mx_world, float my_world, float energy) {
-	if (status == WalkingRight && x > 1000) {
+	bool inLight = isInLight(x + width / 2, y, y + height / 2, fx, fy, mx_world, my_world, energy);
+	if (status == WalkingRight && x > columns * tileWidth - 100) {
 		status = WalkingLeft;
 	}
 	else if (status == WalkingLeft && x < 100) {
