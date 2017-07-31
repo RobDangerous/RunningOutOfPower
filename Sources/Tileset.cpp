@@ -38,7 +38,7 @@ void loadCsv(const char* csvFile) {
 	while (ptr != nullptr) {
 		assert(i < rows * columns);
 		int num = atoi(ptr);
-		log(Info, "%i -> %i", i, num);
+		//log(Info, "%i -> %i", i, num);
 		source[i] = num;
 		ptr = std::strtok(nullptr, delimiter);
 		i++;
@@ -92,7 +92,7 @@ void drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights) {
 
 bool isInLight(float x, float y, float px, float py, float mx, float my, float camX, float camY, float energy)
 {
-	log(Info, "%i -> %i", getFloor(y), getFloor(py));
+	//log(Info, "%i -> %i", getFloor(y), getFloor(py));
 	// Light on
 	return energy >= 0.1f &&
 		// Same floor
@@ -112,7 +112,7 @@ void animateSpider(float px, float py, float mx, float my, float camX, float cam
 		frameCount = 0;
 		for (int i = 0; i < spiderCountCurr; ++i)
 		{
-			log(Info, "Spider %i:", i);
+			//log(Info, "Spider %i:", i);
 			spiderState[i] += spiderDir[i];
 			bool inRange = vec2(spiderPos[i].x() * tileWidth - px, spiderPos[i].y() * tileHeight - py).squareLength() <= tileWidth * tileHeight * 4;
 			bool active = inRange && !isInLight(spiderPos[i].x() * tileWidth, spiderPos[i].y() * tileHeight, px, py, mx, my, camX, camY, energy);
