@@ -343,16 +343,21 @@ namespace {
 					g2->drawScaledSubImage(playerImage, 0, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 
 				float angle = Kore::atan2(my - (py + playerHeight / 2 - camY), mx - (px + playerWidth / 2 - camX));
+				mat3 m = mat3::Identity();
 				if (left || lastDirection == 0) {
+					if (Kore::abs(angle) < Kore::pi * 0.5f)
+						m[1][1] = -1;
 					float xoff = 60;
 					float yoff = 60;
-					g2->transformation = mat3::Translation(px - camX + xoff, py - camY + yoff) * mat3::RotationZ(angle + pi) * mat3::Translation(-xoff, -yoff);
+					g2->transformation = mat3::Translation(px - camX + xoff, py - camY + yoff) * mat3::RotationZ(angle + pi) * m * mat3::Translation(-xoff, -yoff);
 					g2->drawScaledSubImage(playerImage, 10 * playerWidth, 0, -playerWidth, playerHeight, 0, 0, playerWidth, playerHeight);
 				}
 				else {
+					if (Kore::abs(angle) > Kore::pi * 0.5f)
+						m[1][1] = -1;
 					float xoff = 20;
 					float yoff = 60;
-					g2->transformation = mat3::Translation(px - camX + xoff, py - camY + yoff) * mat3::RotationZ(angle) * mat3::Translation(-xoff, -yoff);
+					g2->transformation = mat3::Translation(px - camX + xoff, py - camY + yoff) * mat3::RotationZ(angle) * m * mat3::Translation(-xoff, -yoff);
 					g2->drawScaledSubImage(playerImage, 9 * playerWidth, 0, playerWidth, playerHeight, 0, 0, playerWidth, playerHeight);
 				}
 				g2->transformation = mat3::Identity();
