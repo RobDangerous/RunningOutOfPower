@@ -173,7 +173,7 @@ namespace {
 		sprintf(dText, "");
 		dTime = 0;
 
-		lightOn = true;//false;
+		lightOn = false;
 
 		state = Start;
 		Audio1::stop(music2);
