@@ -113,7 +113,7 @@ void main() {
 	scale = clamp(scale, 0.0, 1.0);
 	if (lightOn) scale = 1.0;
 
-	vec4 texcolor = texture(tex, texCoord + vec2(sin(anim / 20.0 + texCoord.y * 8) * 0.02 * (1.0 - scale), 0.0)) * color;
+	vec4 texcolor = texture(tex, texCoord + vec2(sin(anim / 20.0 + texCoord.y * 8) * 0.01 * (1.0 - scale), 0.0)) * color;
 	texcolor.rgb *= color.a;
 	
 	texcolor.r *= scale;
