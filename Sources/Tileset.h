@@ -21,7 +21,7 @@ namespace {
 	int spiderCountCurr;
 	
 	int rows = 5;
-	int columns = 12;
+	int columns = 24;
 	
 	int* source;
 
