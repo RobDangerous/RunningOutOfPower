@@ -55,12 +55,18 @@ bool SmallMonster::update(float px, float py, float fx, float fy, float mx_world
 	else if (status == WalkingLeft && x < 100) {
 		status = WalkingRight;
 	}
+
 	if (status == WalkingRight) {
-		x += 2;
+		if (x < columns * tileWidth - 102) {
+			x += 2;
+		}
 	}
 	else {
-		x -= 2;
+		if (x > 102) {
+			x -= 2;
+		}
 	}
+	
 	y = -Kore::abs(Kore::sin(x / 50.0f)) * 20 + startY;
 	return (Kore::abs(x + widths[monsterIndex] / 2 - px) < tileWidth * 0.25f && getFloor(y + heights[monsterIndex] / 2) == getFloor(py));
 }
