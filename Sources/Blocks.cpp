@@ -650,6 +650,8 @@ namespace {
 		} else if (state == Start) {
 			g2->setFontColor(Graphics1::Color::White);
 			g2->drawString(skipText, skipButton.x(), skipButton.y());
+			
+			
 		}
 		
 		g2->end();
