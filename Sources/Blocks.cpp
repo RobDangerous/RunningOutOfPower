@@ -257,7 +257,7 @@ namespace {
 		for (int i = 0; i < lightCount; ++i) {
 			lights[i] = vec2(-1000, -1000);
 		}
-		animateSpider(px + playerWidth / 2, py + playerHeight / 2, mx, my, camX, camY, energy);
+		bool dead = animateSpider(px + playerWidth / 2, py + playerHeight / 2, mx, my, camX, camY, energy);
 		drawTiles(g2, camX, camY, lights);
 		for (int i = 0; i < lightCount; ++i) {
 			lights[i] = vec2(lights[i].x() / w, lights[i].y() / h);
@@ -364,7 +364,7 @@ namespace {
 		Graphics4::setFloat(energyLocation, flakyEnergy(energy));
 		Graphics4::setFloat(topLocation, (py - camY - 32) / h);
 		Graphics4::setFloat(bottomLocation, (py - camY + 128) / h);
-		if (!inCloset) g2->drawScaledSubImage(screen, 0, 0, w, h, 0, 0, w * 2, h * 2);
+		if (!inCloset && !dead) g2->drawScaledSubImage(screen, 0, 0, w, h, 0, 0, w * 2, h * 2);
 	//	g2->end();
 		g2->setPipeline(nullptr);
 		
