@@ -64,6 +64,16 @@ void loadCsv(const char* csvFile) {
 	}
 }
 
+void resetSpiders()
+{
+	spiderFrameCount = 0;
+	for (int i = 0; i < spiderCountCurr; ++i)
+	{
+		spiderState[i] = Spider1;
+		spiderCooldownCurr[i] = 0;
+	}
+}
+
 void drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights) {
 	int lightIndex = 0;
 
@@ -105,14 +115,13 @@ bool isInLight(float x, float y, float fx, float fy, float mx, float my, float c
 bool animateSpider(float px, float py, float fx, float fy, float mx, float my, float camX, float camY, float energy)
 {
 	bool caughtPlayer = false;
-	static int frameCount = 0;
-	++frameCount;
+	++spiderFrameCount;
 
 	bool doMove = false;
-	if (frameCount >= 5)
+	if (spiderFrameCount >= 5)
 	{
 		doMove = true;
-		frameCount = 0;
+		spiderFrameCount = 0;
 	}
 
 	for (int i = 0; i < spiderCountCurr; ++i)
