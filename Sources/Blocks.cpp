@@ -120,7 +120,7 @@ namespace {
 	
 	const int monsterCount = 3;
 	Monster monsters[monsterCount];
-	const int smallMonsterCount = 1;
+	const int smallMonsterCount = rows;
 	SmallMonster smallMonsters[smallMonsterCount];
 	
 	bool lightOn = false;
@@ -174,7 +174,7 @@ namespace {
 			monsters[i].reset();
 		}
 		for (int i = 0; i < smallMonsterCount; ++i) {
-			smallMonsters[i].reset();
+			smallMonsters[i].reset(i);
 		}
 		resetSpiders();
 	}
