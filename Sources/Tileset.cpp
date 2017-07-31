@@ -46,6 +46,8 @@ void loadCsv(const char* csvFile) {
 
 	doorCount = 0;
 	spiderCountCurr = 0;
+	int expectedDoorCount = (rows - 1) * 2; // Two for each floor other than the first and second to last
+	doors = new vec2[(rows - 1) * 2];
 	for (int y = 0; y < rows; ++y) {
 		for (int x = 0; x < columns; ++x) {
 			int index = source[y * columns + x];
@@ -62,6 +64,7 @@ void loadCsv(const char* csvFile) {
 			}
 		}
 	}
+	assert(doorCount == expectedDoorCount);
 }
 
 void resetSpiders()
@@ -170,10 +173,25 @@ int getTileID(float px, float py) {
 	return source[y * columns  + x];
 }
 
-vec2 findDoor(float lastX, float lastY) {
-	vec2 door = doors[Random::get(0, doorCount - 1)];
-	while (Kore::abs(door.x() - lastX) <= 0.0001 && Kore::abs(door.y() - lastY) <= 0.0001) {
-		door = doors[Random::get(0, doorCount - 1)];
+int getTileIndex(float px, float py) {
+	int x = px / tileWidth;
+	int y = py / tileHeight;
+	return y * columns + x;
+}
+
+vec2 findDoor(float lastX, float lastY)
+{
+	int compIndex = getTileIndex(lastX, lastY);
+	for (int i = 0; i < doorCount; ++i)
+	{
+		int index = getTileIndex(doors[i].x(), doors[i].y());
+		if (index == compIndex)
+		{
+			if (i % 2 == 0)
+				return doors[i + 1];
+			else
+				return doors[i - 1];
+		}
 	}
-	return door;
+	return doors[doorCount - 1];
 }
