@@ -56,9 +56,7 @@ namespace {
 
 	bool dead = false;
 	float energy = 1.0;
-
-	float angle = 0.0f;
-
+	
 	float px = 0;
 	float py = 0;
 	float mx = 0.0f;
@@ -329,15 +327,23 @@ namespace {
 			lights[i] = vec2(lights[i].x() / w, lights[i].y() / h);
 		}
 
+		float flxoff = 0;
+		float flyoff = 0;
 		if (!inCloset) {
 			if (charging) {
 				my = py - camY + playerHeight / 2;
 				if (left || lastDirection == 0) {
+					flxoff = -10;
+					flyoff = 0;
+
 					mx = px - camX - 100;
 					g2->drawScaledSubImage(playerChargeImage, (chargeIndex + 1) * playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 					g2->drawScaledSubImage(playerChargeImage, playerWidth * 2, playerHeight, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 				}
 				else {
+					flxoff = 10;
+					flyoff = 0;
+
 					mx = px - camX + 100;
 					g2->drawScaledSubImage(playerChargeImage, chargeIndex * playerWidth, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 					g2->drawScaledSubImage(playerChargeImage, playerWidth, playerHeight, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
@@ -372,6 +378,12 @@ namespace {
 						m[1][1] = -1;
 					float xoff = 60;
 					float yoff = 60;
+					vec3 c(20, 0, 0);
+					vec3 d(-30, 0, 0);
+					vec3 r = c + mat3::RotationZ(angle + pi) * d;
+					flxoff = r.x();
+					flyoff = r.y();
+
 					g2->transformation = mat3::Translation(px - camX + xoff, py - camY + yoff) * mat3::RotationZ(angle + pi) * m * mat3::Translation(-xoff, -yoff);
 					g2->drawScaledSubImage(playerImage, 10 * playerWidth, 0, -playerWidth, playerHeight, 0, 0, playerWidth, playerHeight);
 				}
@@ -380,6 +392,12 @@ namespace {
 						m[1][1] = -1;
 					float xoff = 20;
 					float yoff = 60;
+					vec3 c(-20, 0, 0);
+					vec3 d(30, 0, 0);
+					vec3 r = c + mat3::RotationZ(angle) * d;
+					flxoff = r.x();
+					flyoff = r.y();
+
 					g2->transformation = mat3::Translation(px - camX + xoff, py - camY + yoff) * mat3::RotationZ(angle) * m * mat3::Translation(-xoff, -yoff);
 					g2->drawScaledSubImage(playerImage, 9 * playerWidth, 0, playerWidth, playerHeight, 0, 0, playerWidth, playerHeight);
 				}
@@ -400,11 +418,12 @@ namespace {
 		g2->setPipeline(pipeline);
 		Graphics4::setPipeline(pipeline);
 		Graphics4::setFloat(aspectLocation, (float)w / (float)h);
-		angle += 0.01f;
-		if (angle > pi) angle = -pi;
-		Graphics4::setFloat(angleLocation, angle);
-		Graphics4::setFloat2(playerLocation, vec2((px - camX + playerWidth / 2.0f) / w, (py - camY + playerHeight / 2.0f) / h));
-		Graphics4::setFloat2(mouseLocation, vec2(mx / w, my / h));
+		vec2 mouse(mx / w, my / h);
+		vec2 player((px - camX + playerWidth / 2.0f) / w, (py - camY + playerHeight / 2.0f) / h);
+		Graphics4::setFloat(angleLocation, Kore::atan2(mouse.x() - player.x(), mouse.y() - player.y()));
+		Graphics4::setFloat4(playerLocation, vec4(player.x(), player.y(),
+			(px - camX + playerWidth / 2.0f + flxoff) / w, (py - camY + playerHeight / 2.0f + flyoff) / h));
+		Graphics4::setFloat2(mouseLocation, mouse);
 		Graphics4::setInt(animLocation, anim);
 		Graphics4::setFloat(redLocation, red);
 #ifdef KORE_DIRECT3D

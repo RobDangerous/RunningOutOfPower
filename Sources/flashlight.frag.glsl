@@ -6,8 +6,8 @@ in vec4 color;
 out vec4 FragColor;
 
 uniform float aspect;
-//uniform float angle;
-uniform vec2 player;
+uniform float angle;
+uniform vec4 player;
 uniform vec2 mouse;
 uniform int anim;
 uniform vec2 lights[8];
@@ -82,11 +82,11 @@ void main() {
 	tx = texCoord.x - player.x;
 	ty = texCoord.y - player.y;
 
-	float angle = atan(mouse.y - player.y, mouse.x - player.x) - PI / 2.0;
+	//float angle = atan(mouse.y - player.y, mouse.x - player.x) - PI / 2.0;
 
 	float start = angle - 0.4;
 	float end = angle + 0.4;
-	float tangle = atan(ty, tx);
+	float tangle = atan(texCoord.y - player.w, texCoord.x - player.z);
 	float tdistance = sqrt(tx * aspect * tx * aspect + ty * 0.8 * ty * 0.8);
 
 	float scale = 1.0;// - clamp(tdistance * 1.5, 0.0, 1.0);
