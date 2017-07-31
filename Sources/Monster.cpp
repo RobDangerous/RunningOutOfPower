@@ -35,13 +35,13 @@ void Monster::init() {
 bool Monster::update(float px, float py, float fx, float fy, float mx, float my, float camX, float camY, float energy) {
 	doorLock ++;
 	int tile = getTileID(x + width / 2, y + height / 2);
-	/*if (tile == Door && doorLock > 50) {
+	if (tile == Door && doorLock > 50) {
 		vec2 door = findDoor();
 		x = door.x() + 32;
 		y = door.y() + tileHeight - height;
 		
 		doorLock = 0;
-	}*/
+	}
 
 	bool inLight = isInLight(x + width / 2, y, fx, fy, mx, my, camX, camY, energy) ||
 		isInLight(x + 3 * width / 4, y + height / 2, fx, fy, mx, my, camX, camY, energy) ||
