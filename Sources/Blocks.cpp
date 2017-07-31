@@ -36,6 +36,7 @@ namespace {
 	
 	Graphics4::Texture* playerImage;
 	Graphics4::Texture* playerChargeImage;
+	Graphics4::Texture* playerDoorImage;
 
 	Graphics4::Texture* batteryImage;
 
@@ -65,7 +66,11 @@ namespace {
 	bool right = false;
 	bool down_ = false;
 	bool up = false;
+	
 	bool charging = false;
+	bool inCloset = false;
+	bool takeDoor = false;
+	bool doorAnim = false;
 
 	const char* helpText;
 	const char* const chargeText = "Hold space to charge";
@@ -77,6 +82,7 @@ namespace {
 	
 	int runIndex = 0;
 	int chargeIndex = 0;
+	int doorIndex = 0;
 	
 	Kravur* font14;
 	Kravur* font24;
@@ -90,10 +96,6 @@ namespace {
 	vec4 closetButton;
 	vec2 debugText;
 	
-	bool inCloset = false;
-	
-	int spiderIndex = 0;
-
 	const int monsterCount = 1;
 	Monster monsters[monsterCount];
 	
@@ -157,9 +159,16 @@ namespace {
 		g2->setColor(Graphics1::Color::White);
 	}
 	
-	bool goThroughDoor() {
+	bool goThroughTheDoor() {
 		int tile = getTileID(px + playerWidth / 2, py + playerHeight / 2);
-		if (tile == Door) {
+		if (tile == Door && !doorAnim && !takeDoor) {
+			doorIndex = 0;
+			doorAnim = true;
+			return false;
+		}
+		else if(tile == Door && doorAnim && takeDoor) {
+			doorAnim = false;
+			takeDoor = false;
 			vec2 door = findDoor();
 			px = door.x() + 32;
 			py = door.y() + 36;
@@ -257,7 +266,7 @@ namespace {
 		for (int i = 0; i < lightCount; ++i) {
 			lights[i] = vec2(-1000, -1000);
 		}
-		animateSpider(px + playerWidth / 2, py + playerHeight / 2, mx, my, camX, camY, energy);
+		bool dead = animateSpider(px + playerWidth / 2, py + playerHeight / 2, mx, my, camX, camY, energy);
 		drawTiles(g2, camX, camY, lights);
 		for (int i = 0; i < lightCount; ++i) {
 			lights[i] = vec2(lights[i].x() / w, lights[i].y() / h);
@@ -279,6 +288,15 @@ namespace {
 
 			++chargeIndex;
 			chargeIndex %= 4;
+			
+			++doorIndex;
+			if (doorIndex >= 6) {
+				if (doorAnim) {
+					takeDoor = true;
+					goThroughTheDoor();
+				}
+			}
+			doorIndex %= 6;
 		}
 
 		if (!inCloset) {
@@ -293,6 +311,18 @@ namespace {
 					mx = px - camX + 100;
 					g2->drawScaledSubImage(playerChargeImage, chargeIndex * playerWidth, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 					g2->drawScaledSubImage(playerChargeImage, playerWidth, playerHeight, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+				}
+			}
+			else if(doorAnim) {
+				if (left || lastDirection == 0) {
+					mx = px - camX - 100;
+					g2->drawScaledSubImage(playerDoorImage, (doorIndex + 1) * playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+					g2->drawScaledSubImage(playerDoorImage, (doorIndex + 1) * playerWidth * 2, playerHeight, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+				}
+				else {
+					mx = px - camX + 100;
+					g2->drawScaledSubImage(playerDoorImage, doorIndex * playerWidth, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+					g2->drawScaledSubImage(playerDoorImage, doorIndex * playerWidth, playerHeight, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 				}
 			}
 			else {
@@ -343,7 +373,7 @@ namespace {
 		Graphics4::setFloat(energyLocation, flakyEnergy(energy));
 		Graphics4::setFloat(topLocation, (py - camY - 32) / h);
 		Graphics4::setFloat(bottomLocation, (py - camY + 128) / h);
-		if (!inCloset) g2->drawScaledSubImage(screen, 0, 0, w, h, 0, 0, w * 2, h * 2);
+		if (!inCloset && !dead) g2->drawScaledSubImage(screen, 0, 0, w, h, 0, 0, w * 2, h * 2);
 	//	g2->end();
 		g2->setPipeline(nullptr);
 		
@@ -384,7 +414,8 @@ namespace {
 		case KeyUp:
 		case KeyW:
 			up = true;
-			goThroughDoor();
+			takeDoor = false;
+			goThroughTheDoor();
 			hideInTheCloset();
 			break;
 		case KeySpace:
@@ -431,7 +462,7 @@ namespace {
 	void mousePress(int windowId, int button, int x, int y) {
 		if (x > doorButton.x() && y > doorButton.y() && x < doorButton.x() + doorButton.z() && y < doorButton.y() + doorButton.w()) {
 			log(Info, "door button pressed");
-			goThroughDoor();
+			goThroughTheDoor();
 		}
 		
 		if (x > closetButton.x() && y > closetButton.y() && x < closetButton.x() + closetButton.z() && y < closetButton.y() + closetButton.w()) {
@@ -460,6 +491,7 @@ int kore(int argc, char** argv) {
 
 	playerImage = new Graphics4::Texture("player.png");
 	playerChargeImage = new Graphics4::Texture("playerRechargeAnim.png");
+	playerDoorImage = new Graphics4::Texture("playerDoorAnim.png");
 	playerWidth = playerImage->width / 10.0f;
 	playerHeight = playerImage->height / 2.0f;
 	px = 0;

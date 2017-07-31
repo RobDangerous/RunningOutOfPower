@@ -38,7 +38,7 @@ void loadCsv(const char* csvFile) {
 	while (ptr != nullptr) {
 		assert(i < rows * columns);
 		int num = atoi(ptr);
-		log(Info, "%i -> %i", i, num);
+		//log(Info, "%i -> %i", i, num);
 		source[i] = num;
 		ptr = std::strtok(nullptr, delimiter);
 		i++;
@@ -57,7 +57,6 @@ void loadCsv(const char* csvFile) {
 				assert(spiderCountCurr < spiderCountMax);
 				spiderPos[spiderCountCurr] = vec2i(x, y);
 				spiderState[spiderCountCurr] = Spider1;
-				spiderDir[spiderCountCurr] = 1;
 				++spiderCountCurr;
 			}
 		}
@@ -92,7 +91,7 @@ void drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights) {
 
 bool isInLight(float x, float y, float px, float py, float mx, float my, float camX, float camY, float energy)
 {
-	log(Info, "%i -> %i", getFloor(y), getFloor(py));
+	//log(Info, "%i -> %i", getFloor(y), getFloor(py));
 	// Light on
 	return energy >= 0.1f &&
 		// Same floor
@@ -100,29 +99,31 @@ bool isInLight(float x, float y, float px, float py, float mx, float my, float c
 		// Distance small
 		Kore::abs(px - x) <= 200 &&
 		// Angle small
-		Kore::abs(Kore::atan2(my - (py - camY), mx - (px - camX)) - Kore::atan2(y - (py - camY), x - (px - camX))) < 0.2 * Kore::pi;
+		Kore::abs(Kore::atan2(my - (py - camY), mx - (px - camX)) - Kore::atan2(y - py, x - px)) < 0.15 * Kore::pi;
 }
 
-void animateSpider(float px, float py, float mx, float my, float camX, float camY, float energy)
+bool animateSpider(float px, float py, float mx, float my, float camX, float camY, float energy)
 {
+	bool caughtPlayer = false;
 	static int frameCount = 0;
 	++frameCount;
-	if (frameCount >= 5)
+	for (int i = 0; i < spiderCountCurr; ++i)
 	{
-		frameCount = 0;
-		for (int i = 0; i < spiderCountCurr; ++i)
+		int collx = (spiderPos[i].x() + .5f) * tileWidth;
+		int colly = spiderPos[i].y() * tileHeight + 9 + (spiderState[i] - Spider1) * 11 + 14;
+		if (frameCount >= 5)
 		{
-			log(Info, "Spider %i:", i);
-			spiderState[i] += spiderDir[i];
-			bool inRange = vec2(spiderPos[i].x() * tileWidth - px, spiderPos[i].y() * tileHeight - py).squareLength() <= tileWidth * tileHeight * 4;
-			bool active = inRange && !isInLight(spiderPos[i].x() * tileWidth, spiderPos[i].y() * tileHeight, px, py, mx, my, camX, camY, energy);
-			if (spiderState[i] >= Spider9) spiderDir[i] = -1;
-
-			else if (spiderState[i] <= Spider1) spiderDir[i] = active ? +1 : 0;
-			else if (spiderState[i] > Spider1 && !active) spiderDir[i] = -1;
+			frameCount = 0;
+			int collynext = colly + 11;
+			bool inRange = vec2(spiderPos[i].x() * tileWidth - px, spiderPos[i].y() * tileHeight - py).squareLength() <= tileWidth * tileHeight;
+			bool active = inRange && !isInLight(collx, colly, px, py, mx, my, camX, camY, energy);
+			if (active && spiderState[i] < Spider9 && !isInLight(collx, collynext, px, py, mx, my, camX, camY, energy)) ++spiderState[i];
+			else if (!active && spiderState[i] > Spider1) --spiderState[i];
 			source[spiderPos[i].y() * columns  + spiderPos[i].x()] = spiderState[i];
 		}
+		caughtPlayer |= (spiderState[i] >= Spider3 && Kore::abs(collx - px) < tileWidth * 0.25f);
 	}
+	return caughtPlayer;
 }
 
 
