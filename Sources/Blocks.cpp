@@ -577,11 +577,11 @@ namespace {
 			}
 		}
 
-		vec2 f(flashlightPosAbs.x() - camX, flashlightPosAbs.y() - camY);
+		/*vec2 f(flashlightPosAbs.x() - camX, flashlightPosAbs.y() - camY);
 		g2->fillRect(f.x() - 2, f.y() - 2, 4, 4);
 		g2->drawLine(f.x(), f.y(), f.x() + flashlightRay0.x() * 1000, f.y() + flashlightRay0.y() * 1000);
 		g2->drawLine(f.x(), f.y(), f.x() + flashlightRay1.x() * 1000, f.y() + flashlightRay1.y() * 1000);
-		g2->drawLine(f.x(), f.y(), f.x() + flashlightRay2.x() * 1000, f.y() + flashlightRay2.y() * 1000);
+		g2->drawLine(f.x(), f.y(), f.x() + flashlightRay2.x() * 1000, f.y() + flashlightRay2.y() * 1000);*/
 
 		if (state == End) {
 			g2->drawImage(winImage, 0, 0);
