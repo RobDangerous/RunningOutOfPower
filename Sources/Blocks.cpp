@@ -118,8 +118,12 @@ namespace {
 	vec2 debugText;
 	vec4 skipButton;
 	
-	const int monsterCount = 3;
-	Monster monsters[monsterCount];
+	const int monsterCount = 2;
+	//Monster monsters[monsterCount];
+	Monster** monsters;
+	Monster* janitor;
+	Monster* book;
+	
 	const int smallMonsterCount = 1;
 	SmallMonster smallMonsters[smallMonsterCount];
 	
@@ -166,12 +170,12 @@ namespace {
 		sprintf(dText, "");
 		dTime = 0;
 
-		lightOn = false;
+		lightOn = true;//false;
 
 		state = Start;
 
 		for (int i = 0; i < monsterCount; ++i) {
-			monsters[i].reset();
+			monsters[i]->reset();
 		}
 		for (int i = 0; i < smallMonsterCount; ++i) {
 			smallMonsters[i].reset();
@@ -357,17 +361,20 @@ namespace {
 
 			float targetCamX = Kore::min(Kore::max(0.0f, px - w / 2 + playerWidth / 2), 1.f * columns * tileWidth - w);
 			float targetCamY = Kore::min(Kore::max(0.0f, py - h / 2 + playerHeight / 2), 1.f * rows * tileHeight - h);
+			//float targetCamX = Kore::min(Kore::max(0.0f, monsters[0]->x - w / 2 + playerWidth / 2), 1.f * columns * tileWidth - w);
+			//float targetCamY = Kore::min(Kore::max(0.0f, monsters[0]->y - h / 2 + playerHeight / 2), 1.f * rows * tileHeight - h);
+
 
 			vec2 cam(camX, camY);
 			vec2 target(targetCamX, targetCamY);
 
 			vec2 dir = target - cam;
-			if (dir.getLength() < 6.0f) {
+			if (dir.getLength() < 16.0f) {
 				camX = targetCamX;
 				camY = targetCamY;
 			}
 			else {
-				dir.setLength(5.0f);
+				dir.setLength(15.0f);
 				cam = cam + dir;
 				camX = cam.x();
 				camY = cam.y();
@@ -443,7 +450,7 @@ namespace {
 				//if (Kore::abs(px - monsters[i].x) < 100 && mx > px) {
 
 				//}
-				dead |= (monsters[i].update(playerCenter.x(), playerCenter.y(), flashlightPosAbs.x(), flashlightPosAbs.y(), mx + camX, my + camY, energy) && !inCloset);
+				dead |= (monsters[i]->update(playerCenter.x(), playerCenter.y(), flashlightPosAbs.x(), flashlightPosAbs.y(), mx + camX, my + camY, energy) && !inCloset);
 			}
 
 			for (int i = 0; i < smallMonsterCount; ++i) {
@@ -545,7 +552,7 @@ namespace {
 		}
 		
 		for (int i = 0; i < monsterCount; ++i) {
-			monsters[i].render(g2, camX, camY);
+			monsters[i]->render(g2, camX, camY);
 		}
 		for (int i = 0; i < smallMonsterCount; ++i) {
 			smallMonsters[i].render(g2, camX, camY);
@@ -773,7 +780,13 @@ int kore(int argc, char** argv) {
 	playerWidth = playerImage->width / 10.0f;
 	playerHeight = playerImage->height / 2.0f;
 	
-	Monster::init();
+	monsters = new Monster*[monsterCount];
+	janitor = new Monster();
+	janitor->init("janitor.png", 4);
+	monsters[0] = janitor;
+	book = new Monster();
+	book->init("book.png", 8);
+	monsters[1] = book;
 	SmallMonster::init();
 	reset();
 	

@@ -3,21 +3,13 @@
 #include "Monster.h"
 #include "Tileset.h"
 
-#include <Kore/Graphics4/Graphics.h>
 #include <Kore/Math/Random.h>
 #include <Kore/Log.h>
 
 using namespace Kore;
 
-namespace {
-	Graphics4::Texture* texture;
-	int width, height;
-	
-	int doorLock;
-}
-
 Monster::Monster() : initX(400), initY(0) {
-	reset();
+	
 }
 
 void Monster::reset() {
@@ -30,11 +22,12 @@ void Monster::reset() {
 	log(Info, "Monster at floor %i", getFloor(y));
 }
 
-void Monster::init() {
-	texture = new Graphics4::Texture("janitor.png");
-	width = texture->width / 4;
+void Monster::init(const char* textureName, int animTiles) {
+	texture = new Graphics4::Texture(textureName);
+	width = texture->width / animTiles;
 	height = texture->height / 1;
 	doorLock = 0;
+	this->animTiles = animTiles;
 }
 
 bool Monster::update(float px, float py, float fx, float fy, float mx_world, float my_world, float energy) {
@@ -101,7 +94,7 @@ void Monster::changeFloor() {
 }
 
 void Monster::render(Kore::Graphics2::Graphics2* g2, float camX, float camY) {
-	int animIndex = (anim / 10) % 4;
+	int animIndex = (anim / 10) % animTiles;
 	switch (status) {
 	case WalkingRight:
 	case StandingRight: {
