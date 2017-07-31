@@ -47,11 +47,13 @@ namespace {
 	Graphics4::ConstantLocation playerLocation;
 	Graphics4::ConstantLocation mouseLocation;
 	Graphics4::ConstantLocation animLocation;
+	Graphics4::ConstantLocation redLocation;
 	Graphics4::ConstantLocation lightsLocation;
 	Graphics4::ConstantLocation energyLocation;
 	Graphics4::ConstantLocation topLocation;
 	Graphics4::ConstantLocation bottomLocation;
 
+	bool dead = false;
 	float energy = 1.0;
 
 	float angle = 0.0f;
@@ -128,6 +130,7 @@ namespace {
 		playerLocation = pipeline->getConstantLocation("player");
 		mouseLocation = pipeline->getConstantLocation("mouse");
 		animLocation = pipeline->getConstantLocation("anim");
+		redLocation = pipeline->getConstantLocation("red");
 		lightsLocation = pipeline->getConstantLocation("lights");
 		energyLocation = pipeline->getConstantLocation("energy");
 		topLocation = pipeline->getConstantLocation("top");
@@ -196,107 +199,111 @@ namespace {
 		Audio2::update();
 
 		static int anim = 0;
-		++anim;
+		if (!dead)
+		{
+			++anim;
 
-		helpText = nullptr;
+			helpText = nullptr;
 
-		if (charging) {
-			energy += 0.002f;
-			if (energy > 1) energy = 1;
-		}
-		else {
-			energy -= 0.0005f;
-			if (energy < 0.2f) {
-				helpText = chargeText;
-			}
-			if (energy < 0) energy = 0;
-		}
-		
-		// Draw buttons
-		if (getTileID(px + playerWidth / 2, py + playerHeight / 2) == Door) {
-			helpText = doorText;
-		}
-		else if (getTileID(px + playerWidth / 2, py + playerHeight / 2) == Closet) {
-			if (inCloset) {
-				helpText = closetOutText;
+			if (charging) {
+				energy += 0.002f;
+				if (energy > 1) energy = 1;
 			}
 			else {
-				helpText = closetInText;
+				energy -= 0.0005f;
+				if (energy < 0.2f) {
+					helpText = chargeText;
+				}
+				if (energy < 0) energy = 0;
 			}
-		}
-
-		//if (up) {
-		//	py -= 1;
-		//}
-		//if (down_) {
-		//	py += 1;
-		//}
-		if (!inCloset) {
-			if (left) {
-				px -= 4;
+		
+			// Draw buttons
+			if (getTileID(px + playerWidth / 2, py + playerHeight / 2) == Door) {
+				helpText = doorText;
 			}
-			if (right) {
-				px += 4;
+			else if (getTileID(px + playerWidth / 2, py + playerHeight / 2) == Closet) {
+				if (inCloset) {
+					helpText = closetOutText;
+				}
+				else {
+					helpText = closetInText;
+				}
 			}
-		}
 
-		float targetCamX = Kore::max(0.0f, px - w / 2 + playerWidth / 2);
-		float targetCamY = Kore::max(0.0f, py - h / 2 + playerHeight / 2);
+			//if (up) {
+			//	py -= 1;
+			//}
+			//if (down_) {
+			//	py += 1;
+			//}
+			if (!inCloset) {
+				if (left) {
+					px -= 4;
+				}
+				if (right) {
+					px += 4;
+				}
+			}
 
-		vec2 cam(camX, camY);
-		vec2 target(targetCamX, targetCamY);
+			float targetCamX = Kore::max(0.0f, px - w / 2 + playerWidth / 2);
+			float targetCamY = Kore::max(0.0f, py - h / 2 + playerHeight / 2);
 
-		vec2 dir = target - cam;
-		if (dir.getLength() < 6.0f) {
-			camX = targetCamX;
-			camY = targetCamY;
-		}
-		else {
-			dir.setLength(5.0f);
-			cam = cam + dir;
-			camX = cam.x();
-			camY = cam.y();
+			vec2 cam(camX, camY);
+			vec2 target(targetCamX, targetCamY);
+
+			vec2 dir = target - cam;
+			if (dir.getLength() < 6.0f) {
+				camX = targetCamX;
+				camY = targetCamY;
+			}
+			else {
+				dir.setLength(5.0f);
+				cam = cam + dir;
+				camX = cam.x();
+				camY = cam.y();
+			}
+
+			dead = animateSpider(px + playerWidth / 2, py + playerHeight / 2, mx, my, camX, camY, energy);
+
+			for (int i = 0; i < monsterCount; ++i) {
+				//if (Kore::abs(px - monsters[i].x) < 100 && mx > px) {
+
+				//}
+				monsters[i].update();
+			}
+
+			frameCount++;
+			if (frameCount > 10) {
+				frameCount = 0;
+
+				runIndex = runIndex % 8;
+				runIndex++;
+
+				++chargeIndex;
+				chargeIndex %= 4;
+
+				++doorIndex;
+				if (doorIndex >= 6) {
+					if (doorAnim) {
+						takeDoor = true;
+						goThroughTheDoor();
+					}
+				}
+				doorIndex %= 6;
+			}
 		}
 
 		Graphics4::begin();
 		Graphics4::setRenderTarget(screen);
-        g2->begin(true, w, h);
-		
+		g2->begin(true, w, h);
+
 		vec2 lights[lightCount];
 		for (int i = 0; i < lightCount; ++i) {
 			lights[i] = vec2(-1000, -1000);
 		}
-		bool dead = animateSpider(px + playerWidth / 2, py + playerHeight / 2, mx, my, camX, camY, energy);
 		drawTiles(g2, camX, camY, lights);
 		for (int i = 0; i < lightCount; ++i) {
 			lights[i] = vec2(lights[i].x() / w, lights[i].y() / h);
-		}
-
-		for (int i = 0; i < monsterCount; ++i) {
-			//if (Kore::abs(px - monsters[i].x) < 100 && mx > px) {
-
-			//}
-			monsters[i].update();
-		}
-
-		frameCount++;
-		if (frameCount > 10) {
-			frameCount = 0;
-			
-			runIndex = runIndex % 8;
-			runIndex++;
-
-			++chargeIndex;
-			chargeIndex %= 4;
-			
-			++doorIndex;
-			if (doorIndex >= 6) {
-				if (doorAnim) {
-					takeDoor = true;
-					goThroughTheDoor();
-				}
-			}
-			doorIndex %= 6;
 		}
 
 		if (!inCloset) {
@@ -358,6 +365,8 @@ namespace {
 
 		g2->end();
 		
+		static float red = 0;
+		if (dead) red = Kore::min(red + 0.1f, 1.f);
 		Graphics4::restoreRenderTarget();
 		g2->begin(false, w * 2, h * 2);
 		g2->setPipeline(pipeline);
@@ -369,6 +378,7 @@ namespace {
 		Graphics4::setFloat2(playerLocation, vec2((px - camX + playerWidth / 2.0f) / w, (py - camY + playerHeight / 2.0f) / h));
 		Graphics4::setFloat2(mouseLocation, vec2(mx / w, my / h));
 		Graphics4::setInt(animLocation, anim);
+		Graphics4::setFloat(redLocation, red);
 #ifdef KORE_DIRECT3D
 		vec4 vec4lights[lightCount];
 		for (int i = 0; i < lightCount; ++i) {
@@ -382,7 +392,7 @@ namespace {
 		Graphics4::setFloat(energyLocation, flakyEnergy(energy));
 		Graphics4::setFloat(topLocation, (py - camY - 32) / h);
 		Graphics4::setFloat(bottomLocation, (py - camY + 128) / h);
-		if (!inCloset && !dead) g2->drawScaledSubImage(screen, 0, 0, w, h, 0, 0, w * 2, h * 2);
+		if (!inCloset) g2->drawScaledSubImage(screen, 0, 0, w, h, 0, 0, w * 2, h * 2);
 	//	g2->end();
 		g2->setPipeline(nullptr);
 		
@@ -403,6 +413,8 @@ namespace {
 	}
 
 	void keyDown(KeyCode code) {
+		if (dead) return;
+
 		charging = false;
 		switch (code) {
 		case KeyLeft:
@@ -438,6 +450,8 @@ namespace {
 	}
 
 	void keyUp(KeyCode code) {
+		if (dead) return;
+
 		switch (code) {
 		case KeyLeft:
 		case KeyA:
@@ -464,11 +478,15 @@ namespace {
 	}
 
 	void mouseMove(int window, int x, int y, int moveX, int moveY) {
+		if (dead) return;
+
 		mx = x / 2.0f;
 		my = y / 2.0f;
 	}
 	
 	void mousePress(int windowId, int button, int x, int y) {
+		if (dead) return;
+
 		if (x > doorButton.x() && y > doorButton.y() && x < doorButton.x() + doorButton.z() && y < doorButton.y() + doorButton.w()) {
 			log(Info, "door button pressed");
 			goThroughTheDoor();
