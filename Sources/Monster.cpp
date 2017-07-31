@@ -36,7 +36,7 @@ bool Monster::update(float px, float py, float fx, float fy, float mx, float my,
 	doorLock ++;
 	int tile = getTileID(x + width / 2, y + height / 2);
 	if (tile == Door && doorLock > 50) {
-		vec2 door = findDoor();
+		vec2 door = findDoor(x + width / 2, y + height / 2);
 		x = door.x() + 32;
 		y = door.y() + tileHeight - height;
 		

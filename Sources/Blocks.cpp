@@ -176,7 +176,7 @@ namespace {
 		else if(tile == Door && doorAnim && takeDoor) {
 			doorAnim = false;
 			takeDoor = false;
-			vec2 door = findDoor();
+			vec2 door = findDoor(px + playerWidth / 2, py + playerHeight / 2);
 			px = door.x() + 32;
 			py = door.y() + 36;
 			return true;
