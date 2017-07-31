@@ -98,6 +98,7 @@ namespace {
 	const char* const switchLighOffText = "Key Down: Switch the light off";
 	const char* const skipText = "Skip";
 	const char* const resetText = "Press R to Restart";
+	const char* const introText = "In school. Lights out. Don't die!";
 	
 	int frameCount = 0;
 	int anim = 0;
@@ -347,9 +348,48 @@ namespace {
 			}
 		
 			// Draw buttons
+			static int soundBlock = 0;
+			soundBlock--;
 			int tile = getTileID(playerCenter.x(), playerCenter.y());
 			if (tile == Door) {
 				helpText = doorText;
+
+				// Check whether it is safe to go through
+				bool isSave = true;
+				vec2 doorPos = findDoor(playerCenter.x(), playerCenter.y());
+				int doorFloor = getFloor(doorPos.y());
+
+				for (int i = 0; i < monsterCount; ++i) {
+					if (doorFloor != getFloor(monsters[i]->y))
+						continue;
+
+					if (Kore::abs(monsters[i]->x - doorPos.x()) > tileWidth * 2)
+						continue;
+
+					isSave = false;
+					break;
+				}
+				if (isSave)
+				{
+					for (int i = 0; i < smallMonsterCount; ++i) {
+						if (doorFloor != getFloor(smallMonsters[i].y))
+							continue;
+
+						if (Kore::abs(smallMonsters[i].x - doorPos.x()) > tileWidth * 2)
+							continue;
+
+						isSave = false;
+						break;
+					}
+				}
+				if (!isSave && soundBlock <= 0)
+				{
+					Sound* music = new Sound("danger.wav");
+					music->setVolume(0.5f);
+					Audio1::play(music, Random::get(900, 1000) / 1000.f);
+					soundBlock = Random::get(30, 90);
+					log(Info, "danger");
+				}
 			}
 			else if (tile == Closet) {
 				if (inCloset) {
@@ -666,7 +706,7 @@ namespace {
 			g2->setFontColor(Graphics1::Color::White);
 			g2->drawString(skipText, skipButton.x(), skipButton.y());
 			
-			
+			g2->drawString(introText, 200, 120);
 		}
 		
 		g2->end();

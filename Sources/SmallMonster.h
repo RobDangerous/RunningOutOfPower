@@ -10,10 +10,13 @@ public:
 	static void init();
 	bool update(float px, float py, float fx, float fy, float mx_world, float my_world, float energy);
 	void render(Kore::Graphics2::Graphics2* g2, float camX, float camY);
+
+	float x, y;
 	
 private:
+
 	int monsterIndex;
-	float x, y, startY;
+	float startY;
 	int anim;
 	enum Status {
 		WalkingLeft, WalkingRight
