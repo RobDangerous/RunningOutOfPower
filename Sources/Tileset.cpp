@@ -64,7 +64,12 @@ void loadCsv(const char* csvFile) {
 			}
 		}
 	}
+	assert(doorCount == expectedDoorCount);
+	shuffleDoors();
+}
 
+void shuffleDoors()
+{
 	// Shuffle floors
 	for (int i = 1; i < rows * 2; ++i)
 	{
@@ -88,8 +93,6 @@ void loadCsv(const char* csvFile) {
 			doors[2 + (r - 1)] = t1;
 		}
 	}
-
-	assert(doorCount == expectedDoorCount);
 }
 
 void resetSpiders()

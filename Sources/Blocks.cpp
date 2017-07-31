@@ -181,6 +181,7 @@ namespace {
 			smallMonsters[i].reset();
 		}
 		resetSpiders();
+		shuffleDoors();
 	}
 	
 	void createPipeline() {

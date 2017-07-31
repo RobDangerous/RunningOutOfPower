@@ -33,6 +33,7 @@ void loadCsv(const char* csvFile);
 
 void initTiles(const char* csvFile, const char* tileFile);
 void drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights);
+void shuffleDoors();
 
 int getFloor(float py);
 int getTileID(float px, float py);
