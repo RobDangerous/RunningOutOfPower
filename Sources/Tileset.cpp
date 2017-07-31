@@ -92,15 +92,14 @@ void drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights) {
 
 bool isInLight(float x, float y, float fx, float fy, float mx, float my, float camX, float camY, float energy)
 {
-	//log(Info, "%i -> %i", getFloor(y), getFloor(py));
 	// Light on
 	return energy >= 0.1f &&
 		// Same floor
 		getFloor(y) == getFloor(fy) &&
 		// Distance small
-		Kore::abs(fx - x) <= 5 * energy * tileWidth &&
+		Kore::abs(fx - x) <= 3 * energy * tileWidth &&
 		// Angle small
-		Kore::abs(Kore::atan2(my - (fy - camY), mx - (fx - camX)) - Kore::atan2(y - fy, x - fx)) < 0.15 * Kore::pi;
+		Kore::abs(Kore::atan2(my - (fy - camY), mx - (fx - camX)) - Kore::atan2(y - fy, x - fx)) < 0.2 * Kore::pi;
 }
 
 bool animateSpider(float px, float py, float fx, float fy, float mx, float my, float camX, float camY, float energy)
@@ -133,7 +132,7 @@ bool animateSpider(float px, float py, float fx, float fy, float mx, float my, f
 			else if (!active && spiderState[i] > Spider1) --spiderState[i];
 			source[spiderPos[i].y() * columns  + spiderPos[i].x()] = spiderState[i];
 		}
-		caughtPlayer |= (spiderState[i] >= Spider3 && Kore::abs(collx - px) < tileWidth * 0.25f);
+		caughtPlayer |= (spiderState[i] >= Spider3 && Kore::abs(collx - px) < tileWidth * 0.25f && getFloor(colly) == getFloor(py));
 	}
 	return caughtPlayer;
 }
@@ -149,12 +148,10 @@ int getTileID(float px, float py) {
 	return source[y * columns  + x];
 }
 
-vec2 findDoor() {
-	static vec2 last = doors[0];
+vec2 findDoor(float lastX, float lastY) {
 	vec2 door = doors[Random::get(0, doorCount - 1)];
-	while (door == last) {
+	while (door.x() - lastX <= 0.0001 && door.y() - lastY <= 0.0001) {
 		door = doors[Random::get(0, doorCount - 1)];
 	}
-	last = door;
 	return door;
 }

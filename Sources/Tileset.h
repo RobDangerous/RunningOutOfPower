@@ -32,13 +32,10 @@ void loadCsv(const char* csvFile);
 
 void initTiles(const char* csvFile, const char* tileFile);
 void drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights);
-	
-int getTileID(float px, float py);
-vec2 findDoor();
 
 int getFloor(float py);
 int getTileID(float px, float py);
-vec2 findDoor();
+vec2 findDoor(float lastX, float lastY);
 bool isInLight(float x, float y, float fx, float fy, float mx, float my, float camX, float camY, float energy);
 
 bool animateSpider(float px, float py, float fx, float fy, float mx, float my, float camX, float camY, float energy);

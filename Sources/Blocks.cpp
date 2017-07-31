@@ -179,7 +179,7 @@ namespace {
 		else if(tile == Door && doorAnim && takeDoor) {
 			doorAnim = false;
 			takeDoor = false;
-			vec2 door = findDoor();
+			vec2 door = findDoor(px + playerWidth / 2, py + playerHeight / 2);
 			px = door.x() + 32;
 			py = door.y() + 36;
 			return true;
@@ -338,7 +338,7 @@ namespace {
 				//if (Kore::abs(px - monsters[i].x) < 100 && mx > px) {
 
 				//}
-				monsters[i].update();
+				dead |= (monsters[i].update(px + playerWidth / 2, py + playerHeight / 2, px + playerWidth / 2 + flxoff, py + playerHeight / 2 + flyoff, mx, my, camX, camY, energy) && !inCloset);
 			}
 
 			if (frameCount > 10) {
