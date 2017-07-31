@@ -68,7 +68,6 @@ namespace {
 	int lastDirection = 1;	// 0 - left, 1 - right
 	bool left = false;
 	bool right = false;
-	bool down_ = false;
 	bool up = false;
 	
 	bool charging = false;
@@ -80,12 +79,15 @@ namespace {
 	const char* const chargeText = "Hold space to charge";
 	const char* const doorText = "Key Up: Go through the door";
 	const char* const closetInText = "Key Up: Hide in the closet";
-	const char* const closetOutText = "Key Down: Get out of the closet";
+	const char* const closetOutText = "Key Up: Get out of the closet";
 	const char* const switchLighOnText = "Key Up: Switch the light on";
 	const char* const switchLighOffText = "Key Down: Switch the light off";
 	const char* const skipText = "Skip";
+	const char* const resetText = "Press R to Restart";
 	
 	int frameCount = 0;
+	int anim = 0;
+	float red = 0.f;
 	
 	int runIndex = 0;
 	int chargeIndex = 0;
@@ -115,6 +117,51 @@ namespace {
 		Game,
 		End
 	} state;
+
+	void reset()
+	{
+		camX = 0;
+		camY = 0;
+
+		dead = false;
+		energy = 1.0;
+
+		px = 0;
+		py = tileHeight - playerImage->height / 2;
+		//mx = 0.0f;
+		//my = 0.0f;
+
+		lastDirection = 1;
+		left = false;
+		right = false;
+		up = false;
+
+		charging = false;
+		inCloset = false;
+		takeDoor = false;
+		doorAnim = false;
+
+		frameCount = 0;
+		anim = 0;
+		red = 0.f;
+
+		runIndex = 0;
+		chargeIndex = 0;
+		doorIndex = 0;
+		fightIndex = 0;
+
+		sprintf(dText, "");
+		dTime = 0;
+
+		lightOn = false;
+
+		state = Start;
+
+		for (int i = 0; i < monsterCount; ++i) {
+			monsters[i].reset();
+		}
+		resetSpiders();
+	}
 	
 	void createPipeline() {
 		Graphics4::VertexStructure structure;
@@ -227,7 +274,6 @@ namespace {
 
 		float flxoff = 0;
 		float flyoff = 0;
-		static int anim = 0;
 		++frameCount;
 		++anim;
 
@@ -266,12 +312,6 @@ namespace {
 					helpText = switchLighOnText;
 			}
 
-			//if (up) {
-			//	py -= 1;
-			//}
-			//if (down_) {
-			//	py += 1;
-			//}
 			if (!inCloset) {
 				if (left && px >= -10) {
 					px -= 4;
@@ -369,6 +409,9 @@ namespace {
 				doorIndex %= 6;
 			}
 		}
+		else {
+			helpText = resetText;
+		}
 
 		Graphics4::begin();
 		Graphics4::setRenderTarget(screen);
@@ -445,8 +488,7 @@ namespace {
 		if (state == Start) {
 			g2->drawImage(intro, 0, 0);
 		}
-		
-		static float red = 0;
+
 		if (dead) {
 			fightIndex = (frameCount / 10) % 4;
 			energy = 0;
@@ -549,11 +591,6 @@ namespace {
 			right = true;
 			lastDirection = 1;
 			break;
-		case KeyDown:
-		case KeyS:
-			down_ = true;
-			hideInTheCloset();
-			break;
 		case KeyUp:
 		case KeyW:
 			up = true;
@@ -573,6 +610,7 @@ namespace {
 	}
 
 	void keyUp(KeyCode code) {
+		if (code == KeyR) reset();
 		if (dead) return;
 
 		switch (code) {
@@ -585,9 +623,6 @@ namespace {
 			right = false;
 			break;
 		case KeyDown:
-		case KeyS:
-			down_ = false;
-			break;
 		case KeyUp:
 		case KeyW:
 			up = false;
@@ -644,20 +679,15 @@ int kore(int argc, char** argv) {
 
 	Kore::System::setCallback(update);
 
-	state = Start;
 	intro = new Graphics4::Texture("schoolClass.png");
 	playerImage = new Graphics4::Texture("player.png");
 	playerChargeImage = new Graphics4::Texture("playerRechargeAnim.png");
 	playerDoorImage = new Graphics4::Texture("playerDoorAnim.png");
 	playerWidth = playerImage->width / 10.0f;
 	playerHeight = playerImage->height / 2.0f;
-	px = 0;
-	py = tileHeight - playerImage->height/2;
 	
 	Monster::init();
-	for (int i = 0; i < monsterCount; ++i) {
-		monsters[i].position();
-	}
+	reset();
 	
 	batteryImage = new Graphics4::Texture("Tiles/battery.png");
 	
