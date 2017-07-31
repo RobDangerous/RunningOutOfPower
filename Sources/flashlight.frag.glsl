@@ -15,6 +15,7 @@ uniform float energy;
 uniform float top;
 uniform float bottom;
 uniform float red;
+uniform bool lightOn;
 
 // noise from https://www.shadertoy.com/view/Msf3WH
 
@@ -110,6 +111,7 @@ void main() {
 	}
 
 	scale = clamp(scale, 0.0, 1.0);
+	if (lightOn) scale = 1.0;
 
 	vec4 texcolor = texture(tex, texCoord + vec2(sin(anim / 20.0 + texCoord.y * 8) * 0.02 * (1.0 - scale), 0.0)) * color;
 	texcolor.rgb *= color.a;
