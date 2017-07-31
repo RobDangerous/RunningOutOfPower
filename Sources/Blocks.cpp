@@ -369,12 +369,12 @@ namespace {
 			vec2 target(targetCamX, targetCamY);
 
 			vec2 dir = target - cam;
-			if (dir.getLength() < 6.0f) {
+			if (dir.getLength() < 16.0f) {
 				camX = targetCamX;
 				camY = targetCamY;
 			}
 			else {
-				dir.setLength(5.0f);
+				dir.setLength(15.0f);
 				cam = cam + dir;
 				camX = cam.x();
 				camY = cam.y();
