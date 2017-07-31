@@ -18,6 +18,7 @@
 #include <Kore/Graphics1/Color.h>
 
 #include "Monster.h"
+#include "SmallMonster.h"
 #include "Tileset.h"
 
 using namespace Kore;
@@ -50,6 +51,8 @@ namespace {
 	Graphics4::Texture* fightImage;
 	
 	Graphics4::Texture* spiderAnimImage;
+
+	Graphics4::Texture* winImage;
 
 	Graphics4::RenderTarget* screen;
 	Graphics4::PipelineState* pipeline;
@@ -117,6 +120,8 @@ namespace {
 	
 	const int monsterCount = 1;
 	Monster monsters[monsterCount];
+	const int smallMonsterCount = 1;
+	SmallMonster smallMonsters[smallMonsterCount];
 	
 	bool lightOn = false;
 
@@ -167,6 +172,9 @@ namespace {
 
 		for (int i = 0; i < monsterCount; ++i) {
 			monsters[i].reset();
+		}
+		for (int i = 0; i < smallMonsterCount; ++i) {
+			smallMonsters[i].reset();
 		}
 		resetSpiders();
 	}
@@ -437,6 +445,13 @@ namespace {
 				dead |= (monsters[i].update(playerCenter.x(), playerCenter.y(), flashlightPosAbs.x(), flashlightPosAbs.y(), mx + camX, my + camY, energy) && !inCloset);
 			}
 
+			for (int i = 0; i < smallMonsterCount; ++i) {
+				//if (Kore::abs(px - monsters[i].x) < 100 && mx > px) {
+
+				//}
+				dead |= (smallMonsters[i].update(playerCenter.x(), playerCenter.y(), flashlightPosAbs.x(), flashlightPosAbs.y(), mx + camX, my + camY, energy) && !inCloset);
+			}
+
 			if (frameCount > 10) {
 				frameCount = 0;
 
@@ -531,7 +546,10 @@ namespace {
 		for (int i = 0; i < monsterCount; ++i) {
 			monsters[i].render(g2, camX, camY);
 		}
-		
+		for (int i = 0; i < smallMonsterCount; ++i) {
+			smallMonsters[i].render(g2, camX, camY);
+		}
+
 		if (state == Start) {
 			g2->drawImage(intro, 0, 0);
 		}
@@ -556,6 +574,10 @@ namespace {
 		g2->drawLine(f.x(), f.y(), f.x() + flashlightRay0.x() * 1000, f.y() + flashlightRay0.y() * 1000);
 		g2->drawLine(f.x(), f.y(), f.x() + flashlightRay1.x() * 1000, f.y() + flashlightRay1.y() * 1000);
 		g2->drawLine(f.x(), f.y(), f.x() + flashlightRay2.x() * 1000, f.y() + flashlightRay2.y() * 1000);
+
+		if (state == End) {
+			g2->drawImage(winImage, 0, 0);
+		}
 		
 		g2->end();
 		
@@ -599,7 +621,7 @@ namespace {
 			Graphics4::setBool(lightOnLocation, lightOn);
 		}
 		else {
-			if (anim - 60 * 4 > 600.0f) {
+			if (state == Start && anim - 60 * 4 > 600.0f) {
 				state = Game;
 				energy = 1;
 			}
@@ -740,6 +762,7 @@ int kore(int argc, char** argv) {
 
 	Kore::System::setCallback(update);
 
+	winImage = new Graphics4::Texture("win.png");
 	intro = new Graphics4::Texture("schoolClass.png");
 	playerImage = new Graphics4::Texture("player.png");
 	playerChargeImage = new Graphics4::Texture("playerRechargeAnim.png");
@@ -748,6 +771,7 @@ int kore(int argc, char** argv) {
 	playerHeight = playerImage->height / 2.0f;
 	
 	Monster::init();
+	SmallMonster::init();
 	reset();
 	
 	batteryImage = new Graphics4::Texture("Tiles/battery.png");
