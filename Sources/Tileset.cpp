@@ -38,7 +38,7 @@ void loadCsv(const char* csvFile) {
 	while (ptr != nullptr) {
 		assert(i < rows * columns);
 		int num = atoi(ptr);
-		log(Info, "%i -> %i", i, num);
+		//log(Info, "%i -> %i", i, num);
 		source[i] = num;
 		ptr = std::strtok(nullptr, delimiter);
 		i++;
@@ -91,7 +91,7 @@ void drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights) {
 
 bool isInLight(float x, float y, float px, float py, float mx, float my, float camX, float camY, float energy)
 {
-	log(Info, "%i -> %i", getFloor(y), getFloor(py));
+	//log(Info, "%i -> %i", getFloor(y), getFloor(py));
 	// Light on
 	return energy >= 0.1f &&
 		// Same floor
