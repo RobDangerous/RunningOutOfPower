@@ -772,7 +772,7 @@ namespace {
 }
 
 int kore(int argc, char** argv) {
-	System::init("Power", w * 2, h * 2);
+	System::init("Lightmare", w * 2, h * 2);
 	Random::init(static_cast<int>(System::time() * 1000));
 	startTime = System::time();
 	
