@@ -420,7 +420,11 @@ namespace {
 		Graphics4::setFloat(aspectLocation, (float)w / (float)h);
 		vec2 mouse(mx / w, my / h);
 		vec2 player((px - camX + playerWidth / 2.0f) / w, (py - camY + playerHeight / 2.0f) / h);
+#ifdef KORE_DIRECT3D
 		Graphics4::setFloat(angleLocation, Kore::atan2(mouse.x() - player.x(), mouse.y() - player.y()));
+#else
+		Graphics4::setFloat(angleLocation, Kore::atan2(mouse.y() - player.y(), mouse.x() - player.x()) - pi / 2.0f);
+#endif
 		Graphics4::setFloat4(playerLocation, vec4(player.x(), player.y(),
 			(px - camX + playerWidth / 2.0f + flxoff) / w, (py - camY + playerHeight / 2.0f + flyoff) / h));
 		Graphics4::setFloat2(mouseLocation, mouse);
