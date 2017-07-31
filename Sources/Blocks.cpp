@@ -98,6 +98,7 @@ namespace {
 	const char* const switchLighOffText = "Key Down: Switch the light off";
 	const char* const skipText = "Skip";
 	const char* const resetText = "Press R to Restart";
+	const char* const introText = "In school. Lights out. Don't die!";
 	
 	int frameCount = 0;
 	int anim = 0;
@@ -666,7 +667,7 @@ namespace {
 			g2->setFontColor(Graphics1::Color::White);
 			g2->drawString(skipText, skipButton.x(), skipButton.y());
 			
-			
+			g2->drawString(introText, 200, 120);
 		}
 		
 		g2->end();
