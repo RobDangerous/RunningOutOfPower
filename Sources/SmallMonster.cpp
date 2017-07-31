@@ -57,12 +57,12 @@ bool SmallMonster::update(float px, float py, float fx, float fy, float mx_world
 	}
 
 	if (status == WalkingRight) {
-		if (x < columns * tileWidth - 102) {
+		if (x < columns * tileWidth - 50) {
 			x += 2;
 		}
 	}
 	else {
-		if (x > 102) {
+		if (x > 50) {
 			x -= 2;
 		}
 	}
