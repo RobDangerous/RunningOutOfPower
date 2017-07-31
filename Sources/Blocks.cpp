@@ -52,6 +52,7 @@ namespace {
 	Graphics4::ConstantLocation energyLocation;
 	Graphics4::ConstantLocation topLocation;
 	Graphics4::ConstantLocation bottomLocation;
+	Graphics4::ConstantLocation lightOnLocation;
 
 	bool dead = false;
 	float energy = 1.0;
@@ -79,6 +80,8 @@ namespace {
 	const char* const doorText = "Key Up: Go through the door";
 	const char* const closetInText = "Key Up: Hide in the closet";
 	const char* const closetOutText = "Key Down: Get out of the closet";
+	const char* const switchLighOnText = "Key Up: Switch the light on";
+	const char* const switchLighOffText = "Key Down: Switch the light off";
 	
 	int frameCount = 0;
 	
@@ -100,6 +103,8 @@ namespace {
 	
 	const int monsterCount = 1;
 	Monster monsters[monsterCount];
+	
+	bool lightOn = false;
 	
 	void createPipeline() {
 		Graphics4::VertexStructure structure;
@@ -135,6 +140,7 @@ namespace {
 		energyLocation = pipeline->getConstantLocation("energy");
 		topLocation = pipeline->getConstantLocation("top");
 		bottomLocation = pipeline->getConstantLocation("bottom");
+		lightOnLocation = pipeline->getConstantLocation("lightOn");
 	}
 
 	float flakyEnergy(float energy) {
@@ -189,8 +195,19 @@ namespace {
 			inCloset = !inCloset;
 			return true;
 		} else {
-			//sprintf(dText, "There is no closet");
-			log(Info, "There is no closet");
+			return false;
+		}
+	}
+	
+	bool switchTheLightOn() {
+		int tile = getTileID(px + playerWidth / 2, py + playerHeight / 2);
+		
+		if (tile == LightSwitch) {
+			lightOn = !lightOn;
+			
+			if (lightOn) log(Info, "WON!");
+			return true;
+		} else {
 			return false;
 		}
 	}
@@ -218,16 +235,22 @@ namespace {
 			}
 		
 			// Draw buttons
-			if (getTileID(px + playerWidth / 2, py + playerHeight / 2) == Door) {
+			int tile = getTileID(px + playerWidth / 2, py + playerHeight / 2);
+			if (tile == Door) {
 				helpText = doorText;
 			}
-			else if (getTileID(px + playerWidth / 2, py + playerHeight / 2) == Closet) {
+			else if (tile == Closet) {
 				if (inCloset) {
 					helpText = closetOutText;
 				}
 				else {
 					helpText = closetInText;
 				}
+			} else if (tile == LightSwitch) {
+				if (lightOn)
+					helpText = switchLighOffText;
+				else
+					helpText = switchLighOnText;
 			}
 
 			//if (up) {
@@ -397,6 +420,7 @@ namespace {
 		Graphics4::setFloat(energyLocation, flakyEnergy(energy));
 		Graphics4::setFloat(topLocation, (py - camY - 32) / h);
 		Graphics4::setFloat(bottomLocation, (py - camY + 128) / h);
+		Graphics4::setBool(lightOnLocation, lightOn);
 		if (!inCloset) g2->drawScaledSubImage(screen, 0, 0, w, h, 0, 0, w * 2, h * 2);
 	//	g2->end();
 		g2->setPipeline(nullptr);
@@ -443,6 +467,7 @@ namespace {
 			takeDoor = false;
 			goThroughTheDoor();
 			hideInTheCloset();
+			switchTheLightOn();
 			break;
 		case KeySpace:
 			left = false;
