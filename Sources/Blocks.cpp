@@ -323,7 +323,7 @@ namespace {
 		g2->begin(false, w * 2, h * 2);
 		g2->setPipeline(pipeline);
 		Graphics4::setPipeline(pipeline);
-		Graphics4::setFloat(aspectLocation, w / h);
+		Graphics4::setFloat(aspectLocation, (float)w / (float)h);
 		angle += 0.01f;
 		if (angle > pi) angle = -pi;
 		Graphics4::setFloat(angleLocation, angle);

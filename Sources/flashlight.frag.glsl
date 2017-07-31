@@ -68,6 +68,10 @@ float easeOutQuart(float t) {
 	return 1 - (--t) * t * t * t;
 }
 
+float noEase(float t) {
+	return t > 0.2 ? 1.0 : 0.0;
+}
+
 #define PI 3.14159265359
 
 void main() {
@@ -81,9 +85,9 @@ void main() {
 	float start = angle - 0.4;
 	float end = angle + 0.4;
 	float tangle = atan(ty, tx);
-	float tdistance = sqrt(tx * tx + ty * ty);
+	float tdistance = sqrt(tx * aspect * tx * aspect + ty * 0.8 * ty * 0.8);
 
-	float scale = 1.0 - clamp(tdistance * 1.5, 0.0, 1.0);
+	float scale = 1.0;// - clamp(tdistance * 1.5, 0.0, 1.0);
 	
 	float angledif = atan(cos(tangle - angle), sin(tangle - angle));
 
@@ -95,13 +99,13 @@ void main() {
 
 	scale = easeOutQuart(clamp(scale, 0.0, 1.0));
 
-	scale += easeOutQuad(1.0 - clamp(tdistance * 10.0, 0.0, 1.0));
+	scale += easeOutQuad(1.0 - clamp(tdistance * 4.0, 0.0, 1.0));
 
 	for (int i = 0; i < 8; ++i) {
-		float difx = texCoord.x - lights[i].x;
+		float difx = (texCoord.x - lights[i].x) * aspect;
 		float dify = texCoord.y - lights[i].y;
 		float dist = sqrt(difx * difx + dify * dify);
-		scale += easeOutQuad(1.0 - clamp(dist * 15.0, 0.0, 1.0));
+		scale += easeOutQuad(1.0 - clamp(dist * 7.5, 0.0, 1.0));
 	}
 
 	scale = clamp(scale, 0.0, 1.0);
