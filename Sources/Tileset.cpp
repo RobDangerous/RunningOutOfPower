@@ -107,15 +107,22 @@ bool animateSpider(float px, float py, float mx, float my, float camX, float cam
 	bool caughtPlayer = false;
 	static int frameCount = 0;
 	++frameCount;
+
+	bool doMove = false;
+	if (frameCount >= 5)
+	{
+		doMove = true;
+		frameCount = 0;
+	}
+
 	for (int i = 0; i < spiderCountCurr; ++i)
 	{
 		int collx = (spiderPos[i].x() + .5f) * tileWidth;
 		int colly = spiderPos[i].y() * tileHeight + 9 + (spiderState[i] - Spider1) * 11 + 14;
-		if (frameCount >= 5)
+		if (doMove)
 		{
-			frameCount = 0;
 			int collynext = colly + 11;
-			bool inRange = vec2(spiderPos[i].x() * tileWidth - px, spiderPos[i].y() * tileHeight - py).squareLength() <= tileWidth * tileHeight;
+			bool inRange = collx - px <= tileWidth && getFloor(colly) == getFloor(py);
 			bool active = inRange && !isInLight(collx, colly, px, py, mx, my, camX, camY, energy);
 			if (active && spiderState[i] < Spider9 && !isInLight(collx, collynext, px, py, mx, my, camX, camY, energy)) ++spiderState[i];
 			else if (!active && spiderState[i] > Spider1) --spiderState[i];
