@@ -123,11 +123,12 @@ namespace {
 	vec2 debugText;
 	vec4 skipButton;
 	
-	const int monsterCount = 3;
+	const int monsterCount = 4;
 	Monster** monsters;
 	Monster* janitor1;
 	Monster* janitor2;
 	Monster* book;
+	Monster* teacher;
 	
 	const int smallMonsterCount = rows;
 	SmallMonster smallMonsters[smallMonsterCount];
@@ -856,6 +857,10 @@ int kore(int argc, char** argv) {
 	book = new Monster();
 	book->init("book.png", 8);
 	monsters[2] = book;
+	teacher = new Monster();
+	teacher->init("teacher.png", 8);
+	monsters[3] = teacher;
+	
 	SmallMonster::init();
 	reset();
 	
