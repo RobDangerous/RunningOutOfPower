@@ -199,11 +199,11 @@ namespace {
 		++anim;
 
 		if (charging) {
-			energy += 0.001f;
+			energy += 0.002f;
 			if (energy > 1) energy = 1;
 		}
 		else {
-			energy -= 0.001f;
+			energy -= 0.0005f;
 			if (energy < 0) energy = 0;
 		}
 

@@ -99,7 +99,7 @@ void main() {
 
 	scale = easeOutQuart(clamp(scale, 0.0, 1.0));
 
-	scale += easeOutQuad(1.0 - clamp(tdistance * 4.0, 0.0, 1.0));
+	scale += easeOutQuart(1.0 - clamp(tdistance * 5.0, 0.0, 1.0));
 
 	for (int i = 0; i < 8; ++i) {
 		float difx = (texCoord.x - lights[i].x) * aspect;
