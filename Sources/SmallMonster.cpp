@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "SmallMonster.h"
+#include "Tileset.h"
 
 #include <Kore/Graphics4/Graphics.h>
 #include <Kore/Math/Core.h>
@@ -22,6 +23,7 @@ void SmallMonster::reset() {
 	x = initX;
 	y = initY;
 	anim = 0;
+	status = WalkingRight;
 }
 
 void SmallMonster::init() {
@@ -31,9 +33,20 @@ void SmallMonster::init() {
 }
 
 bool SmallMonster::update(float px, float py, float fx, float fy, float mx, float my, float camX, float camY, float energy) {
-	x += 2;
+	if (status == WalkingRight && x > 1000) {
+		status = WalkingLeft;
+	}
+	else if (status == WalkingLeft && x < 100) {
+		status = WalkingRight;
+	}
+	if (status == WalkingRight) {
+		x += 2;
+	}
+	else {
+		x -= 2;
+	}
 	y = Kore::sin(x / 50.0f) * 20 + 50;
-	return false;
+	return (Kore::abs(x + width / 2 - px) < tileWidth * 0.25f && getFloor(y + height / 2) == getFloor(py));
 }
 
 void SmallMonster::render(Kore::Graphics2::Graphics2* g2, float camX, float camY) {
@@ -41,6 +54,10 @@ void SmallMonster::render(Kore::Graphics2::Graphics2* g2, float camX, float camY
 	++anim;
 	int index = anim / 20 % 2;
 	index = 0;
-	//g2->drawScaledSubImage(texture, width * index, 0, width, height, x - camX, y - camY, width, height);
-	g2->drawScaledSubImage(texture, width * (index + 1), 0, -width, height, x - camX, y - camY, width, height);
+	if (status == WalkingLeft) {
+		g2->drawScaledSubImage(texture, width * index, 0, width, height, x - camX, y - camY, width, height);
+	}
+	else {
+		g2->drawScaledSubImage(texture, width * (index + 1), 0, -width, height, x - camX, y - camY, width, height);
+	}
 }
