@@ -172,7 +172,7 @@ int getTileID(float px, float py) {
 
 vec2 findDoor(float lastX, float lastY) {
 	vec2 door = doors[Random::get(0, doorCount - 1)];
-	while (Kore::abs(door.x() - lastX <= 0.0001) && Kore::abs(door.y() - lastY <= 0.0001)) {
+	while (Kore::abs(door.x() - lastX) <= 0.0001 && Kore::abs(door.y() - lastY) <= 0.0001) {
 		door = doors[Random::get(0, doorCount - 1)];
 	}
 	return door;

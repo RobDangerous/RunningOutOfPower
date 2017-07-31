@@ -15,4 +15,7 @@ private:
 	float x, y;
 	float initX, initY;
 	int anim;
+	enum Status {
+		WalkingLeft, WalkingRight
+	} status;
 };
