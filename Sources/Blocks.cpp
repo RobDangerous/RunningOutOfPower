@@ -379,7 +379,16 @@ namespace {
 		Graphics4::setFloat2(mouseLocation, vec2(mx / w, my / h));
 		Graphics4::setInt(animLocation, anim);
 		Graphics4::setFloat(redLocation, red);
+#ifdef KORE_DIRECT3D
+		vec4 vec4lights[lightCount];
+		for (int i = 0; i < lightCount; ++i) {
+			vec4lights[i].x() = lights[i].x();
+			vec4lights[i].y() = lights[i].y();
+		}
+		Graphics4::setFloats(lightsLocation, (float*)vec4lights, lightCount * 4);
+#else
 		Graphics4::setFloats(lightsLocation, (float*)lights, lightCount * 2);
+#endif
 		Graphics4::setFloat(energyLocation, flakyEnergy(energy));
 		Graphics4::setFloat(topLocation, (py - camY - 32) / h);
 		Graphics4::setFloat(bottomLocation, (py - camY + 128) / h);
