@@ -70,6 +70,7 @@ namespace {
 	Graphics4::ConstantLocation topLocation;
 	Graphics4::ConstantLocation bottomLocation;
 	Graphics4::ConstantLocation lightOnLocation;
+	Graphics4::ConstantLocation clampDistanceLocation;
 
 	bool dead = false;
 	float energy = 1.0f;
@@ -225,6 +226,7 @@ namespace {
 		topLocation = pipeline->getConstantLocation("top");
 		bottomLocation = pipeline->getConstantLocation("bottom");
 		lightOnLocation = pipeline->getConstantLocation("lightOn");
+		clampDistanceLocation = pipeline->getConstantLocation("clampDistance");
 	}
 
 	float flakyEnergy(float energy) {
@@ -692,6 +694,7 @@ namespace {
 				Graphics4::setBool(lightOnLocation, anim < 60 * 4);
 			}
 		}
+		Graphics4::setBool(clampDistanceLocation, state != Start);
 		if (!inCloset) g2->drawScaledSubImage(screen, 0, 0, w, h, 0, 0, w * 2, h * 2);
 	//	g2->end();
 		g2->setPipeline(nullptr);
