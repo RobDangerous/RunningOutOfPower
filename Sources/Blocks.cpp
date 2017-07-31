@@ -302,7 +302,7 @@ namespace {
 		++frameCount;
 		++anim;
 
-		vec3 playerCenter;
+		vec3 playerCenter = vec3(px + playerWidth / 2, py + playerHeight / 2, 0.f);
 		vec3 flashlightPosRel;
 		vec3 flashlightPosAbs;
 		vec3 flashlightRay0;
@@ -328,14 +328,15 @@ namespace {
 			if (!inCloset) {
 				if (left && px >= -10) {
 					px -= 4;
+					playerCenter = vec3(px + playerWidth / 2, py + playerHeight / 2, 0.f);
 				}
 				if (right && px <= columns * tileWidth - 70) {
 					px += 4;
+					playerCenter = vec3(px + playerWidth / 2, py + playerHeight / 2, 0.f);
 				}
 			}
 		
 			// Draw buttons
-			playerCenter = vec3(px + playerWidth / 2, py + playerHeight / 2, 0.f);
 			int tile = getTileID(playerCenter.x(), playerCenter.y());
 			if (tile == Door) {
 				helpText = doorText;
