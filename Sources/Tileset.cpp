@@ -64,6 +64,15 @@ void loadCsv(const char* csvFile) {
 	}
 }
 
+void resetSpiders()
+{
+	for (int i = 0; i < spiderCountCurr; ++i)
+	{
+		spiderState[i] = Spider1;
+		spiderCooldownCurr[i] = 0;
+	}
+}
+
 void drawTiles(Graphics2::Graphics2* g2, float camX, float camY, vec2* lights) {
 	int lightIndex = 0;
 

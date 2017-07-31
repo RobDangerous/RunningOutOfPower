@@ -16,12 +16,14 @@ namespace {
 	int doorLock;
 }
 
-Monster::Monster() : x(400), y(0) {
+Monster::Monster() : initX(400), initY(0) {
 
 }
 
-void Monster::position() {
-	y = tileHeight - height;
+void Monster::reset() {
+	x = initX;
+	y = initY + tileHeight - height;
+	anim = 0;
 	status = WalkingRight;
 }
 
