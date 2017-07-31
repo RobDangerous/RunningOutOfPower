@@ -750,6 +750,7 @@ namespace {
 
 int kore(int argc, char** argv) {
 	System::init("Power", w * 2, h * 2);
+	Random::init(static_cast<int>(System::time() * 1000));
 	startTime = System::time();
 	
 	initTiles("Tiles/school.csv", "Tiles/school.png");
@@ -761,7 +762,6 @@ int kore(int argc, char** argv) {
     //Sound::init();
 	Audio1::init();
 	Audio2::init();
-	Random::init(static_cast<int>(System::time() * 1000));
 
 	Kore::System::setCallback(update);
 
