@@ -83,6 +83,7 @@ namespace {
 	const char* const closetOutText = "Key Down: Get out of the closet";
 	const char* const switchLighOnText = "Key Up: Switch the light on";
 	const char* const switchLighOffText = "Key Down: Switch the light off";
+	const char* const skipText = "Skip";
 	
 	int frameCount = 0;
 	
@@ -102,6 +103,7 @@ namespace {
 	vec4 doorButton;
 	vec4 closetButton;
 	vec2 debugText;
+	vec4 skipButton;
 	
 	const int monsterCount = 1;
 	Monster monsters[monsterCount];
@@ -443,6 +445,7 @@ namespace {
 		if (state == Start) {
 			g2->drawImage(intro, 0, 0);
 		}
+		
 		static float red = 0;
 		if (dead) {
 			fightIndex = (frameCount / 10) % 4;
@@ -513,6 +516,9 @@ namespace {
 	//	g2->begin();
 		if (state == Game) {
 			drawGUI();
+		} else if (state == Start) {
+			g2->setFontColor(Graphics1::Color::White);
+			g2->drawString(skipText, skipButton.x(), skipButton.y());
 		}
 		
 		// Draw battery status
@@ -614,6 +620,11 @@ namespace {
 			hideInTheCloset();
 		}
 		
+		if (x > skipButton.x() && y > skipButton.y() && x < skipButton.x() + skipButton.z() && y < skipButton.y() + skipButton.w()) {
+			log(Info, "skip button pressed");
+			state = Game;
+		}
+		
 	}
 }
 
@@ -667,6 +678,8 @@ int kore(int argc, char** argv) {
 	doorButton = vec4(10, h * 2 - 80, g2->getFont()->stringWidth(doorText), 20); // xPos, yPos, width, height
 	closetButton = vec4(10, h * 2 - 50, g2->getFont()->stringWidth(closetInText), 20);
 	debugText = vec2(w * 2 / 2, h * 2 - 80);
+	
+	skipButton = vec4(w * 2 - g2->getFont()->stringWidth(skipText) - 10, 10, g2->getFont()->stringWidth(skipText), 20);
 
 	Keyboard::the()->KeyDown = keyDown;
 	Keyboard::the()->KeyUp = keyUp;
