@@ -267,7 +267,10 @@ namespace {
 		if (tile == LightSwitch) {
 			lightOn = !lightOn;
 			
-			if (lightOn) log(Info, "WON!");
+			if (lightOn) {
+				log(Info, "WON!");
+				state = End;
+			}
 			return true;
 		} else {
 			return false;
