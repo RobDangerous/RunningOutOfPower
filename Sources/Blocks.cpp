@@ -47,6 +47,8 @@ namespace {
 	Graphics4::Texture* batteryImage;
 	
 	Graphics4::Texture* fightImage;
+	
+	Graphics4::Texture* spiderAnimImage;
 
 	Graphics4::RenderTarget* screen;
 	Graphics4::PipelineState* pipeline;
@@ -503,12 +505,18 @@ namespace {
 		}
 
 		if (dead) {
-			fightIndex = (frameCount / 10) % 4;
 			energy = 0;
 			
-			g2->drawScaledSubImage(fightImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX - 20, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
-			
-			//red = Kore::min(red + 0.1f, 1.f);
+			int tile = getTileID(px + playerWidth / 2, py + playerHeight / 2);
+			if (tile >= Spider1 && tile < Spider9) {
+				if (fightIndex < 6) fightIndex = frameCount / 10;
+				//g2->drawScaledSubImage(spiderAnimImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX - 20, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
+				g2->drawScaledSubImage(spiderAnimImage, fightIndex * playerWidth, 0, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+				g2->drawScaledSubImage(spiderAnimImage, fightIndex * playerWidth * 2, playerHeight, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+			} else {
+				fightIndex = (frameCount / 10) % 4;
+				g2->drawScaledSubImage(fightImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX - 20, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
+			}
 		}
 		
 		g2->end();
@@ -706,6 +714,7 @@ int kore(int argc, char** argv) {
 	batteryImage = new Graphics4::Texture("Tiles/battery.png");
 	
 	fightImage = new Graphics4::Texture("Tiles/fight.png");
+	spiderAnimImage = new Graphics4::Texture("playerSpiderAnim.png");
 
 	SoundStream* music = new SoundStream("loop.ogg", true);
 	Audio1::play(music);
