@@ -1,6 +1,6 @@
 # Lightmare
 
-Entry for [Ludum Dare 39](https://aoe-maniac.itch.io/lightmare) and the topic "Running out of Power".
+Entry for [Ludum Dare 39](https://ldjam.com/events/ludum-dare/39/lightmare) and the topic "Running out of Power".
 
 In school. Lights out. Don’t die!
 
