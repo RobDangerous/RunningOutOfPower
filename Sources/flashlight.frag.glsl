@@ -107,11 +107,13 @@ void main() {
 
 	scale += easeOutQuart(1.0 - clamp(tdistance * 5.0, 0.0, 1.0));
 
-	for (int i = 0; i < 8; ++i) {
-		float difx = (texCoord.x - lights[i].x) * aspect;
-		float dify = texCoord.y - lights[i].y;
-		float dist = sqrt(difx * difx + dify * dify);
-		scale += easeOutQuad(1.0 - clamp(dist * 7.5, 0.0, 1.0));
+	if (clampDistance) {
+		for (int i = 0; i < 8; ++i) {
+			float difx = (texCoord.x - lights[i].x) * aspect;
+			float dify = texCoord.y - lights[i].y;
+			float dist = sqrt(difx * difx + dify * dify);
+			scale += easeOutQuad(1.0 - clamp(dist * 7.5, 0.0, 1.0));
+		}
 	}
 
 	scale = clamp(scale, 0.0, 1.0);
