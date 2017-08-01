@@ -5,15 +5,19 @@
 
 class Monster {
 public:
+	enum MonsterTyp {
+		Teacher, Janitor, Book
+	} monsterTyp;
 	
 	Monster();
 	void reset(bool firstFloor);
-	void init(const char* textureName, int animTiles);
+	void init(const char* textureName, int animTiles, MonsterTyp typ);
 	bool update(float px, float py, float fx, float fy, float mx_world, float my_world, float energy);
 	void render(Kore::Graphics2::Graphics2* g2, float camX, float camY);
 	void changeFloor();
 	
 	float x, y;
+	MonsterTyp typ;
 
 private:
 	float initX, initY;
@@ -30,4 +34,5 @@ private:
 	enum Status {
 		WalkingLeft, WalkingRight, StandingLeft, StandingRight
 	} status;
+	
 };

@@ -30,12 +30,13 @@ void Monster::reset(bool firstFloor) {
 	log(Info, "Monster at floor %i", getFloor(y));
 }
 
-void Monster::init(const char* textureName, int animTiles) {
+void Monster::init(const char* textureName, int animTiles, MonsterTyp typ) {
 	texture = new Graphics4::Texture(textureName);
 	width = texture->width / animTiles;
 	height = texture->height / 1;
 	//doorLock = 0;
 	this->animTiles = animTiles;
+	this->typ = typ;
 }
 
 bool Monster::update(float px, float py, float fx, float fy, float mx_world, float my_world, float energy) {

@@ -49,6 +49,7 @@ namespace {
 	Graphics4::Texture* batteryImage;
 	
 	Graphics4::Texture* fightImage;
+	Graphics4::Texture* bookSnakeImage;
 	
 	Graphics4::Texture* spiderAnimImage;
 
@@ -73,6 +74,7 @@ namespace {
 	Graphics4::ConstantLocation clampDistanceLocation;
 
 	bool dead = false;
+	Monster::MonsterTyp deadMonster = Monster::MonsterTyp::Janitor;
 	float energy = 1.0f;
 	
 	float px = 0;
@@ -109,6 +111,7 @@ namespace {
 	int chargeIndex = 0;
 	int doorIndex = 0;
 	int fightIndex = 0;
+	int bookStoneIndex = 0;
 	
 	Kravur* font14;
 	Kravur* font24;
@@ -163,6 +166,8 @@ namespace {
 		inCloset = false;
 		takeDoor = false;
 		doorAnim = false;
+		
+		deadMonster = Monster::MonsterTyp::Janitor;
 
 		frameCount = 0;
 		anim = 0;
@@ -172,6 +177,7 @@ namespace {
 		chargeIndex = 0;
 		doorIndex = 0;
 		fightIndex = 0;
+		bookStoneIndex = 0;
 
 		sprintf(dText, "");
 		dTime = 0;
@@ -504,6 +510,12 @@ namespace {
 
 				//}
 				dead |= (monsters[i]->update(playerCenter.x(), playerCenter.y(), flashlightPosAbs.x(), flashlightPosAbs.y(), mx + camX, my + camY, energy) && !inCloset);
+				
+				if (dead) {
+					deadMonster = monsters[i]->typ;
+					break;
+				}
+				
 			}
 
 			for (int i = 0; i < smallMonsterCount; ++i) {
@@ -626,7 +638,13 @@ namespace {
 				g2->drawScaledSubImage(spiderAnimImage, fightIndex * playerWidth * 2, playerHeight, -playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
 			} else {
 				fightIndex = (frameCount / 10) % 4;
-				g2->drawScaledSubImage(fightImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX - 20, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
+				bookStoneIndex = Kore::min(frameCount / 20, 5);
+				
+				if (deadMonster == Monster::MonsterTyp::Teacher || deadMonster == Monster::MonsterTyp::Book) {
+					g2->drawScaledSubImage(bookSnakeImage, bookStoneIndex * playerWidth, 0, playerWidth, playerHeight, px - camX, py - camY, playerWidth, playerHeight);
+				} else {
+					g2->drawScaledSubImage(fightImage, fightIndex * tileWidth, 0, tileWidth, tileHeight, px - camX - 20, getFloor(py) * tileHeight - camY, tileWidth, tileHeight);
+				}
 			}
 		}
 
@@ -849,16 +867,16 @@ int kore(int argc, char** argv) {
 
 	monsters = new Monster*[monsterCount];
 	janitor1 = new Monster();
-	janitor1->init("janitor.png", 4);
+	janitor1->init("janitor.png", 4, Monster::MonsterTyp::Janitor);
 	monsters[0] = janitor1;
 	janitor2 = new Monster();
-	janitor2->init("janitor.png", 4);
+	janitor2->init("janitor.png", 4, Monster::MonsterTyp::Janitor);
 	monsters[1] = janitor2;
 	book = new Monster();
-	book->init("book.png", 8);
+	book->init("book.png", 8, Monster::MonsterTyp::Book);
 	monsters[2] = book;
 	teacher = new Monster();
-	teacher->init("teacher.png", 8);
+	teacher->init("teacher.png", 8, Monster::MonsterTyp::Teacher);
 	monsters[3] = teacher;
 	
 	SmallMonster::init();
@@ -867,6 +885,7 @@ int kore(int argc, char** argv) {
 	batteryImage = new Graphics4::Texture("Tiles/battery.png");
 	
 	fightImage = new Graphics4::Texture("Tiles/fight.png");
+	bookSnakeImage = new Graphics4::Texture("playerBookAnim.png");
 	spiderAnimImage = new Graphics4::Texture("playerSpiderAnim.png");
 
 	font14 = Kravur::load("Fonts/arial", FontStyle(), 14);
