@@ -21,6 +21,8 @@
 #include "SmallMonster.h"
 #include "Tileset.h"
 
+#include <stdio.h>
+
 using namespace Kore;
 
 namespace {
@@ -367,8 +369,6 @@ namespace {
 			}
 
 			if (!inCloset && !doorAnim) {
-				static int i = 0;
-				log(Info, "move %i", i++);
 				if ((target - cam).getLength() < 16.0f) {
 					if (left && px >= -10) {
 						px -= 4;
